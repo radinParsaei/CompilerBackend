@@ -1,4 +1,7 @@
+import java.util.HashMap;
+
 public class SyntaxTree {
+  private static HashMap<String, ValueBase> variables = new HashMap<>();
   public static class Number extends ValueBase {
     public Number(java.lang.Number number){
       this.setData(number);
@@ -9,6 +12,46 @@ public class SyntaxTree {
    public Text(String text) {
      this.setData(text);
    }
+  }
+
+  public static class Variable extends ValueBase implements java.io.Serializable {
+    private String variableName;
+    public Variable(String variableName) {
+      this.variableName = variableName;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase tmp = variables.get(variableName);
+      if (tmp == null) Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, variableName);
+      return tmp;
+    }
+
+    public String getVariableName() {
+      return variableName;
+    }
+  }
+
+  public static class SetVariable extends ProgramBase implements java.io.Serializable {
+    private String variableName;
+    private ValueBase value;
+    public SetVariable(String variableName, ValueBase value) {
+      this.variableName = variableName;
+      this.value = value;
+    }
+
+    @Override
+    void eval() {
+      variables.put(variableName, value);
+    }
+
+    public String getVariableName() {
+      return variableName;
+    }
+
+    public ValueBase getVariableValue() {
+      return value;
+    }
   }
 
   public static class Programs extends ProgramBase implements java.io.Serializable {
