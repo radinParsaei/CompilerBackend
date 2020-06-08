@@ -7,8 +7,8 @@ public class Main {
     ValueBase[] vals = {val, new SyntaxTree.Text("Hello World")};
     ProgramBase program = new SyntaxTree.Programs(
           new SyntaxTree.SetVariable("a", new SyntaxTree.Number(10.5)),
-          new SyntaxTree.SetVariable("b", new SyntaxTree.Number(10)),
-          new SyntaxTree.Print(new SyntaxTree.Variable("a"), new SyntaxTree.Variable("b"), new SyntaxTree.Number(10), new SyntaxTree.Text(".")).setSeparator(new SyntaxTree.Text("\t"))
+          new SyntaxTree.SetVariable("b", new SyntaxTree.Text("Hello")),
+          new SyntaxTree.Print(new SyntaxTree.Variable("a"), new SyntaxTree.Add(new SyntaxTree.Variable("b"), new SyntaxTree.Number(10)), new SyntaxTree.Text(".")).setSeparator(new SyntaxTree.Text("\t"))
     );
     // program.eval();
     serializer.serialize("file.ser", program);

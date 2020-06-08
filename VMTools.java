@@ -18,6 +18,10 @@ public class VMTools {
         }
         output.append("PUT\tNUM").append(a);
         output.append("\nEQ\nIFTRUN\nPOP\nPUT\tNUM0\nMEMGET\nPUT\tNUM2\nADD\nPUT\tNUM0\nMEMSET\nEND\nPUT\tNUM2\nMEMSIZE\nDIV\nREPEAT\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPUT\tNUM0\nMEMGET\nMEMGET\nPUT\tNUM-1\nPUT\tNUM0\nMEMSET\n");
+      } else if (val instanceof SyntaxTree.Add) {
+        output.append(putVals(((SyntaxTree.Add)val).getV2()));
+        output.append(putVals(((SyntaxTree.Add)val).getV1()));
+        output.append("ADD\n");
       }
     }
     return output.toString();

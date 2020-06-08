@@ -54,6 +54,38 @@ public class SyntaxTree {
     }
   }
 
+  public static class Add extends ValueBase implements java.io.Serializable {
+    private ValueBase v1, v2;
+    public Add(ValueBase v1, ValueBase v2) {
+      this.v1 = v1;
+      this.v2 = v2;
+    }
+
+    @Override
+    public Object getData() {
+      if (v1 instanceof Variable) {
+        v1 = (ValueBase)v1.getData();
+      }
+      if (v2 instanceof Variable) {
+        v2 = (ValueBase)v2.getData();
+      }
+      if (v1 instanceof Number && v2 instanceof Number) {
+        return ((java.lang.Number)v1.getData()).doubleValue() + ((java.lang.Number)v2.getData()).doubleValue();
+      } else {
+        return v1.toString() + v2.toString();
+      }
+    }
+
+    public ValueBase getV1() {
+      return v1;
+    }
+
+    public ValueBase getV2() {
+      return v2;
+    }
+  }
+
+
   public static class Programs extends ProgramBase implements java.io.Serializable {
     private ProgramBase[] programs;
     public Programs(ProgramBase... programs) {
