@@ -51,8 +51,10 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.SetVariable)program).getVariableValue())).append("MEMPUT\n");
       } else {
         output.append(putVals(((SyntaxTree.SetVariable)program).getVariableValue()));
-        output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable)program).getVariableName()) * 2).append("\n");
-        output.append("MEMSET\n");
+        output.append("REC\nPUT\tNUM0\nMEMGET\nPUT\tNUM-1\nEQ\nEND\nPUT\tNUM0\nMEMGET\nPUT\tNUM-1\nEQ\nWFRUN\nPUT NUM1\nPUT\tNUM0\nMEMSET\n");
+        output.append("REC\nPUT\tNUM0\nMEMGET\nPUT\tNUM1\nADD\nPUT\tNUM0\nMEMSET\nBREAK\nEND\nREC\nPUT\tNUM0\nMEMGET\nMEMGET\n");
+        output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable)program).getVariableName()));
+        output.append("\nEQ\nIFTRUN\nPOP\nPUT\tNUM0\nMEMGET\nPUT\tNUM2\nADD\nPUT\tNUM0\nMEMSET\nEND\nPUT\tNUM2\nMEMSIZE\nDIV\nREPEAT\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPUT\tNUM0\nMEMGET\nPUT\tNUM-1\nPUT\tNUM0\nMEMSET\nMEMSET\n");
       }
     }
     return output.toString();
