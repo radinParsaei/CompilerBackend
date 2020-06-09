@@ -1,6 +1,6 @@
 classes=$(subst .java,, $(foreach java-source, $(wildcard *.java), $(java-source).class))
-all: jar # native-image
-jar: $(classes)
+all: output.jar # native-image
+output.jar: $(classes)
 	echo Manifest-Version: 1.0 > manifest.txt
 	echo Main-Class: Main >> manifest.txt
 	jar cvfm output.jar manifest.txt *.class
