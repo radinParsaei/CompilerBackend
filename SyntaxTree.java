@@ -1,10 +1,20 @@
 import java.util.HashMap;
 
 public class SyntaxTree {
+  Object objectToValue(Object object) {
+   if (object instanceof java.lang.Number) {
+     return new SyntaxTree.Number((java.lang.Number)object);
+   } else if (object instanceof String) {
+     return new SyntaxTree.Text((String)object);
+   }
+   return (ValueBase)object;
+ }
+
   private static HashMap<String, ValueBase> variables = new HashMap<>();
   public static class Number extends ValueBase {
     public Number(java.lang.Number number){
-      this.setData(number);
+      if (number.doubleValue() == number.intValue()) this.setData(number.intValue());
+      else this.setData(number);
     }
   }
 
@@ -70,9 +80,9 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return ((java.lang.Number)v1.getData()).doubleValue() + ((java.lang.Number)v2.getData()).doubleValue();
+        return new Number(((java.lang.Number)v1.getData()).doubleValue() + ((java.lang.Number)v2.getData()).doubleValue());
       } else {
-        return v1.toString() + v2.toString();
+        return new Text(v1.toString() + v2.toString());
       }
     }
 
@@ -101,9 +111,9 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return ((java.lang.Number)v1.getData()).doubleValue() - ((java.lang.Number)v2.getData()).doubleValue();
+        return new Number(((java.lang.Number)v1.getData()).doubleValue() - ((java.lang.Number)v2.getData()).doubleValue());
       } else {
-        return v1.toString().replace(v2.toString(), "");
+        return new Text(v1.toString().replace(v2.toString(), ""));
       }
     }
 
