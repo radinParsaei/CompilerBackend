@@ -8,7 +8,7 @@ public class Main {
     ProgramBase program = new SyntaxTree.Programs(
           new SyntaxTree.SetVariable("a", new SyntaxTree.Number(10.5)),
           new SyntaxTree.SetVariable("b", new SyntaxTree.Text("Hello")),
-          new SyntaxTree.Print(new SyntaxTree.Variable("a"), new SyntaxTree.Add(new SyntaxTree.Variable("b"), new SyntaxTree.Number(10)), new SyntaxTree.Text(".")).setSeparator(new SyntaxTree.Text("\t"))
+          new SyntaxTree.Print(new SyntaxTree.Variable("b"), new SyntaxTree.Sub(new SyntaxTree.Add(new SyntaxTree.Variable("a"), new SyntaxTree.Number(10)), new SyntaxTree.Number(5)), new SyntaxTree.Text(".")).setSeparator(new SyntaxTree.Text("\t"))
     );
     // program.eval();
     serializer.serialize("file.ser", program);

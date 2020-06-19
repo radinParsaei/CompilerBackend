@@ -73,11 +73,12 @@ public class SyntaxTree {
 
     @Override
     public Object getData() {
-      if (v1 instanceof Variable) {
+      ValueBase v1 = this.v1, v2 = this.v2;
+      if (!(v1 instanceof Number || v1 instanceof Text)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (v2 instanceof Variable) {
-        v2 = (ValueBase)v2.getData();
+      if (!(v1 instanceof Number || v1 instanceof Text)) {
+        v1 = (ValueBase)v1.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((java.lang.Number)v1.getData()).doubleValue() + ((java.lang.Number)v2.getData()).doubleValue());
@@ -104,11 +105,12 @@ public class SyntaxTree {
 
     @Override
     public Object getData() {
-      if (v1 instanceof Variable) {
+      ValueBase v1 = this.v1, v2 = this.v2;
+      if (!(v1 instanceof Number || v1 instanceof Text)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (v2 instanceof Variable) {
-        v2 = (ValueBase)v2.getData();
+      if (!(v1 instanceof Number || v1 instanceof Text)) {
+        v1 = (ValueBase)v1.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((java.lang.Number)v1.getData()).doubleValue() - ((java.lang.Number)v2.getData()).doubleValue());
