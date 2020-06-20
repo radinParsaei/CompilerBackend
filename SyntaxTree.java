@@ -128,6 +128,51 @@ public class SyntaxTree {
     }
   }
 
+  public static class Mul extends ValueBase implements java.io.Serializable {
+    private ValueBase v1, v2;
+    public Mul(ValueBase v1, ValueBase v2) {
+      this.v1 = v1;
+      this.v2 = v2;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase v1 = this.v1, v2 = this.v2;
+      if (!(v1 instanceof Number || v1 instanceof Text)) {
+        v1 = (ValueBase)v1.getData();
+      }
+      if (!(v1 instanceof Number || v1 instanceof Text)) {
+        v1 = (ValueBase)v1.getData();
+      }
+      if (v1 instanceof Number && v2 instanceof Number) {
+        return new Number(((java.lang.Number)v1.getData()).doubleValue() * ((java.lang.Number)v2.getData()).doubleValue());
+      } else if (v1 instanceof Number) {
+        StringBuilder result = new StringBuilder();
+        for(int i = 0; i < ((java.lang.Number)v1.getData()).intValue(); i++) {
+          result.append(v2.getData());
+        }
+        return new Text(result.toString());
+      } else if (v2 instanceof Number) {
+        StringBuilder result = new StringBuilder();
+        for(int i = 0; i < ((java.lang.Number)v2.getData()).intValue(); i++) {
+          result.append(v1.getData());
+        }
+        return new Text(result.toString());
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR * STR");
+        return new Number(0);
+      }
+    }
+
+    public ValueBase getV1() {
+      return v1;
+    }
+
+    public ValueBase getV2() {
+      return v2;
+    }
+  }
+
   public static class Programs extends ProgramBase implements java.io.Serializable {
     private ProgramBase[] programs;
     public Programs(ProgramBase... programs) {
