@@ -34,6 +34,10 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.Div)val).getV2()));
         output.append(putVals(((SyntaxTree.Div)val).getV1()));
         output.append("DIV\n");
+      } else if (val instanceof SyntaxTree.Mod) {
+        output.append(putVals(((SyntaxTree.Mod)val).getV2()));
+        output.append(putVals(((SyntaxTree.Mod)val).getV1()));
+        output.append("MOD\n");
       }
     }
     return output.toString();
