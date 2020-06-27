@@ -239,6 +239,34 @@ public class SyntaxTree {
     }
   }
 
+  public static class Equals extends ValueBase implements java.io.Serializable {
+    private ValueBase v1, v2;
+    public Equals(ValueBase v1, ValueBase v2) {
+      this.v1 = v1;
+      this.v2 = v2;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase v1 = this.v1, v2 = this.v2;
+      if (!(v1 instanceof Number || v1 instanceof Text)) {
+        v1 = (ValueBase)v1.getData();
+      }
+      if (!(v2 instanceof Number || v2 instanceof Text)) {
+        v2 = (ValueBase)v2.getData();
+      }
+      return v1.toString().equals(v2.toString())? new SyntaxTree.Number(1) : new SyntaxTree.Number(0);
+    }
+
+    public ValueBase getV1() {
+      return v1;
+    }
+
+    public ValueBase getV2() {
+      return v2;
+    }
+  }
+
   public static class Programs extends ProgramBase implements java.io.Serializable {
     private ProgramBase[] programs;
     public Programs(ProgramBase... programs) {
