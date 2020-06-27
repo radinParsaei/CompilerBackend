@@ -77,8 +77,8 @@ public class SyntaxTree {
       if (!(v1 instanceof Number || v1 instanceof Text)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
-        v1 = (ValueBase)v1.getData();
+      if (!(v2 instanceof Number || v2 instanceof Text)) {
+        v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((java.lang.Number)v1.getData()).doubleValue() + ((java.lang.Number)v2.getData()).doubleValue());
@@ -109,8 +109,8 @@ public class SyntaxTree {
       if (!(v1 instanceof Number || v1 instanceof Text)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
-        v1 = (ValueBase)v1.getData();
+      if (!(v2 instanceof Number || v2 instanceof Text)) {
+        v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((java.lang.Number)v1.getData()).doubleValue() - ((java.lang.Number)v2.getData()).doubleValue());
@@ -141,8 +141,8 @@ public class SyntaxTree {
       if (!(v1 instanceof Number || v1 instanceof Text)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
-        v1 = (ValueBase)v1.getData();
+      if (!(v2 instanceof Number || v2 instanceof Text)) {
+        v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((java.lang.Number)v1.getData()).doubleValue() * ((java.lang.Number)v2.getData()).doubleValue());
@@ -186,8 +186,8 @@ public class SyntaxTree {
       if (!(v1 instanceof Number || v1 instanceof Text)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
-        v1 = (ValueBase)v1.getData();
+      if (!(v2 instanceof Number || v2 instanceof Text)) {
+        v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((java.lang.Number)v1.getData()).doubleValue() / ((java.lang.Number)v2.getData()).doubleValue());
@@ -219,8 +219,8 @@ public class SyntaxTree {
       if (!(v1 instanceof Number || v1 instanceof Text)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
-        v1 = (ValueBase)v1.getData();
+      if (!(v2 instanceof Number || v2 instanceof Text)) {
+        v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((java.lang.Number)v1.getData()).doubleValue() % ((java.lang.Number)v2.getData()).doubleValue());
