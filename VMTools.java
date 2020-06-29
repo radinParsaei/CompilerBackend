@@ -42,6 +42,10 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.Equals)val).getV2()));
         output.append(putVals(((SyntaxTree.Equals)val).getV1()));
         output.append("EQ\n");
+       }else if (val instanceof SyntaxTree.StrictEquals) {
+        output.append(putVals(((SyntaxTree.StrictEquals)val).getV2()));
+        output.append(putVals(((SyntaxTree.StrictEquals)val).getV1()));
+        output.append("FEQ\n");
       }
     }
     return output.toString();
