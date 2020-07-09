@@ -347,7 +347,7 @@ public class SyntaxTree {
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number((((java.lang.Number)v1.getData()).doubleValue() >= ((java.lang.Number)v2.getData()).doubleValue())? 1:0);
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR in >");
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR in >=");
         return new Number(0);
       }
     }
