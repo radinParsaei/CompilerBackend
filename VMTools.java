@@ -8,7 +8,7 @@ public class VMTools {
       if (val instanceof SyntaxTree.Number) {
         output.append("PUT\tNUM").append(val.getData()).append("\n");
       } else if (val instanceof SyntaxTree.Text) {
-        output.append("PUT\tTXT").append(val.getData()).append("\n");
+        output.append("PUT\tTXT").append(val.getData().toString().replace("\n", "\\n")).append("\n");
       } else if (val instanceof SyntaxTree.Variable) {
         output.append("REC\nPUT\tNUM0\nMEMGET\nPUT\tNUM-1\nEQ\nEND\nPUT\tNUM0\nMEMGET\nPUT\tNUM-1\nEQ\nWFRUN\nPUT NUM1\nPUT\tNUM0\nMEMSET\n");
         output.append("REC\nPUT\tNUM0\nMEMGET\nPUT\tNUM1\nADD\nPUT\tNUM0\nMEMSET\nBREAK\nEND\nREC\nPUT\tNUM0\nMEMGET\nMEMGET\n");
