@@ -58,6 +58,10 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.LesserThan)val).getV2()));
         output.append(putVals(((SyntaxTree.LesserThan)val).getV1()));
         output.append("LT\n");
+      } else if (val instanceof SyntaxTree.LesserThanOrEqual) {
+        output.append(putVals(((SyntaxTree.LesserThanOrEqual)val).getV2()));
+        output.append(putVals(((SyntaxTree.LesserThanOrEqual)val).getV1()));
+        output.append("LE\n");
       }
     }
     return output.toString();
