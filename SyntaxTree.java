@@ -427,6 +427,30 @@ public class SyntaxTree {
     }
   }
 
+  public static class Negative extends ValueBase implements java.io.Serializable {
+    private ValueBase value;
+    public Negative(ValueBase value) {
+      this.value = value;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase value = this.value;
+      if (!(value instanceof Number || value instanceof Text)) {
+        value = (ValueBase)value.getData();
+      }
+      if (value instanceof Number) {
+        return new Number(-(((java.lang.Number)value.getData()).doubleValue()));
+      } else {
+        return new Text(new StringBuilder((String)value.getData()).reverse().toString());
+      }
+    }
+
+    public ValueBase getValue() {
+      return value;
+    }
+  }
+
   public static class Programs extends ProgramBase implements java.io.Serializable {
     private ProgramBase[] programs;
     public Programs(ProgramBase... programs) {
