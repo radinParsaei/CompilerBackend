@@ -65,6 +65,9 @@ public class VMTools {
       } else if (val instanceof SyntaxTree.Negative) {
         output.append(putVals(((SyntaxTree.Negative)val).getValue()));
         output.append("NEG\n");
+      } else if (val instanceof SyntaxTree.Not) {
+        output.append(putVals(((SyntaxTree.Not)val).getValue()));
+        output.append("LNOT\n");
       }
     }
     return output.toString();

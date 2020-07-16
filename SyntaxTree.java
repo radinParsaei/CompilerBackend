@@ -451,6 +451,31 @@ public class SyntaxTree {
     }
   }
 
+  public static class Not extends ValueBase implements java.io.Serializable {
+    private ValueBase value;
+    public Not(ValueBase value) {
+      this.value = value;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase value = this.value;
+      if (!(value instanceof Number || value instanceof Text)) {
+        value = (ValueBase)value.getData();
+      }
+      if (value instanceof Number) {
+        return new Number((((java.lang.Number)value.getData()).doubleValue()) == 0? 1:0);
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR in !");
+        return new Number(0);
+      }
+    }
+
+    public ValueBase getValue() {
+      return value;
+    }
+  }
+
   public static class Programs extends ProgramBase implements java.io.Serializable {
     private ProgramBase[] programs;
     public Programs(ProgramBase... programs) {
