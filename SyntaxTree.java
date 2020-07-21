@@ -24,6 +24,23 @@ public class SyntaxTree {
    }
   }
 
+  public static class Boolean extends ValueBase {
+    public Boolean(boolean bool) {
+      this.setData(bool);
+    }
+
+    @Override
+    public String toString() {
+      return ((boolean)getData()? "True" : "False");
+    }
+  }
+
+  public static class Null extends ValueBase {
+    public Null() {
+      this.setData(null);
+    }
+  }
+
   public static class Variable extends ValueBase implements java.io.Serializable {
     private String variableName;
     public Variable(String variableName) {
@@ -74,10 +91,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -106,10 +123,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -138,29 +155,29 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((java.lang.Number)v1.getData()).doubleValue() * ((java.lang.Number)v2.getData()).doubleValue());
-      } else if (v1 instanceof Number) {
+      } else if (v1 instanceof Number && v2 instanceof Text) {
         StringBuilder result = new StringBuilder();
         for(int i = 0; i < ((java.lang.Number)v1.getData()).intValue(); i++) {
           result.append(v2.getData());
         }
         return new Text(result.toString());
-      } else if (v2 instanceof Number) {
+      } else if (v2 instanceof Number && v1 instanceof Text) {
         StringBuilder result = new StringBuilder();
         for(int i = 0; i < ((java.lang.Number)v2.getData()).intValue(); i++) {
           result.append(v1.getData());
         }
         return new Text(result.toString());
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR * STR");
-        return new Number(0);
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL * STR | BOOL | NULL");
+        return new Null();
       }
     }
 
@@ -183,17 +200,17 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((java.lang.Number)v1.getData()).doubleValue() / ((java.lang.Number)v2.getData()).doubleValue());
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR in /");
-        return new Number(0);
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in /");
+        return new Null();
       }
     }
 
@@ -216,17 +233,17 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((java.lang.Number)v1.getData()).doubleValue() % ((java.lang.Number)v2.getData()).doubleValue());
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR in %");
-        return new Number(0);
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in %");
+        return new Null();
       }
     }
 
@@ -249,13 +266,20 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
-      return v1.toString().equals(v2.toString())? new SyntaxTree.Number(1) : new SyntaxTree.Number(0);
+      boolean equalAsBoolAndNumber = false;
+      if (v1 instanceof Boolean) {
+        v1 = new Number(((boolean)v1.getData())? 1 : 0);
+      }
+      if (v2 instanceof Boolean) {
+        v2 = new Number(((boolean)v2.getData())? 1 : 0);
+      }
+      return new SyntaxTree.Boolean(v1.toString().equals(v2.toString()) || equalAsBoolAndNumber);
     }
 
     public ValueBase getV1() {
@@ -277,13 +301,13 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
-      return (v1.toString().equals(v2.toString()) && v1 instanceof Number == v2 instanceof Number)? new SyntaxTree.Number(1) : new SyntaxTree.Number(0);
+      return new Boolean((v1.toString().equals(v2.toString()) && v1 instanceof Number == v2 instanceof Number));
     }
 
     public ValueBase getV1() {
@@ -305,17 +329,17 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Number((((java.lang.Number)v1.getData()).doubleValue() > ((java.lang.Number)v2.getData()).doubleValue())? 1:0);
+        return new Boolean((((java.lang.Number)v1.getData()).doubleValue() > ((java.lang.Number)v2.getData()).doubleValue()));
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR in >");
-        return new Number(0);
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in >");
+        return new Null();
       }
     }
 
@@ -338,17 +362,17 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Number((((java.lang.Number)v1.getData()).doubleValue() >= ((java.lang.Number)v2.getData()).doubleValue())? 1:0);
+        return new Boolean((((java.lang.Number)v1.getData()).doubleValue() >= ((java.lang.Number)v2.getData()).doubleValue()));
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR in >=");
-        return new Number(0);
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in >=");
+        return new Null();
       }
     }
 
@@ -371,17 +395,17 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Number((((java.lang.Number)v1.getData()).doubleValue() < ((java.lang.Number)v2.getData()).doubleValue())? 1:0);
+        return new Boolean((((java.lang.Number)v1.getData()).doubleValue() < ((java.lang.Number)v2.getData()).doubleValue()));
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR in <");
-        return new Number(0);
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in <");
+        return new Null();
       }
     }
 
@@ -404,17 +428,17 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Number((((java.lang.Number)v1.getData()).doubleValue() <= ((java.lang.Number)v2.getData()).doubleValue())? 1:0);
+        return new Boolean((((java.lang.Number)v1.getData()).doubleValue() <= ((java.lang.Number)v2.getData()).doubleValue()));
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR in <=");
-        return new Number(0);
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in <=");
+        return new Null();
       }
     }
 
@@ -436,14 +460,15 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase value = this.value;
-      if (!(value instanceof Number || value instanceof Text)) {
+      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean)) {
         value = (ValueBase)value.getData();
       }
       if (value instanceof Number) {
         return new Number(-(((java.lang.Number)value.getData()).doubleValue()));
-      } else {
+      } else if (value instanceof Text) {
         return new Text(new StringBuilder((String)value.getData()).reverse().toString());
       }
+      return value;
     }
 
     public ValueBase getValue() {
@@ -460,14 +485,16 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase value = this.value;
-      if (!(value instanceof Number || value instanceof Text)) {
+      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean)) {
         value = (ValueBase)value.getData();
       }
       if (value instanceof Number) {
-        return new Number((((java.lang.Number)value.getData()).doubleValue()) == 0? 1:0);
+        return new Boolean((((java.lang.Number)value.getData()).doubleValue()) == 0? true : false);
+      } else if (value instanceof Boolean) {
+        return new Boolean(!(boolean)value.getData());
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR in !");
-        return new Number(0);
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | NULL in !");
+        return new Null();
       }
     }
 
