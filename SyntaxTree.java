@@ -1,12 +1,18 @@
 import java.util.HashMap;
 
 public class SyntaxTree {
-  Object objectToValue(Object object) {
-   if (object instanceof java.lang.Number) {
-     return new SyntaxTree.Number((java.lang.Number)object);
-   } else if (object instanceof String) {
-     return new SyntaxTree.Text((String)object);
-   }
+  public static ValueBase objectToValue(Object object) {
+    try {
+      if (object instanceof java.lang.Number) {
+       return new SyntaxTree.Number((java.lang.Number)object);
+      } else if (object instanceof String) {
+       return new SyntaxTree.Text((String)object);
+      } else if (object instanceof Boolean || (boolean)object == true || (boolean)object == false) {
+       return new SyntaxTree.Boolean((boolean)object);
+      } else if (object == null) {
+       return new SyntaxTree.Null();
+      }
+    } catch (ClassCastException ignore) {}
    return (ValueBase)object;
  }
 
