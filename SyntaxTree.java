@@ -509,6 +509,35 @@ public class SyntaxTree {
     }
   }
 
+  public static class BitwiseNot extends ValueBase implements java.io.Serializable {
+    private ValueBase value;
+    public BitwiseNot(ValueBase value) {
+      this.value = value;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase value = this.value;
+      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean)) {
+        value = (ValueBase)value.getData();
+      }
+      if (value instanceof Number) {
+        return ~((java.lang.Number)value.getData()).intValue();
+      } else if (value instanceof Boolean) {
+        return (java.lang.Number)((boolean)value.getData()? -2:-1);
+      } else if (value instanceof Null) {
+        return -1;
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR in ~");
+        return new Null();
+      }
+    }
+
+    public ValueBase getValue() {
+      return value;
+    }
+  }
+
   public static class Programs extends ProgramBase implements java.io.Serializable {
     private ProgramBase[] programs;
     public Programs(ProgramBase... programs) {

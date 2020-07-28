@@ -72,6 +72,9 @@ public class VMTools {
       } else if (val instanceof SyntaxTree.Not) {
         output.append(putVals(((SyntaxTree.Not)val).getValue()));
         output.append("LNOT\n");
+      } else if (val instanceof SyntaxTree.BitwiseNot) {
+        output.append(putVals(((SyntaxTree.BitwiseNot)val).getValue()));
+        output.append("NOT\n");
       }
     }
     return output.toString();
