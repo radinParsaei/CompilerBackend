@@ -457,6 +457,39 @@ public class SyntaxTree {
     }
   }
 
+    public static class And extends ValueBase implements java.io.Serializable {
+      private ValueBase v1, v2;
+      public And(ValueBase v1, ValueBase v2) {
+        this.v1 = v1;
+        this.v2 = v2;
+      }
+
+      @Override
+      public Object getData() {
+        ValueBase v1 = this.v1, v2 = this.v2;
+        if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+          v1 = (ValueBase)v1.getData();
+        }
+        if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+          v2 = (ValueBase)v2.getData();
+        }
+        if (v1 instanceof Boolean && v2 instanceof Boolean) {
+          return new Boolean((boolean)v1.getData() && (boolean)v2.getData());
+        } else {
+          Errors.error(ErrorCodes.ERROR_TYPE, "STR | NUM | NULL in &&");
+          return new Null();
+        }
+      }
+
+      public ValueBase getV1() {
+        return v1;
+      }
+
+      public ValueBase getV2() {
+        return v2;
+      }
+    }
+
   public static class Negative extends ValueBase implements java.io.Serializable {
     private ValueBase value;
     public Negative(ValueBase value) {
