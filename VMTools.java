@@ -70,6 +70,10 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.And)val).getV2()));
         output.append(putVals(((SyntaxTree.And)val).getV1()));
         output.append("LAND\n");
+      } else if (val instanceof SyntaxTree.Or) {
+        output.append(putVals(((SyntaxTree.Or)val).getV2()));
+        output.append(putVals(((SyntaxTree.Or)val).getV1()));
+        output.append("LOR\n");
       } else if (val instanceof SyntaxTree.Negative) {
         output.append(putVals(((SyntaxTree.Negative)val).getValue()));
         output.append("NEG\n");
