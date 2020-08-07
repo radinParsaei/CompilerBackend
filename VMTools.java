@@ -120,6 +120,9 @@ public class VMTools {
           output.append("PRINT\n");
         }
       }
+    } else if (program instanceof SyntaxTree.Exit) {
+        output.append(putVals(((SyntaxTree.Exit)program).getStatus()));
+        output.append("EXIT\n");
     } else if (program instanceof SyntaxTree.SetVariable) {
       if (variables.get(((SyntaxTree.SetVariable)program).getVariableName()) == null) {
         variablesCounter++;

@@ -763,4 +763,25 @@ public class SyntaxTree {
       }
     }
   }
+
+  public static class Exit extends ProgramBase implements java.io.Serializable {
+    private ValueBase status;
+    public ValueBase getStatus() {
+      return this.status;
+    }
+    public Exit(ValueBase status) {
+      this.status = status;
+    }
+
+    @Override
+    void eval() {
+      if (status instanceof Number) {
+        System.exit((int)(java.lang.Number)status.getData());
+      } else if (status instanceof Null) {
+        System.exit(0);
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL in exit");
+      }
+    }
+  }
 }
