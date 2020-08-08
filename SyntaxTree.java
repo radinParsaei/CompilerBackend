@@ -601,6 +601,39 @@ public class SyntaxTree {
     }
   }
 
+  public static class LeftShift extends ValueBase implements java.io.Serializable {
+    private ValueBase v1, v2;
+    public LeftShift(ValueBase v1, ValueBase v2) {
+      this.v1 = v1;
+      this.v2 = v2;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase v1 = this.v1, v2 = this.v2;
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+        v1 = (ValueBase)v1.getData();
+      }
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+        v2 = (ValueBase)v2.getData();
+      }
+      if (v1 instanceof Number && v2 instanceof Number) {
+        return new Number((int)(java.lang.Number)v1.getData() << (int)(java.lang.Number)v2.getData());
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in <<");
+        return new Null();
+      }
+    }
+
+    public ValueBase getV1() {
+      return v1;
+    }
+
+    public ValueBase getV2() {
+      return v2;
+    }
+  }
+
   public static class Xor extends ValueBase implements java.io.Serializable {
     private ValueBase v1, v2;
     public Xor(ValueBase v1, ValueBase v2) {
