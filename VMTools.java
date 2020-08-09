@@ -86,6 +86,10 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.LeftShift)val).getV2()));
         output.append(putVals(((SyntaxTree.LeftShift)val).getV1()));
         output.append("LSHIFT\n");
+      } else if (val instanceof SyntaxTree.RightShift) {
+        output.append(putVals(((SyntaxTree.RightShift)val).getV2()));
+        output.append(putVals(((SyntaxTree.RightShift)val).getV1()));
+        output.append("RSHIFT\n");
       } else if (val instanceof SyntaxTree.BitwiseOr) {
         output.append(putVals(((SyntaxTree.BitwiseOr)val).getV2()));
         output.append(putVals(((SyntaxTree.BitwiseOr)val).getV1()));
