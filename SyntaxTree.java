@@ -841,8 +841,12 @@ public class SyntaxTree {
 
     @Override
     void eval() {
+      ValueBase status = this.status;
+      if (!(status instanceof Number || status instanceof Text || status instanceof Boolean)) {
+        status = (ValueBase)status.getData();
+      }
       if (status instanceof Number) {
-        System.exit((int)(java.lang.Number)status.getData());
+        System.exit(((java.lang.Number)status.getData()).intValue());
       } else if (status instanceof Null) {
         System.exit(0);
       } else {
