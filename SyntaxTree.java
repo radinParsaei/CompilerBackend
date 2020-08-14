@@ -854,4 +854,49 @@ public class SyntaxTree {
       }
     }
   }
+
+  public static class If extends ProgramBase implements java.io.Serializable {
+    private ValueBase condition;
+    private ProgramBase program;
+    private ProgramBase elseProgram;
+    public ValueBase getCondition() {
+      return this.condition;
+    }
+    public ProgramBase getProgram() {
+      return this.program;
+    }
+    public ProgramBase getElseProgram() {
+      return this.elseProgram;
+    }
+    public If addElse(ProgramBase elseProgram) {
+      this.elseProgram = elseProgram;
+      return this;
+    }
+    public If(ValueBase condition, ProgramBase program) {
+      this.condition = condition;
+      this.program = program;
+      this.elseProgram = elseProgram;
+    }
+
+    @Override
+    void eval() {
+      ValueBase condition = this.condition;
+      if (!(condition instanceof Number || condition instanceof Text || condition instanceof Boolean)) {
+        condition = (ValueBase)condition.getData();
+      }
+      boolean condition2 = false;
+      if (condition instanceof Number) {
+        condition2 = (int)(java.lang.Number)condition.getData() != 0;
+      } else if (condition instanceof Boolean) {
+        condition2 = (boolean)condition.getData();
+      } else if (condition instanceof Text) {
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR in If");
+      }
+      if (condition2) {
+        program.eval();
+      } else {
+        if (elseProgram != null) elseProgram.eval();
+      }
+    }
+  }
 }

@@ -128,9 +128,20 @@ public class VMTools {
           output.append("PRINT\n");
         }
       }
+    } else if (program instanceof SyntaxTree.If) {
+      ProgramBase programBase = ((SyntaxTree.If)program).getElseProgram();
+      String elseByteCode = SyntaxTreeToVMByteCode2(programBase);
+      output.append(putVals(new SyntaxTree.Number(elseByteCode.split("\n").length + 2 - (programBase == null? 1:0))));
+      output.append(putVals(((SyntaxTree.If)program).getCondition()));
+      output.append("TOBOOL\nIFSKIP\n");
+      output.append(elseByteCode);
+      String byteCode = SyntaxTreeToVMByteCode2(((SyntaxTree.If)program).getProgram());
+      output.append(putVals(new SyntaxTree.Number(byteCode.split("\n").length)));
+      output.append("SKIP\n");
+      output.append(byteCode);
     } else if (program instanceof SyntaxTree.Exit) {
-        output.append(putVals(((SyntaxTree.Exit)program).getStatus()));
-        output.append("EXIT\n");
+      output.append(putVals(((SyntaxTree.Exit)program).getStatus()));
+      output.append("EXIT\n");
     } else if (program instanceof SyntaxTree.SetVariable) {
       if (variables.get(((SyntaxTree.SetVariable)program).getVariableName()) == null) {
         variablesCounter++;
