@@ -75,6 +75,10 @@ public class SyntaxTree {
 
     @Override
     void eval() {
+      ValueBase value = this.value;
+      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null)) {
+        value = (ValueBase)value.getData();
+      }
       variables.put(variableName, value);
     }
 
@@ -875,7 +879,6 @@ public class SyntaxTree {
     public If(ValueBase condition, ProgramBase program) {
       this.condition = condition;
       this.program = program;
-      this.elseProgram = elseProgram;
     }
 
     @Override
