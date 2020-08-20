@@ -6,14 +6,20 @@ public class Main {
     SyntaxTreeSerializer serializer = new SyntaxTreeSerializer();
     ValueBase[] vals = {val, new SyntaxTree.Text("Hello World")};
     ProgramBase program = new SyntaxTree.Programs(
-          new SyntaxTree.SetVariable("a", new SyntaxTree.Number(10.5)),
-          new SyntaxTree.SetVariable("b", new SyntaxTree.Text("Hello")),
-          new SyntaxTree.Print(new SyntaxTree.Variable("b"), new SyntaxTree.Mul(new SyntaxTree.Number(5), new SyntaxTree.Add(new SyntaxTree.Variable("b"), new SyntaxTree.Number(10))), new SyntaxTree.Text(".")).setSeparator(new SyntaxTree.Text("\t"))
+    new SyntaxTree.SetVariable("a", new SyntaxTree.Number(10.5)),
+    new SyntaxTree.SetVariable("b", new SyntaxTree.Text("Hello")),
+    new SyntaxTree.Print(new SyntaxTree.Variable("b"), new SyntaxTree.Mul(new SyntaxTree.Number(5), new SyntaxTree.Add(new SyntaxTree.Variable("b"), new SyntaxTree.Number(10))), new SyntaxTree.Text(".")).setSeparator(new SyntaxTree.Text("\t")),
+    new SyntaxTree.SetVariable("c", new SyntaxTree.Number(0)),
+    new SyntaxTree.Print(new SyntaxTree.Text("\n")),
+    new SyntaxTree.While(new SyntaxTree.LesserThan(new SyntaxTree.Variable("c"), new SyntaxTree.Number(10)),
+      new SyntaxTree.Programs(
+        new SyntaxTree.SetVariable("c", new SyntaxTree.Add(new SyntaxTree.Variable("c"), new SyntaxTree.Number(1))),
+        new SyntaxTree.Print(new SyntaxTree.Add(new SyntaxTree.Variable("c"), new SyntaxTree.Text("\n")))
+      ))
     );
     // program.eval();
     serializer.serialize("file.ser", program);
     serializer.deserialize("file.ser").eval();
-    System.out.println();
     try {
       FileWriter writer = new FileWriter("a");
       VMTools vmTools = new VMTools();

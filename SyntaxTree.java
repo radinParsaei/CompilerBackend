@@ -902,4 +902,52 @@ public class SyntaxTree {
       }
     }
   }
+
+  public static class While extends ProgramBase implements java.io.Serializable {
+    private ValueBase condition;
+    private ProgramBase program;
+    public ValueBase getCondition() {
+      return this.condition;
+    }
+    public ProgramBase getProgram() {
+      return this.program;
+    }
+    public While(ValueBase condition, ProgramBase program) {
+      this.condition = condition;
+      this.program = program;
+    }
+
+    @Override
+    void eval() {
+      ValueBase condition2;
+      if (!(condition instanceof Number || condition instanceof Text || condition instanceof Boolean)) {
+        condition2 = (ValueBase)condition.getData();
+      } else {
+        condition2 = condition;
+      }
+      boolean condition3 = false;
+      if (condition2 instanceof Number) {
+        condition3 = (int)(java.lang.Number)condition2.getData() != 0;
+      } else if (condition2 instanceof Boolean) {
+        condition3 = (boolean)condition2.getData();
+      } else if (condition2 instanceof Text) {
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR in While");
+      }
+      while (condition3) {
+        program.eval();
+        if (!(condition instanceof Number || condition instanceof Text || condition instanceof Boolean)) {
+          condition2 = (ValueBase)condition.getData();
+        } else {
+          condition2 = condition;
+        }
+        if (condition2 instanceof Number) {
+          condition3 = (int)(java.lang.Number)condition2.getData() != 0;
+        } else if (condition2 instanceof Boolean) {
+          condition3 = (boolean)condition2.getData();
+        } else if (condition2 instanceof Text) {
+          Errors.error(ErrorCodes.ERROR_TYPE, "STR in While");
+        }
+      }
+    }
+  }
 }
