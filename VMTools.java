@@ -145,7 +145,7 @@ public class VMTools {
       output.append(putVals(((SyntaxTree.While)program).getCondition()));
       output.append("END\n");
       output.append(putVals(((SyntaxTree.While)program).getCondition()));
-      output.append("WTRUN");
+      output.append("WTRUN\nPOP\n");
     } else if (program instanceof SyntaxTree.Exit) {
       output.append(putVals(((SyntaxTree.Exit)program).getStatus()));
       output.append("EXIT\n");
