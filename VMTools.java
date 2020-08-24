@@ -1,4 +1,6 @@
 import java.util.HashMap;
+import java.math.BigDecimal;
+
 public class VMTools {
   private HashMap<String, Integer> variables = new HashMap<>();
   private int variablesCounter = 0;
@@ -6,7 +8,7 @@ public class VMTools {
     StringBuilder output = new StringBuilder();
     for (ValueBase val : vals) {
       if (val instanceof SyntaxTree.Number) {
-        output.append("PUT\tNUM").append(val.getData()).append("\n");
+        output.append("PUT\tNUM").append(String.format("%.100f", ((java.lang.Number)val.getData()).doubleValue())).append("\n");
       } else if (val instanceof SyntaxTree.Text) {
         output.append("PUT\tTXT").append(val.getData().toString().replace("\n", "\\n")).append("\n");
       } else if (val instanceof SyntaxTree.Boolean) {
@@ -131,12 +133,12 @@ public class VMTools {
     } else if (program instanceof SyntaxTree.If) {
       ProgramBase programBase = ((SyntaxTree.If)program).getElseProgram();
       String elseByteCode = SyntaxTreeToVMByteCode2(programBase);
-      output.append(putVals(new SyntaxTree.Number(elseByteCode.split("\n").length + 2 - (programBase == null? 1:0))));
+      output.append(putVals(new SyntaxTree.Number(new BigDecimal(elseByteCode.split("\n").length + 2 - (programBase == null? 1:0)))));
       output.append(putVals(((SyntaxTree.If)program).getCondition()));
       output.append("TOBOOL\nIFSKIP\n");
       output.append(elseByteCode);
       String byteCode = SyntaxTreeToVMByteCode2(((SyntaxTree.If)program).getProgram());
-      output.append(putVals(new SyntaxTree.Number(byteCode.split("\n").length)));
+      output.append(putVals(new SyntaxTree.Number(new BigDecimal(byteCode.split("\n").length))));
       output.append("SKIP\n");
       output.append(byteCode);
     } else if (program instanceof SyntaxTree.While) {
