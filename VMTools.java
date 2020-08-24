@@ -8,7 +8,7 @@ public class VMTools {
     StringBuilder output = new StringBuilder();
     for (ValueBase val : vals) {
       if (val instanceof SyntaxTree.Number) {
-        output.append("PUT\tNUM").append(String.format("%.100f", ((java.lang.Number)val.getData()).doubleValue())).append("\n");
+        output.append("PUT\tNUM").append((BigDecimal)val.getData()).append("\n");
       } else if (val instanceof SyntaxTree.Text) {
         output.append("PUT\tTXT").append(val.getData().toString().replace("\n", "\\n")).append("\n");
       } else if (val instanceof SyntaxTree.Boolean) {
