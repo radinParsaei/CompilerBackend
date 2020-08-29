@@ -11,6 +11,6 @@ public class ValueBase implements java.io.Serializable {
 
   @Override
   public String toString() {
-    return this.getData().toString();
+    return this.getData() + "";
   }
 }
