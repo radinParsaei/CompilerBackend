@@ -111,7 +111,7 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Number(new BigDecimal(((BigDecimal)v1.getData()).doubleValue() + ((BigDecimal)v2.getData()).doubleValue()));
+        return new Number(((BigDecimal)v1.getData()).add((BigDecimal)v2.getData()));
       } else {
         return new Text(v1.toString() + v2.toString());
       }
@@ -143,7 +143,7 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Number(new BigDecimal(((BigDecimal)v1.getData()).doubleValue() - ((BigDecimal)v2.getData()).doubleValue()));
+        return new Number(((BigDecimal)v1.getData()).subtract((BigDecimal)v2.getData()));
       } else {
         return new Text(v1.toString().replace(v2.toString(), ""));
       }
@@ -175,7 +175,7 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Number(new BigDecimal(((BigDecimal)v1.getData()).doubleValue() * ((BigDecimal)v2.getData()).doubleValue()));
+        return new Number(((BigDecimal)v1.getData()).multiply((BigDecimal)v2.getData()));
       } else if (v1 instanceof Number && v2 instanceof Text) {
         StringBuilder result = new StringBuilder();
         for(int i = 0; i < ((BigDecimal)v1.getData()).intValue(); i++) {
@@ -220,7 +220,7 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Number(new BigDecimal(((BigDecimal)v1.getData()).doubleValue() / ((BigDecimal)v2.getData()).doubleValue()));
+        return new Number(((BigDecimal)v1.getData()).divide((BigDecimal)v2.getData()));
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in /");
         return new Null();
@@ -253,7 +253,7 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Number(new BigDecimal(((BigDecimal)v1.getData()).doubleValue() % ((BigDecimal)v2.getData()).doubleValue()));
+        return new Number(((BigDecimal)v1.getData()).remainder((BigDecimal)v2.getData()));
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in %");
         return new Null();
@@ -286,13 +286,29 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       boolean equalAsBoolAndNumber = false;
-      if (v1 instanceof Boolean) {
-        v1 = new Number(new BigDecimal(((boolean)v1.getData())? 1 : 0));
+      if (v1 instanceof Boolean && v2 instanceof Number) {
+        if (((boolean)v1.getData())) {
+          if (!((BigDecimal)v2.getData()).equals(BigDecimal.ZERO)) {
+            return new Boolean(true);
+          }
+        } else {
+          if (((BigDecimal)v2.getData()).equals(BigDecimal.ZERO)) {
+            return new Boolean(true);
+          }
+        }
       }
-      if (v2 instanceof Boolean) {
-        v2 = new Number(new BigDecimal(((boolean)v2.getData())? 1 : 0));
+      if (v2 instanceof Boolean && v1 instanceof Number) {
+        if (((boolean)v2.getData())) {
+          if (!((BigDecimal)v1.getData()).equals(BigDecimal.ZERO)) {
+            return new Boolean(true);
+          }
+        } else {
+          if (((BigDecimal)v1.getData()).equals(BigDecimal.ZERO)) {
+            return new Boolean(true);
+          }
+        }
       }
-      return new SyntaxTree.Boolean(v1.toString().equals(v2.toString()) || equalAsBoolAndNumber);
+      return new SyntaxTree.Boolean(v2.toString().equals(v1.toString()));
     }
 
     public ValueBase getV1() {
@@ -349,7 +365,7 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Boolean((((BigDecimal)v1.getData()).doubleValue() > ((BigDecimal)v2.getData()).doubleValue()));
+        return new Boolean((((BigDecimal)v1.getData()).compareTo((BigDecimal)v2.getData())) == 1);
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in >");
         return new Null();
@@ -382,7 +398,8 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Boolean((((BigDecimal)v1.getData()).doubleValue() >= ((BigDecimal)v2.getData()).doubleValue()));
+        int tmp = (((BigDecimal)v1.getData()).compareTo((BigDecimal)v2.getData()));
+        return new Boolean(tmp == 1 || tmp == 0);
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in >=");
         return new Null();
@@ -415,7 +432,7 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Boolean((((BigDecimal)v1.getData()).doubleValue() < ((BigDecimal)v2.getData()).doubleValue()));
+        return new Boolean((((BigDecimal)v1.getData()).compareTo((BigDecimal)v2.getData())) == -1);
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in <");
         return new Null();
@@ -448,7 +465,8 @@ public class SyntaxTree {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
-        return new Boolean((((BigDecimal)v1.getData()).doubleValue() <= ((BigDecimal)v2.getData()).doubleValue()));
+        int tmp = (((BigDecimal)v1.getData()).compareTo((BigDecimal)v2.getData()));
+        return new Boolean(tmp == -1 || tmp == 0);
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in <=");
         return new Null();
@@ -726,7 +744,7 @@ public class SyntaxTree {
         value = (ValueBase)value.getData();
       }
       if (value instanceof Number) {
-        return new Number(new BigDecimal(-(((BigDecimal)value.getData()).doubleValue())));
+        return new Number(((BigDecimal)value.getData()).negate());
       } else if (value instanceof Text) {
         return new Text(new StringBuilder((String)value.getData()).reverse().toString());
       }
@@ -751,7 +769,7 @@ public class SyntaxTree {
         value = (ValueBase)value.getData();
       }
       if (value instanceof Number) {
-        return new Boolean((((BigDecimal)value.getData()).doubleValue()) == 0? true : false);
+        return new Boolean((((BigDecimal)value.getData()).compareTo(BigDecimal.ZERO) == 0? true : false));
       } else if (value instanceof Boolean) {
         return new Boolean(!(boolean)value.getData());
       } else {
