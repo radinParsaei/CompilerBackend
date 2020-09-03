@@ -971,4 +971,34 @@ public class SyntaxTree {
       }
     }
   }
+
+  public static class Repeat extends ProgramBase implements java.io.Serializable {
+    private ValueBase count;
+    private ProgramBase program;
+    public ValueBase getCount() {
+      return this.count;
+    }
+    public ProgramBase getProgram() {
+      return this.program;
+    }
+    public Repeat(ValueBase count, ProgramBase program) {
+      this.count = count;
+      this.program = program;
+    }
+
+    @Override
+    void eval() {
+      ValueBase count = this.count;
+      if (!(count instanceof Number || count instanceof Text || count instanceof Boolean)) {
+        count = (ValueBase)count.getData();
+      }
+      if (count instanceof Number) {
+        for (BigDecimal i = BigDecimal.ZERO; i.compareTo((BigDecimal)count.getData()) == -1; i = i.add(BigDecimal.ONE)) {
+          program.eval();
+        }
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in If");
+      }
+    }
+  }
 }

@@ -148,6 +148,12 @@ public class VMTools {
       output.append("END\n");
       output.append(putVals(((SyntaxTree.While)program).getCondition()));
       output.append("WTRUN\nPOP\n");
+    } else if (program instanceof SyntaxTree.Repeat) {
+      output.append("REC\n");
+      output.append(SyntaxTreeToVMByteCode2(((SyntaxTree.Repeat)program).getProgram()));
+      output.append("END\n");
+      output.append(putVals(((SyntaxTree.Repeat)program).getCount()));
+      output.append("REPEAT\n");
     } else if (program instanceof SyntaxTree.Exit) {
       output.append(putVals(((SyntaxTree.Exit)program).getStatus()));
       output.append("EXIT\n");
