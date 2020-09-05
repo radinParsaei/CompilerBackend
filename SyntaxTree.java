@@ -18,6 +18,9 @@ public class SyntaxTree {
  }
 
   private static HashMap<String, ValueBase> variables = new HashMap<>();
+  public static HashMap<String, ValueBase> getVariables() {
+    return variables;
+  }
   public static class Number extends ValueBase {
     public Number(BigDecimal number) {
       this.setData(number);
