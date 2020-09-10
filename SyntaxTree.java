@@ -74,9 +74,19 @@ public class SyntaxTree {
   public static class SetVariable extends ProgramBase implements java.io.Serializable {
     private String variableName;
     private ValueBase value;
+    private boolean isStatic = true;
     public SetVariable(String variableName, ValueBase value) {
       this.variableName = variableName;
       this.value = value;
+    }
+
+    public SetVariable setIsStatic(boolean isStatic) {
+      this.isStatic = isStatic;
+      return this;
+    }
+
+    public boolean getIsStatic() {
+      return isStatic;
     }
 
     @Override
