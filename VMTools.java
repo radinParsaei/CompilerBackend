@@ -2,8 +2,30 @@ import java.util.HashMap;
 import java.math.BigDecimal;
 
 public class VMTools {
+  class FunctionHolder {
+    private int location;
+    private int size = 0;
+    public FunctionHolder(int location, int size) {
+      this.location = location;
+      this.size = size;
+    }
+    public int getLocation() {
+      return location;
+    }
+    public void setLocation(int location) {
+      this.location = location;
+    }
+    public int getSize() {
+      return size;
+    }
+    public void setSize(int size) {
+      this.size = size;
+    }
+  }
   private HashMap<String, Integer> variables = new HashMap<>();
   private int variablesCounter = 0;
+  private HashMap<String, FunctionHolder> functions = new HashMap<>();
+  private StringBuilder functionsCode = new StringBuilder();
   private HashMap<String, Integer> dynamicVariables = new HashMap<>();
   private int dynamicVariablesCounter = -1;
   private String putVals(ValueBase... vals) {
@@ -117,10 +139,17 @@ public class VMTools {
   }
 
   public String SyntaxTreeToVMByteCode(ProgramBase program) {
+    StringBuilder stringBuilder = new StringBuilder();
+    boolean dynamicVariablesInitialized = false;
     if (program instanceof SyntaxTree.SetVariable) {
       if (((SyntaxTree.SetVariable)program).getIsStatic()) {
         variablesCounter++;
         variables.put(((SyntaxTree.SetVariable)program).getVariableName(), variablesCounter);
+      } else {
+        if (!dynamicVariablesInitialized) {
+          dynamicVariablesInitialized = true;
+          stringBuilder.append("PUT\tNUM-1\nMEMPUT\n");
+        }
       }
     } else if (program instanceof SyntaxTree.Programs) {
       for (ProgramBase program2 : ((SyntaxTree.Programs)program).getPrograms()) {
@@ -128,11 +157,18 @@ public class VMTools {
           if (((SyntaxTree.SetVariable)program2).getIsStatic()) {
             variablesCounter++;
             variables.put(((SyntaxTree.SetVariable)program2).getVariableName(), variablesCounter);
+          } else {
+            if (!dynamicVariablesInitialized) {
+              dynamicVariablesInitialized = true;
+              stringBuilder.append("PUT\tNUM-1\nMEMPUT\n");
+            }
           }
         }
       }
     }
-    return new StringBuilder("PUT\tNUM-1\nMEMPUT\n").append(SyntaxTreeToVMByteCode2(program)).toString();
+    String tmp = SyntaxTreeToVMByteCode2(program);
+    stringBuilder.append(functionsCode.toString()).append(tmp);
+    return stringBuilder.toString();
   }
 
   private String SyntaxTreeToVMByteCode2(ProgramBase program) {
@@ -169,6 +205,29 @@ public class VMTools {
       output.append("END\n");
       output.append(putVals(((SyntaxTree.While)program).getCondition()));
       output.append("WTRUN\nPOP\n");
+    } else if (program instanceof SyntaxTree.Function) {
+      String functionCode = SyntaxTreeToVMByteCode2(((SyntaxTree.Function)program).getProgram());
+      if (functions.containsKey(((SyntaxTree.Function)program).getFunctionName())) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, ((SyntaxTree.Function)program).getFunctionName());
+      }
+      int size = functionCode.split("\n").length + functionCode.split("PUT").length - 1;
+      functions.put(((SyntaxTree.Function)program).getFunctionName(), new FunctionHolder(++variablesCounter, size));
+      functionsCode.append("REC\n").append(functionCode)
+                          .append("END\nPUT\tNUM").append(variablesCounter)
+                          .append("\nMEMSET\nREC\nPUT\tNUM").append(variablesCounter + 1)
+                          .append("\nMEMINS\nEND\nPUT\tNUM").append(size).append("\n")
+                          .append("REPEAT\n");
+      variablesCounter += size;
+    } else if (program instanceof SyntaxTree.CallFunction) {
+      FunctionHolder functionHolder = functions.get(((SyntaxTree.CallFunction)program).getFunctionName());
+      if (functionHolder == null) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction)program).getFunctionName());
+      }
+      output.append("\n\nPUT\tNUM0\nPUT\tNUM").append(functionHolder.getLocation()).append("\nMEMSET\nREC\nPUT\tNUM").append(functionHolder.getLocation())
+                          .append("\nMEMGET\nPUT\tNUM1\nADD\nPUT\tNUM").append(functionHolder.getLocation()).append("\nMEMSET\n")
+                          .append("PUT\tNUM").append(functionHolder.getLocation()).append("\nMEMGET\nPUT\tNUM").append(functionHolder.getLocation())
+                          .append("\nADD\nMEMGET\nEND\nPUT\tNUM").append(functionHolder.getSize()).append("\nREPEAT\nPUT\tNUM")
+                          .append(functionHolder.getSize()).append("\nRUN\n");
     } else if (program instanceof SyntaxTree.Repeat) {
       output.append("REC\n");
       output.append(SyntaxTreeToVMByteCode2(((SyntaxTree.Repeat)program).getProgram()));

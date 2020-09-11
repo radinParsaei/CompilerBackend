@@ -21,6 +21,10 @@ public class SyntaxTree {
   public static HashMap<String, ValueBase> getVariables() {
     return variables;
   }
+  private static HashMap<String, ProgramBase> functions = new HashMap<>();
+  public static HashMap<String, ProgramBase> getFunctions() {
+    return functions;
+  }
   public static class Number extends ValueBase {
     public Number(BigDecimal number) {
       this.setData(number);
@@ -104,6 +108,51 @@ public class SyntaxTree {
 
     public ValueBase getVariableValue() {
       return value;
+    }
+  }
+
+  public static class Function extends ProgramBase implements java.io.Serializable {
+    private String functionName;
+    private ProgramBase program;
+    public Function(String functionName, ProgramBase program) {
+      this.functionName = functionName;
+      this.program = program;
+    }
+
+    @Override
+    void eval() {
+      if (functions.containsKey(functionName)) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
+      }
+      functions.put(functionName, program);
+    }
+
+    public String getFunctionName() {
+      return functionName;
+    }
+
+    public ProgramBase getProgram() {
+      return program;
+    }
+  }
+
+  public static class CallFunction extends ProgramBase implements java.io.Serializable {
+    private String functionName;
+    public CallFunction(String functionName) {
+      this.functionName = functionName;
+    }
+
+    @Override
+    void eval() {
+      ProgramBase program = functions.get(functionName);
+      if (program == null) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, functionName);
+      }
+      program.eval();
+    }
+
+    public String getFunctionName() {
+      return functionName;
     }
   }
 
