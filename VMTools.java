@@ -205,6 +205,29 @@ public class VMTools {
       output.append("END\n");
       output.append(putVals(((SyntaxTree.While)program).getCondition()));
       output.append("WTRUN\nPOP\n");
+    } else if (program instanceof SyntaxTree.OpCode) {
+      VM vm = new VM();
+      ValueBase[] byteCodes = ((SyntaxTree.OpCode)program).getProgram();
+      for (int i = 0; i < byteCodes.length; i++) {
+        if (byteCodes[i] instanceof SyntaxTree.Number) {
+          byte tmp = (byte)((BigDecimal)((SyntaxTree.Number)byteCodes[i]).getData()).intValue();
+          if (tmp == VM.PUT) {
+            i++;
+            if (byteCodes[i] instanceof SyntaxTree.Number) {
+              output.append(vm.disassemble(tmp, (BigDecimal)((SyntaxTree.Number)byteCodes[i]).getData()));
+            } else if (byteCodes[i] instanceof SyntaxTree.Text) {
+              output.append(vm.disassemble(tmp, (String)((SyntaxTree.Text)byteCodes[i]).getData()).replace("\n", "\\n").replace("\f", "\\f").replace("\r", "\\r"));
+            } else if (byteCodes[i] instanceof SyntaxTree.Boolean) {
+              output.append(vm.disassemble(tmp, (boolean)((SyntaxTree.Boolean)byteCodes[i]).getData()));
+            } else {
+              output.append(vm.disassemble(tmp));
+            }
+          } else {
+            output.append(vm.disassemble(tmp));
+          }
+        }
+        output.append("\n");
+      }
     } else if (program instanceof SyntaxTree.Function) {
       String functionCode = SyntaxTreeToVMByteCode2(((SyntaxTree.Function)program).getProgram());
       if (functions.containsKey(((SyntaxTree.Function)program).getFunctionName())) {
@@ -223,7 +246,7 @@ public class VMTools {
       if (functionHolder == null) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction)program).getFunctionName());
       }
-      output.append("\n\nPUT\tNUM0\nPUT\tNUM").append(functionHolder.getLocation()).append("\nMEMSET\nREC\nPUT\tNUM").append(functionHolder.getLocation())
+      output.append("PUT\tNUM0\nPUT\tNUM").append(functionHolder.getLocation()).append("\nMEMSET\nREC\nPUT\tNUM").append(functionHolder.getLocation())
                           .append("\nMEMGET\nPUT\tNUM1\nADD\nPUT\tNUM").append(functionHolder.getLocation()).append("\nMEMSET\n")
                           .append("PUT\tNUM").append(functionHolder.getLocation()).append("\nMEMGET\nPUT\tNUM").append(functionHolder.getLocation())
                           .append("\nADD\nMEMGET\nEND\nPUT\tNUM").append(functionHolder.getSize()).append("\nREPEAT\nPUT\tNUM")

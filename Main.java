@@ -17,7 +17,9 @@ public class Main {
                 new SyntaxTree.SetVariable("c", new SyntaxTree.Add(new SyntaxTree.Variable("c"), new SyntaxTree.Number(1))),
                 new SyntaxTree.Print(new SyntaxTree.Add(new SyntaxTree.Variable("c"), new SyntaxTree.Text("\n")))
             ))
-    )), new SyntaxTree.CallFunction("main"), new SyntaxTree.CallFunction("func2")
+    )),
+    new SyntaxTree.CallFunction("main"), new SyntaxTree.CallFunction("func2"),
+    new SyntaxTree.OpCode(SyntaxTree.objectToValue(VM.PUT), SyntaxTree.objectToValue("\nText From VM\n"), SyntaxTree.objectToValue(VM.PRINT))
     );
     // program.eval();
     serializer.serialize("file.ser", program);

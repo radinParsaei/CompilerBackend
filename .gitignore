@@ -2,3 +2,7 @@ META-INF
 output
 output.jar
 *.class
+libVM.dylib
+libVM.so
+VM.dll
+VM_JNI.o

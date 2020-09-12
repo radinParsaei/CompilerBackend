@@ -8,6 +8,10 @@ public class SyntaxTree {
        return new SyntaxTree.Number((BigDecimal)object);
       } else if (object instanceof String) {
        return new SyntaxTree.Text((String)object);
+      } else if (object instanceof Integer) {
+       return new SyntaxTree.Number((int)object);
+     } else if (object instanceof Byte) {
+       return new SyntaxTree.Number((byte)object);
       } else if (object instanceof Boolean || (boolean)object == true || (boolean)object == false) {
        return new SyntaxTree.Boolean((boolean)object);
       } else if (object == null) {
@@ -1060,6 +1064,40 @@ public class SyntaxTree {
         }
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in If");
+      }
+    }
+  }
+
+  public static class OpCode extends ProgramBase implements java.io.Serializable {
+    private ValueBase[] program;
+    public ValueBase[] getProgram() {
+      return this.program;
+    }
+    public OpCode(ValueBase... program) {
+      this.program = program;
+    }
+
+    @Override
+    void eval() {
+      VM vm = new VM();
+      for (int i = 0; i < program.length; i++) {
+        if (program[i] instanceof Number) {
+          byte tmp = (byte)((BigDecimal)((Number)program[i]).getData()).intValue();
+          if (tmp == VM.PUT) {
+            i++;
+            if (program[i] instanceof Number) {
+              vm.run(tmp, (BigDecimal)((Number)program[i]).getData());
+            } else if (program[i] instanceof Text) {
+              vm.run(tmp, (String)((Text)program[i]).getData());
+            } else if (program[i] instanceof Boolean) {
+              vm.run(tmp, (boolean)((Boolean)program[i]).getData());
+            } else {
+              vm.run(tmp);
+            }
+          } else {
+            vm.run(tmp);
+          }
+        }
       }
     }
   }

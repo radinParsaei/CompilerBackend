@@ -1,5 +1,47 @@
 classes=$(subst .java,, $(foreach java-source, $(wildcard *.java), $(java-source).class))
-all: output.jar # native-image
+INCLUDES:=-I. -IVM -IVM/Value -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/darwin -I$(JAVA_HOME)/include/linux -I$(JAVA_HOME)/include/win32 -I/usr/lib/jvm/default-java/include -I/usr/lib/jvm/default-java/include/linux
+override LDFLAGS:=$(LDFLAGS) -shared -fPIC
+
+ifeq ($(USE_GMP_LIB),1)
+override LDFLAGS:=$(LDFLAGS) -lgmp -lgmpxx
+override CFLAGS:=$(CFLAGS) -DUSE_GMP_LIB
+else
+override INCLUDES:=$(INCLUDES) -IVM/BigNumber/src/BigNumber
+objs=VM/number.o VM/BigNumber.o
+rmobjs=rmobjs
+endif
+
+override CFLAGS:=$(CFLAGS) $(INCLUDES)
+
+ifeq ($(OS),Windows_NT)
+	EXT:=dll
+	NAME:=VM
+else
+		NAME:=libVM
+    UNAME := $(shell uname -s)
+    ifeq ($(UNAME),Linux)
+			EXT:=so
+    endif
+    ifeq ($(UNAME),Darwin)
+			EXT=dylib
+    endif
+endif
+
+all: $(rmobjs) $(objs) VM_JNI.o $(NAME).$(EXT) output.jar # native-image
+.PHONY: all
+
+rmobjs:
+	$(RM) $(objs)
+
+%.o:
+	$(MAKE) -C VM $(subst VM/,,$@) EXT_CFLAGS=-fPIC
+
+VM_JNI.o: VM_JNI.cpp VM_JNI.h
+	$(CXX) -c $(CFLAGS) VM_JNI.cpp -fPIC
+
+$(NAME).$(EXT): VM_JNI.o
+	$(CXX) $(CFLAGS) $(objs) VM_JNI.o VM/VM.cpp $(LDFLAGS) -o $(NAME).$(EXT)
+
 output.jar: $(classes)
 	echo Manifest-Version: 1.0 > manifest.txt
 	echo Main-Class: Main >> manifest.txt
@@ -14,4 +56,4 @@ INF: jar
 	mkdir -p META-INF/native-image
 	-java -agentlib:native-image-agent=config-output-dir=META-INF/native-image Main
 clean:
-	$(RM) $(classes) output.jar output
+	$(RM) *.class output.jar output *.o $(NAME).$(EXT)
