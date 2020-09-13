@@ -1067,38 +1067,4 @@ public class SyntaxTree {
       }
     }
   }
-
-  public static class OpCode extends ProgramBase implements java.io.Serializable {
-    private ValueBase[] program;
-    public ValueBase[] getProgram() {
-      return this.program;
-    }
-    public OpCode(ValueBase... program) {
-      this.program = program;
-    }
-
-    @Override
-    void eval() {
-      VM vm = new VM();
-      for (int i = 0; i < program.length; i++) {
-        if (program[i] instanceof Number) {
-          byte tmp = (byte)((BigDecimal)((Number)program[i]).getData()).intValue();
-          if (tmp == VM.PUT) {
-            i++;
-            if (program[i] instanceof Number) {
-              vm.run(tmp, (BigDecimal)((Number)program[i]).getData());
-            } else if (program[i] instanceof Text) {
-              vm.run(tmp, (String)((Text)program[i]).getData());
-            } else if (program[i] instanceof Boolean) {
-              vm.run(tmp, (boolean)((Boolean)program[i]).getData());
-            } else {
-              vm.run(tmp);
-            }
-          } else {
-            vm.run(tmp);
-          }
-        }
-      }
-    }
-  }
 }

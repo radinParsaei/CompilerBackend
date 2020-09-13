@@ -13,6 +13,7 @@ public class VM {
 	private native String disassembleWithString(byte opcode, String data);
 	private native String disassembleWithDouble(byte opcode, String data);
 	private native String disassembleWithBoolean(byte opcode, boolean data);
+	public native String pop();
 	private native void init();
 	public native void run(byte opcode);
 	public void run(byte opcode, BigDecimal data) {

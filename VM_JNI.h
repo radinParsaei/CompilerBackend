@@ -73,6 +73,9 @@ JNIEXPORT void JNICALL Java_VM_init
 JNIEXPORT void JNICALL Java_VM_run
   (JNIEnv *, jobject, jbyte);
 
+JNIEXPORT jstring JNICALL Java_VM_pop
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

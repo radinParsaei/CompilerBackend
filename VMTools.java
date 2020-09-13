@@ -205,9 +205,9 @@ public class VMTools {
       output.append("END\n");
       output.append(putVals(((SyntaxTree.While)program).getCondition()));
       output.append("WTRUN\nPOP\n");
-    } else if (program instanceof SyntaxTree.OpCode) {
+    } else if (program instanceof OpCode) {
       VM vm = new VM();
-      ValueBase[] byteCodes = ((SyntaxTree.OpCode)program).getProgram();
+      ValueBase[] byteCodes = ((OpCode)program).getProgram();
       for (int i = 0; i < byteCodes.length; i++) {
         if (byteCodes[i] instanceof SyntaxTree.Number) {
           byte tmp = (byte)((BigDecimal)((SyntaxTree.Number)byteCodes[i]).getData()).intValue();

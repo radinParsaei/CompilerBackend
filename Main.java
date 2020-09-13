@@ -19,7 +19,8 @@ public class Main {
             ))
     )),
     new SyntaxTree.CallFunction("main"), new SyntaxTree.CallFunction("func2"),
-    new SyntaxTree.OpCode(SyntaxTree.objectToValue(VM.PUT), SyntaxTree.objectToValue("\nText From VM\n"), SyntaxTree.objectToValue(VM.PRINT))
+    new OpCode(SyntaxTree.objectToValue(VM.PUT), SyntaxTree.objectToValue("\nText From VM\n")/*, SyntaxTree.objectToValue(VM.PRINT)*/),
+    new SyntaxTree.Print(new OpCode.PopFromVM())
     );
     // program.eval();
     serializer.serialize("file.ser", program);

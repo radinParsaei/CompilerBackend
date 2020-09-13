@@ -52,3 +52,20 @@ JNIEXPORT jstring JNICALL Java_VM_disassembleWithDouble (JNIEnv *env, jobject, j
     return env->NewStringUTF(VM::disassemble((char)opcode, NUMBER(env->GetStringUTFChars(data, new jboolean(1)))).toString().c_str());
   }
 }
+
+JNIEXPORT jstring JNICALL Java_VM_pop(JNIEnv *env, jobject) {
+  std::string tmp;
+  Value value = vm.getStack()[vm.getStack().size() - 1];
+  if (value.getType() == VALUE_TYPE_NUMBER) {
+    tmp = "N" + value.toString();
+  } else if (value.getType() == VALUE_TYPE_TEXT) {
+    tmp = "T" + value.toString();
+  } else if (value.getType() == True || value.getType() == False) {
+    tmp = "B";
+    tmp += (int)value.getBool();
+  } else if (value.getType() == null) {
+    tmp = "0";
+  }
+  vm.getStack().pop_back();
+  return env->NewStringUTF(tmp.c_str());
+}
