@@ -120,14 +120,15 @@ public class SyntaxTree {
     private ProgramBase program;
     public Function(String functionName, ProgramBase program) {
       this.functionName = functionName;
+      if (functions.containsKey(functionName)) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
+      }
+      functions.put(functionName, null);
       this.program = program;
     }
 
     @Override
     void eval() {
-      if (functions.containsKey(functionName)) {
-        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
-      }
       functions.put(functionName, program);
     }
 
