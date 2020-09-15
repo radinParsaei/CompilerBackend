@@ -74,6 +74,10 @@ public class SyntaxTree {
       return tmp;
     }
 
+    public void setVariableName(String variableName) {
+      this.variableName = variableName;
+    }
+
     public String getVariableName() {
       return variableName;
     }
@@ -108,6 +112,10 @@ public class SyntaxTree {
 
     public String getVariableName() {
       return variableName;
+    }
+
+    public void setVariableName(String variableName) {
+      this.variableName = variableName;
     }
 
     public ValueBase getVariableValue() {
