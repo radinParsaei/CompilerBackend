@@ -138,8 +138,7 @@ public class VMTools {
     return output.toString();
   }
 
-  public String SyntaxTreeToVMByteCode(ProgramBase program) {
-    StringBuilder stringBuilder = new StringBuilder();
+  private boolean init(ProgramBase program) {
     boolean dynamicVariablesInitialized = false;
     if (program instanceof SyntaxTree.SetVariable) {
       if (((SyntaxTree.SetVariable)program).getIsStatic()) {
@@ -148,24 +147,20 @@ public class VMTools {
       } else {
         if (!dynamicVariablesInitialized) {
           dynamicVariablesInitialized = true;
-          stringBuilder.append("PUT\tNUM-1\nMEMPUT\n");
+          return true;
         }
       }
     } else if (program instanceof SyntaxTree.Programs) {
+      boolean tmp = false;
       for (ProgramBase program2 : ((SyntaxTree.Programs)program).getPrograms()) {
-        if (program2 instanceof SyntaxTree.SetVariable) {
-          if (((SyntaxTree.SetVariable)program2).getIsStatic()) {
-            variablesCounter++;
-            variables.put(((SyntaxTree.SetVariable)program2).getVariableName(), variablesCounter);
-          } else {
-            if (!dynamicVariablesInitialized) {
-              dynamicVariablesInitialized = true;
-              stringBuilder.append("PUT\tNUM-1\nMEMPUT\n");
-            }
-          }
-        }
+        tmp |= init(program2);
       }
     }
+    return false;
+  }
+
+  public String SyntaxTreeToVMByteCode(ProgramBase program) {
+    StringBuilder stringBuilder = new StringBuilder(init(program)? "PUT\tNUM-1\nMEMPUT\n" : "");
     String tmp = SyntaxTreeToVMByteCode2(program);
     stringBuilder.append(functionsCode.toString()).append(tmp);
     return stringBuilder.toString();
