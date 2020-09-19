@@ -5,27 +5,28 @@ public class SyntaxTree {
   public static ValueBase objectToValue(Object object) {
     try {
       if (object instanceof BigDecimal) {
-       return new SyntaxTree.Number((BigDecimal)object);
+        return new SyntaxTree.Number((BigDecimal)object);
       } else if (object instanceof String) {
-       return new SyntaxTree.Text((String)object);
+        return new SyntaxTree.Text((String)object);
       } else if (object instanceof Integer) {
-       return new SyntaxTree.Number((int)object);
-     } else if (object instanceof Byte) {
-       return new SyntaxTree.Number((byte)object);
-      } else if (object instanceof Boolean || (boolean)object == true || (boolean)object == false) {
-       return new SyntaxTree.Boolean((boolean)object);
+        return new SyntaxTree.Number((int)object);
+      } else if (object instanceof Byte) {
+        return new SyntaxTree.Number((byte)object);
+      } else if (object instanceof Boolean || (boolean) object || !((boolean) object)) {
+        return new SyntaxTree.Boolean((boolean)object);
       } else if (object == null) {
-       return new SyntaxTree.Null();
+        return new SyntaxTree.Null();
       }
     } catch (ClassCastException ignore) {}
-   return (ValueBase)object;
- }
+    assert object instanceof ValueBase;
+    return (ValueBase)object;
+  }
 
-  private static HashMap<String, ValueBase> variables = new HashMap<>();
+  private static final HashMap<String, ValueBase> variables = new HashMap<>();
   public static HashMap<String, ValueBase> getVariables() {
     return variables;
   }
-  private static HashMap<String, ProgramBase> functions = new HashMap<>();
+  private static final HashMap<String, ProgramBase> functions = new HashMap<>();
   public static HashMap<String, ProgramBase> getFunctions() {
     return functions;
   }
@@ -39,9 +40,9 @@ public class SyntaxTree {
   }
 
   public static class Text extends ValueBase {
-   public Text(String text) {
-     this.setData(text);
-   }
+    public Text(String text) {
+      this.setData(text);
+    }
   }
 
   public static class Boolean extends ValueBase {
@@ -85,10 +86,20 @@ public class SyntaxTree {
 
   public static class SetVariable extends ProgramBase implements java.io.Serializable {
     private String variableName;
-    private ValueBase value;
+    private final ValueBase value;
+    private boolean isStatic = true;
     public SetVariable(String variableName, ValueBase value) {
       this.variableName = variableName;
       this.value = value;
+    }
+
+    public SetVariable setIsStatic(boolean isStatic) {
+      this.isStatic = isStatic;
+      return this;
+    }
+
+    public boolean getIsStatic() {
+      return isStatic;
     }
 
     @Override
@@ -114,11 +125,11 @@ public class SyntaxTree {
   }
 
   public static class Function extends ProgramBase implements java.io.Serializable {
-    private String functionName;
-    private ProgramBase program;
+    private final String functionName;
+    private final ProgramBase program;
     public Function(String functionName, ProgramBase program) {
       this.functionName = functionName;
-      if (functions.containsKey(functionName)) {
+      if (functions.containsKey(functionName) && functions.get(functionName) != null) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
       }
       functions.put(functionName, null);
@@ -140,7 +151,7 @@ public class SyntaxTree {
   }
 
   public static class CallFunction extends ProgramBase implements java.io.Serializable {
-    private String functionName;
+    private final String functionName;
     public CallFunction(String functionName) {
       this.functionName = functionName;
     }
@@ -160,7 +171,8 @@ public class SyntaxTree {
   }
 
   public static class Add extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public Add(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -192,7 +204,8 @@ public class SyntaxTree {
   }
 
   public static class Sub extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public Sub(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -224,7 +237,8 @@ public class SyntaxTree {
   }
 
   public static class Mul extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public Mul(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -269,7 +283,8 @@ public class SyntaxTree {
   }
 
   public static class Div extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public Div(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -302,7 +317,8 @@ public class SyntaxTree {
   }
 
   public static class Mod extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public Mod(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -335,7 +351,8 @@ public class SyntaxTree {
   }
 
   public static class Equals extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public Equals(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -353,22 +370,22 @@ public class SyntaxTree {
       boolean equalAsBoolAndNumber = false;
       if (v1 instanceof Boolean && v2 instanceof Number) {
         if (((boolean)v1.getData())) {
-          if (!((BigDecimal)v2.getData()).equals(BigDecimal.ZERO)) {
+          if (!v2.getData().equals(BigDecimal.ZERO)) {
             return new Boolean(true);
           }
         } else {
-          if (((BigDecimal)v2.getData()).equals(BigDecimal.ZERO)) {
+          if (v2.getData().equals(BigDecimal.ZERO)) {
             return new Boolean(true);
           }
         }
       }
       if (v2 instanceof Boolean && v1 instanceof Number) {
         if (((boolean)v2.getData())) {
-          if (!((BigDecimal)v1.getData()).equals(BigDecimal.ZERO)) {
+          if (!v1.getData().equals(BigDecimal.ZERO)) {
             return new Boolean(true);
           }
         } else {
-          if (((BigDecimal)v1.getData()).equals(BigDecimal.ZERO)) {
+          if (v1.getData().equals(BigDecimal.ZERO)) {
             return new Boolean(true);
           }
         }
@@ -386,7 +403,8 @@ public class SyntaxTree {
   }
 
   public static class StrictEquals extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public StrictEquals(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -414,7 +432,8 @@ public class SyntaxTree {
   }
 
   public static class GreaterThan extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public GreaterThan(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -447,7 +466,8 @@ public class SyntaxTree {
   }
 
   public static class GreaterThanOrEqual extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public GreaterThanOrEqual(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -481,7 +501,8 @@ public class SyntaxTree {
   }
 
   public static class LesserThan extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public LesserThan(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -514,7 +535,8 @@ public class SyntaxTree {
   }
 
   public static class LesserThanOrEqual extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public LesserThanOrEqual(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -548,7 +570,8 @@ public class SyntaxTree {
   }
 
   public static class And extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public And(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -581,7 +604,8 @@ public class SyntaxTree {
   }
 
   public static class Or extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public Or(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -614,7 +638,8 @@ public class SyntaxTree {
   }
 
   public static class BitwiseAnd extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public BitwiseAnd(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -653,7 +678,8 @@ public class SyntaxTree {
   }
 
   public static class BitwiseOr extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public BitwiseOr(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -692,7 +718,8 @@ public class SyntaxTree {
   }
 
   public static class LeftShift extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public LeftShift(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -725,7 +752,8 @@ public class SyntaxTree {
   }
 
   public static class RightShift extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public RightShift(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -758,7 +786,8 @@ public class SyntaxTree {
   }
 
   public static class Xor extends ValueBase implements java.io.Serializable {
-    private ValueBase v1, v2;
+    private final ValueBase v1;
+    private final ValueBase v2;
     public Xor(ValueBase v1, ValueBase v2) {
       this.v1 = v1;
       this.v2 = v2;
@@ -797,7 +826,7 @@ public class SyntaxTree {
   }
 
   public static class Negative extends ValueBase implements java.io.Serializable {
-    private ValueBase value;
+    private final ValueBase value;
     public Negative(ValueBase value) {
       this.value = value;
     }
@@ -822,7 +851,7 @@ public class SyntaxTree {
   }
 
   public static class Not extends ValueBase implements java.io.Serializable {
-    private ValueBase value;
+    private final ValueBase value;
     public Not(ValueBase value) {
       this.value = value;
     }
@@ -834,7 +863,7 @@ public class SyntaxTree {
         value = (ValueBase)value.getData();
       }
       if (value instanceof Number) {
-        return new Boolean((((BigDecimal)value.getData()).compareTo(BigDecimal.ZERO) == 0? true : false));
+        return new Boolean((((BigDecimal) value.getData()).compareTo(BigDecimal.ZERO) == 0));
       } else if (value instanceof Boolean) {
         return new Boolean(!(boolean)value.getData());
       } else {
@@ -849,7 +878,7 @@ public class SyntaxTree {
   }
 
   public static class BitwiseNot extends ValueBase implements java.io.Serializable {
-    private ValueBase value;
+    private final ValueBase value;
     public BitwiseNot(ValueBase value) {
       this.value = value;
     }
@@ -878,7 +907,7 @@ public class SyntaxTree {
   }
 
   public static class Programs extends ProgramBase implements java.io.Serializable {
-    private ProgramBase[] programs;
+    private final ProgramBase[] programs;
     public Programs(ProgramBase... programs) {
       this.programs = programs;
     }
@@ -895,7 +924,7 @@ public class SyntaxTree {
   }
 
   public static class Print extends ProgramBase implements java.io.Serializable {
-    private ValueBase[] args;
+    private final ValueBase[] args;
     private ValueBase separator = new Text(" ");
     public ValueBase[] getArgs() {
       return this.args;
@@ -921,7 +950,7 @@ public class SyntaxTree {
   }
 
   public static class Exit extends ProgramBase implements java.io.Serializable {
-    private ValueBase status;
+    private final ValueBase status;
     public ValueBase getStatus() {
       return this.status;
     }
@@ -946,8 +975,8 @@ public class SyntaxTree {
   }
 
   public static class If extends ProgramBase implements java.io.Serializable {
-    private ValueBase condition;
-    private ProgramBase program;
+    private final ValueBase condition;
+    private final ProgramBase program;
     private ProgramBase elseProgram;
     public ValueBase getCondition() {
       return this.condition;
@@ -990,8 +1019,8 @@ public class SyntaxTree {
   }
 
   public static class While extends ProgramBase implements java.io.Serializable {
-    private ValueBase condition;
-    private ProgramBase program;
+    private final ValueBase condition;
+    private final ProgramBase program;
     public ValueBase getCondition() {
       return this.condition;
     }
@@ -1038,8 +1067,8 @@ public class SyntaxTree {
   }
 
   public static class Repeat extends ProgramBase implements java.io.Serializable {
-    private ValueBase count;
-    private ProgramBase program;
+    private final ValueBase count;
+    private final ProgramBase program;
     public ValueBase getCount() {
       return this.count;
     }
