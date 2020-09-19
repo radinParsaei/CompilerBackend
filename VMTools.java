@@ -26,8 +26,6 @@ public class VMTools {
   private int variablesCounter = 0;
   private HashMap<String, FunctionHolder> functions = new HashMap<>();
   private StringBuilder functionsCode = new StringBuilder();
-  private HashMap<String, Integer> dynamicVariables = new HashMap<>();
-  private int dynamicVariablesCounter = -1;
   private String putVals(ValueBase... vals) {
     StringBuilder output = new StringBuilder();
     for (ValueBase val : vals) {
@@ -40,13 +38,7 @@ public class VMTools {
       } else if (val instanceof SyntaxTree.Null) {
         output.append("PUT\tNULL\n");
       } else if (val instanceof SyntaxTree.Variable) {
-        if (dynamicVariables.get(((SyntaxTree.Variable)val).getVariableName()) != null) {
-          output.append("REC\nPUT\tNUM0\nMEMGET\nPUT\tNUM-1\nEQ\nEND\nPUT\tNUM0\nMEMGET\nPUT\tNUM-1\nEQ\nWFRUN\nPUT\tNUM").append(variablesCounter + 1).append("\nPUT\tNUM0\nMEMSET\n");
-          output.append("REC\nPUT\tNUM0\nMEMGET\nPUT\tNUM1\nADD\nPUT\tNUM0\nMEMSET\nBREAK\nEND\nREC\nPUT\tNUM0\nMEMGET\nMEMGET\n");
-          Integer a = dynamicVariables.get(((SyntaxTree.Variable)val).getVariableName());
-          output.append("PUT\tNUM").append(a);
-          output.append("\nEQ\nIFTRUN\nPOP\nPUT\tNUM0\nMEMGET\nPUT\tNUM2\nADD\nPUT\tNUM0\nMEMSET\nEND\nPUT\tNUM2\nMEMSIZE\nDIV\nREPEAT\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPUT\tNUM0\nMEMGET\nMEMGET\nPUT\tNUM-1\nPUT\tNUM0\nMEMSET\n");
-        } else if (variables.get(((SyntaxTree.Variable)val).getVariableName()) != null) {
+        if (variables.get(((SyntaxTree.Variable)val).getVariableName()) != null) {
           Integer a = variables.get(((SyntaxTree.Variable)val).getVariableName());
           output.append("PUT\tNUM").append(a).append("\nMEMGET\n");
         } else {
@@ -138,29 +130,20 @@ public class VMTools {
     return output.toString();
   }
 
-  private boolean init(ProgramBase program) {
-    boolean dynamicVariablesInitialized = false;
+  private void init(ProgramBase program) {
     if (program instanceof SyntaxTree.SetVariable) {
-      if (((SyntaxTree.SetVariable)program).getIsStatic()) {
-        variablesCounter++;
-        variables.put(((SyntaxTree.SetVariable)program).getVariableName(), variablesCounter);
-      } else {
-        if (!dynamicVariablesInitialized) {
-          dynamicVariablesInitialized = true;
-          return true;
-        }
-      }
+      variablesCounter++;
+      variables.put(((SyntaxTree.SetVariable)program).getVariableName(), variablesCounter);
     } else if (program instanceof SyntaxTree.Programs) {
-      boolean tmp = false;
       for (ProgramBase program2 : ((SyntaxTree.Programs)program).getPrograms()) {
-        tmp |= init(program2);
+        init(program2);
       }
     }
-    return false;
   }
 
   public String SyntaxTreeToVMByteCode(ProgramBase program) {
-    StringBuilder stringBuilder = new StringBuilder(init(program)? "PUT\tNUM-1\nMEMPUT\n" : "");
+    init(program);
+    StringBuilder stringBuilder = new StringBuilder();
     String tmp = SyntaxTreeToVMByteCode2(program);
     stringBuilder.append(functionsCode.toString()).append(tmp);
     return stringBuilder.toString();
@@ -256,29 +239,14 @@ public class VMTools {
       output.append(putVals(((SyntaxTree.Exit)program).getStatus()));
       output.append("EXIT\n");
     } else if (program instanceof SyntaxTree.SetVariable) {
-      if (((SyntaxTree.SetVariable)program).getIsStatic()) {
-        if (variables.get(((SyntaxTree.SetVariable)program).getVariableName()) == null) {
-          variablesCounter++;
-          variables.put(((SyntaxTree.SetVariable)program).getVariableName(), variablesCounter);
-          output.append(putVals(((SyntaxTree.SetVariable)program).getVariableValue()));
-          output.append("PUT\tNUM").append(variablesCounter).append("\nMEMSET\n");
-        } else {
-          output.append(putVals(((SyntaxTree.SetVariable)program).getVariableValue()));
-          output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable)program).getVariableName())).append("\nMEMSET\n");
-        }
+      if (variables.get(((SyntaxTree.SetVariable)program).getVariableName()) == null) {
+        variablesCounter++;
+        variables.put(((SyntaxTree.SetVariable)program).getVariableName(), variablesCounter);
+        output.append(putVals(((SyntaxTree.SetVariable)program).getVariableValue()));
+        output.append("PUT\tNUM").append(variablesCounter).append("\nMEMSET\n");
       } else {
-        if (dynamicVariables.get(((SyntaxTree.SetVariable)program).getVariableName()) == null) {
-          dynamicVariablesCounter++;
-          dynamicVariables.put(((SyntaxTree.SetVariable)program).getVariableName(), dynamicVariablesCounter);
-          output.append("PUT\tNUM").append(dynamicVariablesCounter).append("\nMEMPUT\n");
-          output.append(putVals(((SyntaxTree.SetVariable)program).getVariableValue())).append("MEMPUT\n");
-        } else {
-          output.append(putVals(((SyntaxTree.SetVariable)program).getVariableValue()));
-          output.append("REC\nPUT\tNUM0\nMEMGET\nPUT\tNUM-1\nEQ\nEND\nPUT\tNUM0\nMEMGET\nPUT\tNUM-1\nEQ\nWFRUN\nPUT\tNUM").append(variablesCounter + 1).append("\nPUT\tNUM0\nMEMSET\n");
-          output.append("REC\nPUT\tNUM0\nMEMGET\nPUT\tNUM1\nADD\nPUT\tNUM0\nMEMSET\nBREAK\nEND\nREC\nPUT\tNUM0\nMEMGET\nMEMGET\n");
-          output.append("PUT\tNUM").append(dynamicVariables.get(((SyntaxTree.SetVariable)program).getVariableName()));
-          output.append("\nEQ\nIFTRUN\nPOP\nPUT\tNUM0\nMEMGET\nPUT\tNUM2\nADD\nPUT\tNUM0\nMEMSET\nEND\nPUT\tNUM2\nMEMSIZE\nDIV\nREPEAT\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPOP\nPUT\tNUM0\nMEMGET\nPUT\tNUM-1\nPUT\tNUM0\nMEMSET\nMEMSET\n");
-        }
+        output.append(putVals(((SyntaxTree.SetVariable)program).getVariableValue()));
+        output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable)program).getVariableName())).append("\nMEMSET\n");
       }
     }
     return output.toString();
