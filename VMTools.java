@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.math.BigDecimal;
+import java.util.Map;
 
 public class VMTools {
   class FunctionHolder {
@@ -146,7 +147,12 @@ public class VMTools {
     StringBuilder stringBuilder = new StringBuilder();
     String tmp = SyntaxTreeToVMByteCode2(program);
     stringBuilder.append(functionsCode.toString()).append(tmp);
-    return stringBuilder.toString();
+    String result = stringBuilder.toString();
+    for (Map.Entry<String, FunctionHolder> entry : functions.entrySet()) {
+      result = result.replace("FN" + entry.getKey() + ".location", entry.getValue().getLocation() + "");
+      result = result.replace("FN" + entry.getKey() + ".size", entry.getValue().getSize() + "");
+    }
+    return result;
   }
 
   private String SyntaxTreeToVMByteCode2(ProgramBase program) {
@@ -207,8 +213,13 @@ public class VMTools {
         output.append("\n");
       }
     } else if (program instanceof SyntaxTree.Function) {
-      String functionCode = SyntaxTreeToVMByteCode2(((SyntaxTree.Function)program).getProgram());
       if (functions.containsKey(((SyntaxTree.Function)program).getFunctionName())) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, ((SyntaxTree.Function)program).getFunctionName());
+      } else {
+        functions.put(((SyntaxTree.Function)program).getFunctionName(), null);
+      }
+      String functionCode = SyntaxTreeToVMByteCode2(((SyntaxTree.Function)program).getProgram());
+      if (functions.get(((SyntaxTree.Function)program).getFunctionName()) != null) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, ((SyntaxTree.Function)program).getFunctionName());
       }
       int size = functionCode.split("\n").length + functionCode.split("PUT").length - 1;
@@ -221,14 +232,20 @@ public class VMTools {
       variablesCounter += size;
     } else if (program instanceof SyntaxTree.CallFunction) {
       FunctionHolder functionHolder = functions.get(((SyntaxTree.CallFunction)program).getFunctionName());
-      if (functionHolder == null) {
+      if (functionHolder == null && !functions.containsKey(((SyntaxTree.CallFunction)program).getFunctionName())) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction)program).getFunctionName());
       }
-      output.append("PUT\tNUM0\nPUT\tNUM").append(functionHolder.getLocation()).append("\nMEMSET\nREC\nPUT\tNUM").append(functionHolder.getLocation())
-                          .append("\nMEMGET\nPUT\tNUM1\nADD\nPUT\tNUM").append(functionHolder.getLocation()).append("\nMEMSET\n")
-                          .append("PUT\tNUM").append(functionHolder.getLocation()).append("\nMEMGET\nPUT\tNUM").append(functionHolder.getLocation())
-                          .append("\nADD\nMEMGET\nEND\nPUT\tNUM").append(functionHolder.getSize()).append("\nREPEAT\nPUT\tNUM")
-                          .append(functionHolder.getSize()).append("\nRUN\n");
+      String location = "FN" + ((SyntaxTree.CallFunction)program).getFunctionName() + ".location";
+      String size = "FN" + ((SyntaxTree.CallFunction)program).getFunctionName() + ".size";
+      if (functionHolder != null) {
+        location = functionHolder.getLocation() + "";
+        size = functionHolder.getSize() + "";
+      }
+      output.append("PUT\tNUM0\nPUT\tNUM").append(location).append("\nMEMSET\nREC\nPUT\tNUM").append(location)
+                          .append("\nMEMGET\nPUT\tNUM1\nADD\nPUT\tNUM").append(location).append("\nMEMSET\n")
+                          .append("PUT\tNUM").append(location).append("\nMEMGET\nPUT\tNUM").append(location)
+                          .append("\nADD\nMEMGET\nEND\nPUT\tNUM").append(size).append("\nREPEAT\nPUT\tNUM")
+                          .append(size).append("\nRUN\n");
     } else if (program instanceof SyntaxTree.Repeat) {
       output.append("REC\n");
       output.append(SyntaxTreeToVMByteCode2(((SyntaxTree.Repeat)program).getProgram()));
