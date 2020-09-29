@@ -52,7 +52,7 @@ output.jar: $(classes)
 native-image: INF
 	native-image 2>&1 >/dev/null && echo native-image installed! || (echo native-image not found && exit 1)
 	native-image -jar output.jar --no-fallback -H:ReflectionConfigurationFiles=META-INF/native-image/reflect-config.json
-INF: jar
+INF: output.jar
 	mkdir -p META-INF/native-image
 	-java -agentlib:native-image-agent=config-output-dir=META-INF/native-image Main
 clean:

@@ -64,6 +64,16 @@ public class SyntaxTree {
 
   public static class Variable extends ValueBase implements java.io.Serializable {
     private String variableName;
+    private boolean isDeclaration = false;
+
+    public boolean getIsDeclaration() {
+      return isDeclaration;
+    }
+
+    public void setIsDeclaration(boolean isDeclaration) {
+      this.isDeclaration = isDeclaration;
+    }
+
     public Variable(String variableName) {
       this.variableName = variableName;
     }
