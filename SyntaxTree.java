@@ -64,16 +64,6 @@ public class SyntaxTree {
 
   public static class Variable extends ValueBase implements java.io.Serializable {
     private String variableName;
-    private boolean isDeclaration = false;
-
-    public boolean getIsDeclaration() {
-      return isDeclaration;
-    }
-
-    public void setIsDeclaration(boolean isDeclaration) {
-      this.isDeclaration = isDeclaration;
-    }
-
     public Variable(String variableName) {
       this.variableName = variableName;
     }
@@ -97,19 +87,32 @@ public class SyntaxTree {
   public static class SetVariable extends ProgramBase implements java.io.Serializable {
     private String variableName;
     private final ValueBase value;
-    private boolean isStatic = true;
+    private boolean isDeclaration = false;
+
+    public boolean getIsDeclaration() {
+      return isDeclaration;
+    }
+
+    public void setIsDeclaration(boolean isDeclaration) {
+      this.isDeclaration = isDeclaration;
+    }
+    public SetVariable(String variableName, ValueBase value, boolean isDeclaration) {
+      this.variableName = variableName;
+      this.value = value;
+      this.isDeclaration = isDeclaration;
+      if (isDeclaration && variables.containsKey(variableName)) {
+        Errors.error(ErrorCodes.ERROR_VARIABLE_REDECLARATION, variableName);
+      }
+      if (!isDeclaration && !variables.containsKey(variableName)) {
+        Errors.error(ErrorCodes.ERROR_VARIABLE_NOT_DECLARED, variableName);
+      }
+      variables.put(variableName, null);
+    }
+
     public SetVariable(String variableName, ValueBase value) {
       this.variableName = variableName;
       this.value = value;
-    }
-
-    public SetVariable setIsStatic(boolean isStatic) {
-      this.isStatic = isStatic;
-      return this;
-    }
-
-    public boolean getIsStatic() {
-      return isStatic;
+      variables.put(variableName, null);
     }
 
     @Override
