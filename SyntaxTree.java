@@ -75,8 +75,9 @@ public class SyntaxTree {
       return tmp;
     }
 
-    public void setVariableName(String variableName) {
+    public Variable setVariableName(String variableName) {
       this.variableName = variableName;
+      return this;
     }
 
     public String getVariableName() {
@@ -93,8 +94,9 @@ public class SyntaxTree {
       return isDeclaration;
     }
 
-    public void setIsDeclaration(boolean isDeclaration) {
+    public SetVariable setIsDeclaration(boolean isDeclaration) {
       this.isDeclaration = isDeclaration;
+      return this;
     }
     public SetVariable(String variableName, ValueBase value, boolean isDeclaration) {
       this.variableName = variableName;
@@ -128,8 +130,9 @@ public class SyntaxTree {
       return variableName;
     }
 
-    public void setVariableName(String variableName) {
+    public SetVariable setVariableName(String variableName) {
       this.variableName = variableName;
+      return this;
     }
 
     public ValueBase getVariableValue() {
