@@ -137,9 +137,18 @@ public class SyntaxTree {
   public static class Function extends ProgramBase implements java.io.Serializable {
     private final String functionName;
     private final ProgramBase program;
+    public Function(String functionName, ProgramBase program, boolean error) {
+      this.functionName = functionName;
+      if (error && functions.containsKey(functionName)) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
+      }
+      functions.put(functionName, null);
+      this.program = program;
+    }
+
     public Function(String functionName, ProgramBase program) {
       this.functionName = functionName;
-      if (functions.containsKey(functionName) && functions.get(functionName) != null) {
+      if (functions.containsKey(functionName)) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
       }
       functions.put(functionName, null);
