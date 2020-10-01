@@ -89,6 +89,7 @@ public class SyntaxTree {
     private String variableName;
     private final ValueBase value;
     private boolean isDeclaration = false;
+    private boolean checkDeclarationInRuntime = false;
 
     public boolean getIsDeclaration() {
       return isDeclaration;
@@ -98,15 +99,30 @@ public class SyntaxTree {
       this.isDeclaration = isDeclaration;
       return this;
     }
+
+    public boolean getCheckDeclarationInRuntime() {
+      return checkDeclarationInRuntime;
+    }
+
+    public SetVariable setCheckDeclarationInRuntime(boolean checkDeclarationInRuntime) {
+      this.checkDeclarationInRuntime = checkDeclarationInRuntime;
+      return this;
+    }
     public SetVariable(String variableName, ValueBase value, boolean isDeclaration) {
       this.variableName = variableName;
       this.value = value;
       this.isDeclaration = isDeclaration;
-      if (isDeclaration && variables.containsKey(variableName)) {
-        Errors.error(ErrorCodes.ERROR_VARIABLE_REDECLARATION, variableName);
-      }
-      if (!isDeclaration && !variables.containsKey(variableName)) {
-        Errors.error(ErrorCodes.ERROR_VARIABLE_NOT_DECLARED, variableName);
+      checkDeclaration();
+      variables.put(variableName, null);
+    }
+
+    public SetVariable(String variableName, ValueBase value, boolean isDeclaration, boolean checkDeclarationInRuntime) {
+      this.variableName = variableName;
+      this.value = value;
+      this.isDeclaration = isDeclaration;
+      this.checkDeclarationInRuntime = checkDeclarationInRuntime;
+      if (!checkDeclarationInRuntime) {
+        checkDeclaration();
       }
       variables.put(variableName, null);
     }
@@ -117,8 +133,18 @@ public class SyntaxTree {
       variables.put(variableName, null);
     }
 
+    public void checkDeclaration() {
+      if (isDeclaration && variables.get(variableName) != null) {
+        Errors.error(ErrorCodes.ERROR_VARIABLE_REDECLARATION, variableName);
+      }
+      if (!isDeclaration && variables.get(variableName) == null) {
+        Errors.error(ErrorCodes.ERROR_VARIABLE_NOT_DECLARED, variableName);
+      }
+    }
+
     @Override
     void eval() {
+      if (checkDeclarationInRuntime) checkDeclaration();
       ValueBase value = this.value;
       if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null)) {
         value = (ValueBase)value.getData();

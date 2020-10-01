@@ -3,7 +3,11 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 public class VMTools {
-  class FunctionHolder {
+  private static boolean variablesHasDeclaration = false;
+  public static void setVariablesHasDeclaration(boolean variablesHasDeclaration1) {
+    variablesHasDeclaration = variablesHasDeclaration1;
+  }
+  static class FunctionHolder {
     private int location;
     private int size = 0;
     public FunctionHolder(int location, int size) {
@@ -23,10 +27,10 @@ public class VMTools {
       this.size = size;
     }
   }
-  private HashMap<String, Integer> variables = new HashMap<>();
+  private final HashMap<String, Integer> variables = new HashMap<>();
   private int variablesCounter = 0;
-  private HashMap<String, FunctionHolder> functions = new HashMap<>();
-  private StringBuilder functionsCode = new StringBuilder();
+  private final HashMap<String, FunctionHolder> functions = new HashMap<>();
+  private final StringBuilder functionsCode = new StringBuilder();
   private String putVals(ValueBase... vals) {
     StringBuilder output = new StringBuilder();
     for (ValueBase val : vals) {
@@ -134,6 +138,14 @@ public class VMTools {
   private void init(ProgramBase program) {
     if (program instanceof SyntaxTree.SetVariable) {
       variablesCounter++;
+      if (variablesHasDeclaration && ((SyntaxTree.SetVariable)program).getIsDeclaration() &&
+              variables.containsKey(((SyntaxTree.SetVariable)program).getVariableName())) {
+        Errors.error(ErrorCodes.ERROR_VARIABLE_REDECLARATION, ((SyntaxTree.SetVariable)program).getVariableName());
+      }
+      if (variablesHasDeclaration && !((SyntaxTree.SetVariable)program).getIsDeclaration() &&
+              !variables.containsKey(((SyntaxTree.SetVariable)program).getVariableName())) {
+        Errors.error(ErrorCodes.ERROR_VARIABLE_NOT_DECLARED, ((SyntaxTree.SetVariable)program).getVariableName());
+      }
       variables.put(((SyntaxTree.SetVariable)program).getVariableName(), variablesCounter);
     } else if (program instanceof SyntaxTree.Programs) {
       for (ProgramBase program2 : ((SyntaxTree.Programs)program).getPrograms()) {
