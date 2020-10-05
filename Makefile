@@ -34,13 +34,13 @@ rmobjs:
 	$(RM) $(objs)
 
 %.o:
-	$(MAKE) -C VM $(subst VM/,,$@) EXT_CFLAGS=-fPIC
+	$(MAKE) -C VM -f Makefile.old $(subst VM/,,$@) EXT_CFLAGS="-fPIC $(EXT_CFLAGS)" EXT_LDFLAGS="$(EXT_LDFLAGS)"
 
 VM_JNI.o: VM_JNI.cpp VM_JNI.h
-	$(CXX) -c $(CFLAGS) VM_JNI.cpp -fPIC
+	$(CXX) -c $(CFLAGS) "$(EXT_CFLAGS)" VM_JNI.cpp -fPIC "$(EXT_LDFLAGS)"
 
 $(NAME).$(EXT): VM_JNI.o
-	$(CXX) $(CFLAGS) $(objs) VM_JNI.o VM/VM.cpp $(LDFLAGS) -o $(NAME).$(EXT)
+	$(CXX) $(CFLAGS) "$(EXT_CFLAGS)" $(objs) VM_JNI.o VM/VM.cpp $(LDFLAGS) -o $(NAME).$(EXT) "$(EXT_LDFLAGS)"
 
 output.jar: $(classes)
 	echo Manifest-Version: 1.0 > manifest.txt

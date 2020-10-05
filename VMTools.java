@@ -207,6 +207,8 @@ public class VMTools {
         output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable)program).getVariableName())).append("\nMEMSET\n");
       }
       variablesCounter++;
+    } else if (program instanceof SyntaxTree.Break) {
+      output.append("BREAK\n");
     }
     return output.toString();
   }

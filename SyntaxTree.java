@@ -30,6 +30,16 @@ public class SyntaxTree {
   public static HashMap<String, ProgramBase> getFunctions() {
     return functions;
   }
+  private static Data data = new Data();
+
+  public static Data getData() {
+    return data;
+  }
+
+  public static void setData(Data data) {
+    SyntaxTree.data = data;
+  }
+
   public static class Number extends ValueBase {
     public Number(BigDecimal number) {
       this.setData(number);
@@ -70,7 +80,7 @@ public class SyntaxTree {
 
     @Override
     public Object getData() {
-      ValueBase tmp = variables.get(variableName);
+      ValueBase tmp = data.getVariables().get(variableName);
       if (tmp == null) Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, variableName);
       return tmp;
     }
@@ -113,7 +123,7 @@ public class SyntaxTree {
       this.value = value;
       this.isDeclaration = isDeclaration;
       checkDeclaration();
-      variables.put(variableName, null);
+      data.getVariables().put(variableName, null);
     }
 
     public SetVariable(String variableName, ValueBase value, boolean isDeclaration, boolean checkDeclarationInRuntime) {
@@ -124,20 +134,20 @@ public class SyntaxTree {
       if (!checkDeclarationInRuntime) {
         checkDeclaration();
       }
-      variables.put(variableName, null);
+      data.getVariables().put(variableName, null);
     }
 
     public SetVariable(String variableName, ValueBase value) {
       this.variableName = variableName;
       this.value = value;
-      variables.put(variableName, null);
+      data.getVariables().put(variableName, null);
     }
 
     public void checkDeclaration() {
-      if (isDeclaration && variables.get(variableName) != null) {
+      if (isDeclaration && data.getVariables().get(variableName) != null) {
         Errors.error(ErrorCodes.ERROR_VARIABLE_REDECLARATION, variableName);
       }
-      if (!isDeclaration && variables.get(variableName) == null) {
+      if (!isDeclaration && data.getVariables().get(variableName) == null) {
         Errors.error(ErrorCodes.ERROR_VARIABLE_NOT_DECLARED, variableName);
       }
     }
@@ -149,7 +159,7 @@ public class SyntaxTree {
       if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null)) {
         value = (ValueBase)value.getData();
       }
-      variables.put(variableName, value);
+      data.getVariables().put(variableName, value);
     }
 
     public String getVariableName() {
@@ -171,25 +181,25 @@ public class SyntaxTree {
     private final ProgramBase program;
     public Function(String functionName, ProgramBase program, boolean error) {
       this.functionName = functionName;
-      if (error && functions.containsKey(functionName)) {
+      if (error && data.getFunctions().containsKey(functionName)) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
       }
-      functions.put(functionName, null);
+      data.getFunctions().put(functionName, null);
       this.program = program;
     }
 
     public Function(String functionName, ProgramBase program) {
       this.functionName = functionName;
-      if (functions.containsKey(functionName)) {
+      if (data.getFunctions().containsKey(functionName)) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
       }
-      functions.put(functionName, null);
+      data.getFunctions().put(functionName, null);
       this.program = program;
     }
 
     @Override
     void eval() {
-      functions.put(functionName, program);
+      data.getFunctions().put(functionName, program);
     }
 
     public String getFunctionName() {
@@ -209,7 +219,7 @@ public class SyntaxTree {
 
     @Override
     void eval() {
-      ProgramBase program = functions.get(functionName);
+      ProgramBase program = data.getFunctions().get(functionName);
       if (program == null) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, functionName);
       }
@@ -970,6 +980,7 @@ public class SyntaxTree {
     void eval() {
       for (ProgramBase program : programs) {
         program.eval();
+        if (data.isBreaked()) break;
       }
     }
   }
@@ -1101,6 +1112,10 @@ public class SyntaxTree {
       }
       while (condition3) {
         program.eval();
+        if (data.isBreaked()) {
+          data.setBreaked(false);
+          return;
+        }
         if (!(condition instanceof Number || condition instanceof Text || condition instanceof Boolean)) {
           condition2 = (ValueBase)condition.getData();
         } else {
@@ -1140,10 +1155,21 @@ public class SyntaxTree {
       if (count instanceof Number) {
         for (BigDecimal i = BigDecimal.ZERO; i.compareTo((BigDecimal)count.getData()) == -1; i = i.add(BigDecimal.ONE)) {
           program.eval();
+          if (data.isBreaked()) {
+            data.setBreaked(false);
+            return;
+          }
         }
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in If");
       }
+    }
+  }
+
+  public static class Break extends ProgramBase implements java.io.Serializable {
+    @Override
+    void eval() {
+      data.setBreaked(true);
     }
   }
 }
