@@ -1172,4 +1172,11 @@ public class SyntaxTree {
       data.setBreaked(true);
     }
   }
+
+  public static class Return extends ProgramBase implements java.io.Serializable {
+    @Override
+    void eval() {
+      data.setBreaked(true);
+    }
+  }
 }
