@@ -20,7 +20,12 @@ public class Main {
     )),
     new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("main")), new SyntaxTree.Print(new SyntaxTree.CallFunction("func2")),
     new OpCode(SyntaxTree.objectToValue(VM.PUT), SyntaxTree.objectToValue("\nText From VM\n")/*, SyntaxTree.objectToValue(VM.PRINT)*/),
-    new SyntaxTree.Print(new OpCode.PopFromVM())
+    new SyntaxTree.Print(new OpCode.PopFromVM()),
+            new SyntaxTree.If(new SyntaxTree.Boolean(true), new SyntaxTree.Programs(
+                    new SyntaxTree.SetVariable("a", new SyntaxTree.Null(), true),
+                    new SyntaxTree.Print(new SyntaxTree.Variable("a"))
+            )),
+            new SyntaxTree.Print(new SyntaxTree.Variable("a"))
     );
 //     program.eval();
     serializer.serialize("file.ser", program);

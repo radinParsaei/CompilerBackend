@@ -40,6 +40,23 @@ public class SyntaxTree {
     SyntaxTree.data = data;
   }
 
+  private static String lastNameSpace = "@";
+  private static int location = 0;
+  private static String nextNameSpace() {
+    if (lastNameSpace.charAt(location) == 'z') {
+      location++;
+      lastNameSpace += "@";
+    }
+    StringBuilder stringBuilder = new StringBuilder(lastNameSpace);
+    char toReplace = (char) (lastNameSpace.charAt(location) + 1);
+    if (toReplace == '[') {
+      toReplace += 6;
+    }
+    stringBuilder.setCharAt(location, toReplace);
+    lastNameSpace = stringBuilder.toString();
+    return lastNameSpace;
+  }
+
   public static class Number extends ValueBase {
     public Number(BigDecimal number) {
       this.setData(number);
@@ -185,7 +202,7 @@ public class SyntaxTree {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
       }
       data.getFunctions().put(functionName, null);
-      this.program = program;
+      this.program = NameSpaces.addNameSpaces(nextNameSpace(), program, null);
     }
 
     public Function(String functionName, ProgramBase program) {
@@ -194,7 +211,7 @@ public class SyntaxTree {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
       }
       data.getFunctions().put(functionName, null);
-      this.program = program;
+      this.program = NameSpaces.addNameSpaces(nextNameSpace(), program, null);
     }
 
     @Override
@@ -1060,12 +1077,12 @@ public class SyntaxTree {
       return this.elseProgram;
     }
     public If addElse(ProgramBase elseProgram) {
-      this.elseProgram = elseProgram;
+      this.elseProgram = NameSpaces.addNameSpaces(nextNameSpace(), elseProgram, null);
       return this;
     }
     public If(ValueBase condition, ProgramBase program) {
       this.condition = condition;
-      this.program = program;
+      this.program = NameSpaces.addNameSpaces(nextNameSpace(), program, null);
     }
 
     @Override
@@ -1101,7 +1118,7 @@ public class SyntaxTree {
     }
     public While(ValueBase condition, ProgramBase program) {
       this.condition = condition;
-      this.program = program;
+      this.program = NameSpaces.addNameSpaces(nextNameSpace(), program, null);
     }
 
     @Override
@@ -1156,7 +1173,7 @@ public class SyntaxTree {
     }
     public Repeat(ValueBase count, ProgramBase program) {
       this.count = count;
-      this.program = program;
+      this.program = NameSpaces.addNameSpaces(nextNameSpace(), program, null);
     }
 
     @Override
@@ -1218,6 +1235,17 @@ public class SyntaxTree {
 
     public ValueBase getValue() {
       return value;
+    }
+  }
+
+  public static class Global extends ProgramBase implements java.io.Serializable {
+    String variableName;
+    public Global(String variableName) {
+      this.variableName = variableName;
+    }
+
+    public String getVariableName() {
+      return variableName;
     }
   }
 }
