@@ -4,6 +4,15 @@ public class Data implements java.io.Serializable {
     transient private HashMap<String, ValueBase> variables = SyntaxTree.getVariables();
     transient private HashMap<String, ProgramBase> functions = SyntaxTree.getFunctions();
     transient private boolean isBreaked = false;
+    transient private ValueBase returnedData = null;
+
+    public ValueBase getReturnedData() {
+        return returnedData;
+    }
+
+    public void setReturnedData(ValueBase returnedData) {
+        this.returnedData = returnedData;
+    }
 
     public boolean isBreaked() {
         return isBreaked;

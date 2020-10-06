@@ -11,18 +11,18 @@ public class Main {
         new SyntaxTree.Print(new SyntaxTree.Variable("b"), new SyntaxTree.Mul(new SyntaxTree.Number(5), new SyntaxTree.Add(new SyntaxTree.Variable("b"), new SyntaxTree.Number(10))), new SyntaxTree.Text(".")).setSeparator(new SyntaxTree.Text("\t")),
         new SyntaxTree.SetVariable("c", new SyntaxTree.Number(0)),
         new SyntaxTree.Print(new SyntaxTree.Text("Hello\n")),
-        new SyntaxTree.Function("func2", new SyntaxTree.Print(vals)),
+        new SyntaxTree.Function("func2", new SyntaxTree.Programs(new SyntaxTree.Print(vals), new SyntaxTree.Return(new SyntaxTree.Number(10)))),
         new SyntaxTree.Repeat(new SyntaxTree.Number(10),
             new SyntaxTree.Programs(
                 new SyntaxTree.SetVariable("c", new SyntaxTree.Add(new SyntaxTree.Variable("c"), new SyntaxTree.Number(1))),
                 new SyntaxTree.Print(new SyntaxTree.Add(new SyntaxTree.Variable("c"), new SyntaxTree.Text("\n")))
             ))
     )),
-    new SyntaxTree.CallFunction("main"), new SyntaxTree.CallFunction("func2"),
+    new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("main")), new SyntaxTree.Print(new SyntaxTree.CallFunction("func2")),
     new OpCode(SyntaxTree.objectToValue(VM.PUT), SyntaxTree.objectToValue("\nText From VM\n")/*, SyntaxTree.objectToValue(VM.PRINT)*/),
     new SyntaxTree.Print(new OpCode.PopFromVM())
     );
-    // program.eval();
+//     program.eval();
     serializer.serialize("file.ser", program);
     serializer.deserialize("file.ser").eval();
     try {

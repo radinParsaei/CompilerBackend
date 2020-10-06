@@ -211,19 +211,28 @@ public class SyntaxTree {
     }
   }
 
-  public static class CallFunction extends ProgramBase implements java.io.Serializable {
+  public static class CallFunction extends ValueBase implements java.io.Serializable {
     private final String functionName;
     public CallFunction(String functionName) {
       this.functionName = functionName;
     }
 
     @Override
-    void eval() {
+    public ValueBase getData() {
       ProgramBase program = data.getFunctions().get(functionName);
       if (program == null) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, functionName);
+        return new Null();
       }
       program.eval();
+      ValueBase tmp;
+      if (program.getData().getReturnedData() != null) {
+        tmp = program.getData().getReturnedData();
+        program.getData().setReturnedData(null);
+      } else {
+        tmp = new Null();
+      }
+      return tmp;
     }
 
     public String getFunctionName() {
@@ -981,6 +990,7 @@ public class SyntaxTree {
       for (ProgramBase program : programs) {
         program.eval();
         if (data.isBreaked()) break;
+        if (data.getReturnedData() != null) break;
       }
     }
   }
@@ -1116,6 +1126,9 @@ public class SyntaxTree {
           data.setBreaked(false);
           return;
         }
+        if (data.getReturnedData() != null) {
+          return;
+        }
         if (!(condition instanceof Number || condition instanceof Text || condition instanceof Boolean)) {
           condition2 = (ValueBase)condition.getData();
         } else {
@@ -1156,9 +1169,12 @@ public class SyntaxTree {
         for (BigDecimal i = BigDecimal.ZERO; i.compareTo((BigDecimal)count.getData()) == -1; i = i.add(BigDecimal.ONE)) {
           program.eval();
           if (data.isBreaked()) {
-            data.setBreaked(false);
-            return;
-          }
+          data.setBreaked(false);
+          return;
+        }
+        if (data.getReturnedData() != null) {
+          return;
+        }
         }
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in If");
@@ -1174,9 +1190,34 @@ public class SyntaxTree {
   }
 
   public static class Return extends ProgramBase implements java.io.Serializable {
+    ValueBase value;
+    public Return(ValueBase value) {
+      this.value = value;
+    }
+
     @Override
     void eval() {
-      data.setBreaked(true);
+      data.setReturnedData(value);
+    }
+
+    public ValueBase getValue() {
+      return value;
+    }
+  }
+
+  public static class ExecuteValue extends ProgramBase implements java.io.Serializable {
+    ValueBase value;
+    public ExecuteValue(ValueBase value) {
+      this.value = value;
+    }
+
+    @Override
+    void eval() {
+      value.getData();
+    }
+
+    public ValueBase getValue() {
+      return value;
     }
   }
 }

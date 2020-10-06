@@ -110,6 +110,12 @@ public class VMTools {
       } else if (val instanceof SyntaxTree.BitwiseNot) {
         output.append(putVals(((SyntaxTree.BitwiseNot)val).getValue()));
         output.append("NOT\n");
+      } else if (val instanceof SyntaxTree.CallFunction) {
+        Integer functionCode = functions.get(((SyntaxTree.CallFunction)val).getFunctionName());
+        if (!functions.containsKey(((SyntaxTree.CallFunction)val).getFunctionName())) {
+          Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction)val).getFunctionName());
+        }
+        output.append("PUT\tNUM").append(functionCode).append("\nCALLFN\n");
       }
     }
     return output.toString();
@@ -182,12 +188,8 @@ public class VMTools {
       output.append("REC\n").append(functionCode)
               .append("END\nPUT\tNUM").append(functions.get(((SyntaxTree.Function)program).getFunctionName()))
               .append("\nMKFN\n");
-    } else if (program instanceof SyntaxTree.CallFunction) {
-      Integer functionCode = functions.get(((SyntaxTree.CallFunction)program).getFunctionName());
-      if (!functions.containsKey(((SyntaxTree.CallFunction)program).getFunctionName())) {
-        Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction)program).getFunctionName());
-      }
-      output.append("PUT\tNUM").append(functionCode).append("\nCALLFN\n");
+    } else if (program instanceof SyntaxTree.ExecuteValue) {
+      output.append(putVals(((SyntaxTree.ExecuteValue)program).getValue()));
     } else if (program instanceof SyntaxTree.Repeat) {
       output.append("REC\n");
       output.append(SyntaxTreeToVMByteCode(((SyntaxTree.Repeat)program).getProgram()));
@@ -209,6 +211,8 @@ public class VMTools {
       variablesCounter++;
     } else if (program instanceof SyntaxTree.Break) {
       output.append("BREAK\n");
+    } else if (program instanceof SyntaxTree.Return) {
+      output.append(putVals(((SyntaxTree.Return)program).getValue())).append("EXITFN\n");
     }
     return output.toString();
   }
