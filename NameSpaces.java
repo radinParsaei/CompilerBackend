@@ -58,6 +58,10 @@ public class NameSpaces {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Repeat)program).getCount(), declaredVariables);
         } else if (program instanceof SyntaxTree.Exit) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Exit)program).getStatus(), declaredVariables);
+        } else if (program instanceof SyntaxTree.Return) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Return)program).getValue(), declaredVariables);
+        } else if (program instanceof SyntaxTree.ExecuteValue) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.ExecuteValue)program).getValue(), declaredVariables);
         } else if (program instanceof SyntaxTree.Print) {
             for (ValueBase value : ((SyntaxTree.Print)program).getArgs()) {
                 addNameSpacesOnValue(nameSpace, value, declaredVariables);
@@ -138,6 +142,8 @@ public class NameSpaces {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Not) value).getValue(), declaredVariables);
         } else if (value instanceof SyntaxTree.BitwiseNot) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.BitwiseNot) value).getValue(), declaredVariables);
+        } else if (value instanceof SyntaxTree.CallFunction) {
+            addNameSpaces(nameSpace, new SyntaxTree.Programs(((SyntaxTree.CallFunction) value).getVariableSetters()), declaredVariables);
         }
     }
 }

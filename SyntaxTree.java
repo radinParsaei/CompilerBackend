@@ -1,5 +1,8 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.math.BigDecimal;
+import java.util.Map;
 
 public class SyntaxTree {
   public static ValueBase objectToValue(Object object) {
@@ -196,22 +199,30 @@ public class SyntaxTree {
   public static class Function extends ProgramBase implements java.io.Serializable {
     private final String functionName;
     private final ProgramBase program;
-    public Function(String functionName, ProgramBase program, boolean error) {
-      this.functionName = functionName;
-      if (error && data.getFunctions().containsKey(functionName)) {
-        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
+    public Function(String functionName, ProgramBase program, boolean error, String... args) {
+      StringBuilder finalFunctionName = new StringBuilder(functionName).append(":");
+      for (String string : args) {
+        finalFunctionName.append(",").append(string);
       }
-      data.getFunctions().put(functionName, null);
-      this.program = NameSpaces.addNameSpaces(nextNameSpace(), program, null);
+      this.functionName = finalFunctionName.toString();
+      if (error && data.getFunctions().containsKey(this.functionName)) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
+      }
+      data.getFunctions().put(this.functionName, null);
+      this.program = NameSpaces.addNameSpaces(nextNameSpace(), program, new ArrayList<>(Arrays.asList(args)));
     }
 
-    public Function(String functionName, ProgramBase program) {
-      this.functionName = functionName;
-      if (data.getFunctions().containsKey(functionName)) {
-        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, functionName);
+    public Function(String functionName, ProgramBase program, String... args) {
+      StringBuilder finalFunctionName = new StringBuilder(functionName).append(":");
+      for (String string : args) {
+        finalFunctionName.append(",").append(string);
       }
-      data.getFunctions().put(functionName, null);
-      this.program = NameSpaces.addNameSpaces(nextNameSpace(), program, null);
+      this.functionName = finalFunctionName.toString();
+      if (data.getFunctions().containsKey(this.functionName)) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
+      }
+      data.getFunctions().put(this.functionName, null);
+      this.program = NameSpaces.addNameSpaces("F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
     }
 
     @Override
@@ -229,13 +240,37 @@ public class SyntaxTree {
   }
 
   public static class CallFunction extends ValueBase implements java.io.Serializable {
-    private final String functionName;
-    public CallFunction(String functionName) {
+    private String functionName;
+    private final ProgramBase[] programs;
+    public CallFunction(String functionName, ValueBase... args) {
       this.functionName = functionName;
+      programs = new ProgramBase[args.length];
+      ArrayList<String> params = new ArrayList<>();
+      for (Map.Entry<String, ProgramBase> entry : data.getFunctions().entrySet()) {
+        if (entry.getKey().split(":")[0].equals(functionName)) {
+          this.functionName = entry.getKey();
+          if (entry.getKey().split(":").length > 1) {
+            for (String string : entry.getKey().split(":")[1].split(",")) {
+              if (string.equals("")) continue;
+              params.add(string);
+            }
+          }
+        }
+      }
+      if (params.size() != args.length) {
+        Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+      }
+      int i = 0;
+      for (ValueBase value : args) {
+        programs[i] = new SyntaxTree.SetVariable("F" + this.functionName + ":" + params.get(i++), value);
+      }
     }
 
     @Override
     public ValueBase getData() {
+      for (ProgramBase program : programs) {
+        program.eval();
+      }
       ProgramBase program = data.getFunctions().get(functionName);
       if (program == null) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, functionName);
@@ -254,6 +289,10 @@ public class SyntaxTree {
 
     public String getFunctionName() {
       return functionName;
+    }
+
+    public ProgramBase[] getVariableSetters() {
+      return programs;
     }
   }
 

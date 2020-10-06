@@ -10,6 +10,9 @@ public class Errors {
       case ErrorCodes.ERROR_FUNCTION_REDECLARATION:
         System.err.println("Function " + args[0] + " already exists");
         break;
+      case ErrorCodes.ERROR_ARGS_NOT_MATCH:
+        System.err.println("arguments not match for " + args[0]);
+        break;
       case ErrorCodes.ERROR_VARIABLE_REDECLARATION:
         System.err.println("Variable " + args[0] + " already exists");
         break;

@@ -3,13 +3,10 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 public class VMTools {
-  private static boolean variablesHasDeclaration = false;
-  public static void setVariablesHasDeclaration(boolean variablesHasDeclaration1) {
-    variablesHasDeclaration = variablesHasDeclaration1;
-  }
   private final HashMap<String, Integer> variables = new HashMap<>();
   private int variablesCounter = 0;
   private int functionsCounter = 0;
+  private boolean checkVariables = true;
   private final HashMap<String, Integer> functions = new HashMap<>();
   private String putVals(ValueBase... vals) {
     StringBuilder output = new StringBuilder();
@@ -17,18 +14,13 @@ public class VMTools {
       if (val instanceof SyntaxTree.Number) {
         output.append("PUT\tNUM").append((BigDecimal)val.getData()).append("\n");
       } else if (val instanceof SyntaxTree.Text) {
-        output.append("PUT\tTXT").append(val.getData().toString().replace("\n", "\\n")).append("\n");
+        output.append("PUT\tTXT").append(val.getData().toString().replace("\n", "\\n").replace("\t", "\\t")).append("\n");
       } else if (val instanceof SyntaxTree.Boolean) {
         output.append("PUT\tBOOL").append(val.getData().toString()).append("\n");
       } else if (val instanceof SyntaxTree.Null) {
         output.append("PUT\tNULL\n");
       } else if (val instanceof SyntaxTree.Variable) {
-        if (variables.get(((SyntaxTree.Variable)val).getVariableName()) != null) {
-          Integer a = variables.get(((SyntaxTree.Variable)val).getVariableName());
-          output.append("PUT\tNUM").append(a).append("\nMEMGET\n");
-        } else {
-          Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, ((SyntaxTree.Variable)val).getVariableName());
-        }
+        output.append("PUT\tNUM&").append(((SyntaxTree.Variable) val).getVariableName()).append("\nMEMGET\n");
       } else if (val instanceof SyntaxTree.Add) {
         output.append(putVals(((SyntaxTree.Add)val).getV2()));
         output.append(putVals(((SyntaxTree.Add)val).getV1()));
@@ -115,60 +107,63 @@ public class VMTools {
         if (!functions.containsKey(((SyntaxTree.CallFunction)val).getFunctionName())) {
           Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction)val).getFunctionName());
         }
-        output.append("PUT\tNUM").append(functionCode).append("\nCALLFN\n");
+        output.append(SyntaxTreeToVMByteCode(new SyntaxTree.Programs(((SyntaxTree.CallFunction)val).getVariableSetters())))
+                .append("PUT\tNUM").append(functionCode).append("\nCALLFN\n");
       }
     }
     return output.toString();
   }
 
   public String SyntaxTreeToVMByteCode(ProgramBase program) {
+    boolean checkVariables2 = checkVariables;
+    if (checkVariables2) checkVariables = false;
     StringBuilder output = new StringBuilder();
     if (program instanceof SyntaxTree.Programs) {
-      for (ProgramBase program2 : ((SyntaxTree.Programs)program).getPrograms()) {
+      for (ProgramBase program2 : ((SyntaxTree.Programs) program).getPrograms()) {
         output.append(SyntaxTreeToVMByteCode(program2));
       }
     } else if (program instanceof SyntaxTree.Print) {
-      ValueBase[] args = ((SyntaxTree.Print)program).getArgs();
+      ValueBase[] args = ((SyntaxTree.Print) program).getArgs();
       for (int i = 0; i < args.length; i++) {
         output.append(putVals(args[i]));
         output.append("PRINT\n");
         if (i < args.length - 1) {
-          output.append(putVals((((SyntaxTree.Print)program).getSeparator())));
+          output.append(putVals((((SyntaxTree.Print) program).getSeparator())));
           output.append("PRINT\n");
         }
       }
     } else if (program instanceof SyntaxTree.If) {
-      ProgramBase programBase = ((SyntaxTree.If)program).getElseProgram();
+      ProgramBase programBase = ((SyntaxTree.If) program).getElseProgram();
       String elseByteCode = SyntaxTreeToVMByteCode(programBase);
-      output.append(putVals(new SyntaxTree.Number(new BigDecimal(elseByteCode.split("\n").length + 2 - (programBase == null? 1:0)))));
-      output.append(putVals(((SyntaxTree.If)program).getCondition()));
+      output.append(putVals(new SyntaxTree.Number(new BigDecimal(elseByteCode.split("\n").length + 2 - (programBase == null ? 1 : 0)))));
+      output.append(putVals(((SyntaxTree.If) program).getCondition()));
       output.append("TOBOOL\nIFSKIP\n");
       output.append(elseByteCode);
-      String byteCode = SyntaxTreeToVMByteCode(((SyntaxTree.If)program).getProgram());
+      String byteCode = SyntaxTreeToVMByteCode(((SyntaxTree.If) program).getProgram());
       output.append(putVals(new SyntaxTree.Number(new BigDecimal(byteCode.split("\n").length))));
       output.append("SKIP\n");
       output.append(byteCode);
     } else if (program instanceof SyntaxTree.While) {
       output.append("REC\n");
-      output.append(SyntaxTreeToVMByteCode(((SyntaxTree.While)program).getProgram()));
-      output.append(putVals(((SyntaxTree.While)program).getCondition()));
+      output.append(SyntaxTreeToVMByteCode(((SyntaxTree.While) program).getProgram()));
+      output.append(putVals(((SyntaxTree.While) program).getCondition()));
       output.append("END\n");
-      output.append(putVals(((SyntaxTree.While)program).getCondition()));
+      output.append(putVals(((SyntaxTree.While) program).getCondition()));
       output.append("WTRUN\nPOP\n");
     } else if (program instanceof OpCode) {
       VM vm = new VM();
-      ValueBase[] byteCodes = ((OpCode)program).getProgram();
+      ValueBase[] byteCodes = ((OpCode) program).getProgram();
       for (int i = 0; i < byteCodes.length; i++) {
         if (byteCodes[i] instanceof SyntaxTree.Number) {
-          byte tmp = (byte)((BigDecimal)((SyntaxTree.Number)byteCodes[i]).getData()).intValue();
+          byte tmp = (byte) ((BigDecimal) ((SyntaxTree.Number) byteCodes[i]).getData()).intValue();
           if (tmp == VM.PUT) {
             i++;
             if (byteCodes[i] instanceof SyntaxTree.Number) {
-              output.append(vm.disassemble(tmp, (BigDecimal)((SyntaxTree.Number)byteCodes[i]).getData()));
+              output.append(vm.disassemble(tmp, (BigDecimal) ((SyntaxTree.Number) byteCodes[i]).getData()));
             } else if (byteCodes[i] instanceof SyntaxTree.Text) {
-              output.append(vm.disassemble(tmp, (String)((SyntaxTree.Text)byteCodes[i]).getData()).replace("\n", "\\n").replace("\f", "\\f").replace("\r", "\\r"));
+              output.append(vm.disassemble(tmp, (String) ((SyntaxTree.Text) byteCodes[i]).getData()).replace("\n", "\\n").replace("\f", "\\f").replace("\r", "\\r"));
             } else if (byteCodes[i] instanceof SyntaxTree.Boolean) {
-              output.append(vm.disassemble(tmp, (boolean)((SyntaxTree.Boolean)byteCodes[i]).getData()));
+              output.append(vm.disassemble(tmp, (boolean) ((SyntaxTree.Boolean) byteCodes[i]).getData()));
             } else {
               output.append(vm.disassemble(tmp));
             }
@@ -179,41 +174,51 @@ public class VMTools {
         output.append("\n");
       }
     } else if (program instanceof SyntaxTree.Function) {
-      if (functions.containsKey(((SyntaxTree.Function)program).getFunctionName())) {
-        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, ((SyntaxTree.Function)program).getFunctionName());
+      if (functions.containsKey(((SyntaxTree.Function) program).getFunctionName())) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, ((SyntaxTree.Function) program).getFunctionName());
       }
-      functions.put(((SyntaxTree.Function)program).getFunctionName(), functionsCounter);
+      functions.put(((SyntaxTree.Function) program).getFunctionName(), functionsCounter);
       functionsCounter++;
-      String functionCode = SyntaxTreeToVMByteCode(((SyntaxTree.Function)program).getProgram());
+      String functionCode = SyntaxTreeToVMByteCode(((SyntaxTree.Function) program).getProgram());
       output.append("REC\n").append(functionCode)
-              .append("END\nPUT\tNUM").append(functions.get(((SyntaxTree.Function)program).getFunctionName()))
+              .append("END\nPUT\tNUM").append(functions.get(((SyntaxTree.Function) program).getFunctionName()))
               .append("\nMKFN\n");
     } else if (program instanceof SyntaxTree.ExecuteValue) {
-      output.append(putVals(((SyntaxTree.ExecuteValue)program).getValue()));
+      output.append(putVals(((SyntaxTree.ExecuteValue) program).getValue()));
     } else if (program instanceof SyntaxTree.Repeat) {
       output.append("REC\n");
-      output.append(SyntaxTreeToVMByteCode(((SyntaxTree.Repeat)program).getProgram()));
+      output.append(SyntaxTreeToVMByteCode(((SyntaxTree.Repeat) program).getProgram()));
       output.append("END\n");
-      output.append(putVals(((SyntaxTree.Repeat)program).getCount()));
+      output.append(putVals(((SyntaxTree.Repeat) program).getCount()));
       output.append("REPEAT\n");
     } else if (program instanceof SyntaxTree.Exit) {
-      output.append(putVals(((SyntaxTree.Exit)program).getStatus()));
+      output.append(putVals(((SyntaxTree.Exit) program).getStatus()));
       output.append("EXIT\n");
     } else if (program instanceof SyntaxTree.SetVariable) {
-      if (variables.get(((SyntaxTree.SetVariable)program).getVariableName()) == null) {
-        variables.put(((SyntaxTree.SetVariable)program).getVariableName(), variablesCounter);
-        output.append(putVals(((SyntaxTree.SetVariable)program).getVariableValue()));
+      if (variables.get(((SyntaxTree.SetVariable) program).getVariableName()) == null) {
+        variables.put(((SyntaxTree.SetVariable) program).getVariableName(), variablesCounter);
+        output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
         output.append("PUT\tNUM").append(variablesCounter).append("\nMEMSET\n");
       } else {
-        output.append(putVals(((SyntaxTree.SetVariable)program).getVariableValue()));
-        output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable)program).getVariableName())).append("\nMEMSET\n");
+        output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
+        output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable) program).getVariableName())).append("\nMEMSET\n");
       }
       variablesCounter++;
     } else if (program instanceof SyntaxTree.Break) {
       output.append("BREAK\n");
     } else if (program instanceof SyntaxTree.Return) {
-      output.append(putVals(((SyntaxTree.Return)program).getValue())).append("EXITFN\n");
+      output.append(putVals(((SyntaxTree.Return) program).getValue())).append("EXITFN\n");
     }
-    return output.toString();
+    String result = output.toString();
+    if (checkVariables2) {
+      for (Map.Entry<String, Integer> entry : variables.entrySet()) {
+        result = result.replace("PUT\tNUM&" + entry.getKey() + "\n", "PUT\tNUM" + entry.getValue() + "\n");
+      }
+      int index = result.indexOf("PUT\tNUM&");
+      if (index != -1) {
+        Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, result.substring(index + 8, result.indexOf("\n", index)));
+      }
+    }
+    return result;
   }
 }
