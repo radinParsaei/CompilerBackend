@@ -103,6 +103,7 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.BitwiseNot)val).getValue()));
         output.append("NOT\n");
       } else if (val instanceof SyntaxTree.CallFunction) {
+        ((SyntaxTree.CallFunction)val).findFunction();
         Integer functionCode = functions.get(((SyntaxTree.CallFunction)val).getFunctionName());
         if (!functions.containsKey(((SyntaxTree.CallFunction)val).getFunctionName())) {
           Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction)val).getFunctionName());

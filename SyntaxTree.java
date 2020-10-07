@@ -94,6 +94,7 @@ public class SyntaxTree {
 
   public static class Variable extends ValueBase implements java.io.Serializable {
     private String variableName;
+    private boolean error = true;
     public Variable(String variableName) {
       this.variableName = variableName;
     }
@@ -101,7 +102,8 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase tmp = data.getVariables().get(variableName);
-      if (tmp == null) Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, variableName);
+      if (error && tmp == null) Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, variableName);
+      if (!error && tmp == null) tmp = new SyntaxTree.Null();
       return tmp;
     }
 
@@ -112,6 +114,11 @@ public class SyntaxTree {
 
     public String getVariableName() {
       return variableName;
+    }
+
+    public Variable setError(boolean error) {
+      this.error = error;
+      return this;
     }
   }
 
@@ -241,16 +248,22 @@ public class SyntaxTree {
 
   public static class CallFunction extends ValueBase implements java.io.Serializable {
     private String functionName;
-    private final ProgramBase[] programs;
+    private ProgramBase[] programs;
+    private final ValueBase[] args;
     public CallFunction(String functionName, ValueBase... args) {
       this.functionName = functionName;
+      this.args = args;
+    }
+
+    void findFunction() {
+      if (functionName.contains(":")) return;
       programs = new ProgramBase[args.length];
       ArrayList<String> params = new ArrayList<>();
       for (Map.Entry<String, ProgramBase> entry : data.getFunctions().entrySet()) {
         if (entry.getKey().split(":")[0].equals(functionName)) {
           this.functionName = entry.getKey();
-          if (entry.getKey().split(":").length > 1) {
-            for (String string : entry.getKey().split(":")[1].split(",")) {
+          if (this.functionName.split(":").length > 1) {
+            for (String string : this.functionName.split(":")[1].split(",")) {
               if (string.equals("")) continue;
               params.add(string);
             }
@@ -268,6 +281,7 @@ public class SyntaxTree {
 
     @Override
     public ValueBase getData() {
+      findFunction();
       for (ProgramBase program : programs) {
         program.eval();
       }
@@ -307,10 +321,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -340,10 +354,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -373,10 +387,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -419,10 +433,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -453,10 +467,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -487,10 +501,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       boolean equalAsBoolAndNumber = false;
@@ -539,10 +553,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       return new Boolean((v1.toString().equals(v2.toString()) && v1 instanceof Number == v2 instanceof Number));
@@ -568,10 +582,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -602,10 +616,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -637,10 +651,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -671,10 +685,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -706,10 +720,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Boolean && v2 instanceof Boolean) {
@@ -740,10 +754,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Boolean && v2 instanceof Boolean) {
@@ -774,10 +788,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Boolean && v2 instanceof Boolean) {
@@ -814,10 +828,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Boolean && v2 instanceof Boolean) {
@@ -854,10 +868,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -888,10 +902,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Number && v2 instanceof Number) {
@@ -922,10 +936,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase v1 = this.v1, v2 = this.v2;
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+      while (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+      while (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof Boolean && v2 instanceof Boolean) {
@@ -960,7 +974,7 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase value = this.value;
-      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean)) {
+      while (!(value instanceof Number || value instanceof Text || value instanceof Boolean)) {
         value = (ValueBase)value.getData();
       }
       if (value instanceof Number) {
@@ -985,7 +999,7 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase value = this.value;
-      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean)) {
+      while (!(value instanceof Number || value instanceof Text || value instanceof Boolean)) {
         value = (ValueBase)value.getData();
       }
       if (value instanceof Number) {
@@ -1012,7 +1026,7 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase value = this.value;
-      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean)) {
+      while (!(value instanceof Number || value instanceof Text || value instanceof Boolean)) {
         value = (ValueBase)value.getData();
       }
       if (value instanceof Number) {
@@ -1225,12 +1239,12 @@ public class SyntaxTree {
         for (BigDecimal i = BigDecimal.ZERO; i.compareTo((BigDecimal)count.getData()) == -1; i = i.add(BigDecimal.ONE)) {
           program.eval();
           if (data.isBreaked()) {
-          data.setBreaked(false);
-          return;
-        }
-        if (data.getReturnedData() != null) {
-          return;
-        }
+            data.setBreaked(false);
+            return;
+          }
+          if (data.getReturnedData() != null) {
+            return;
+          }
         }
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in If");

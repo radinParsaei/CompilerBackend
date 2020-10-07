@@ -143,7 +143,10 @@ public class NameSpaces {
         } else if (value instanceof SyntaxTree.BitwiseNot) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.BitwiseNot) value).getValue(), declaredVariables);
         } else if (value instanceof SyntaxTree.CallFunction) {
-            addNameSpaces(nameSpace, new SyntaxTree.Programs(((SyntaxTree.CallFunction) value).getVariableSetters()), declaredVariables);
+            ((SyntaxTree.CallFunction) value).findFunction();
+            for (ProgramBase setVariable : ((SyntaxTree.CallFunction) value).getVariableSetters()) {
+                addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable)setVariable).getVariableValue(), declaredVariables);
+            }
         }
     }
 }
