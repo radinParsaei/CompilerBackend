@@ -144,6 +144,9 @@ public class NameSpaces {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.BitwiseNot) value).getValue(), declaredVariables);
         } else if (value instanceof SyntaxTree.CallFunction) {
             ((SyntaxTree.CallFunction) value).findFunction();
+            if (nameSpace.equals("F" + ((SyntaxTree.CallFunction) value).getFunctionName())) {
+                ((SyntaxTree.CallFunction) value).setRecursion(true);
+            }
             for (ProgramBase setVariable : ((SyntaxTree.CallFunction) value).getVariableSetters()) {
                 addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable)setVariable).getVariableValue(), declaredVariables);
             }

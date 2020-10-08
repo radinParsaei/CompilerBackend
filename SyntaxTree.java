@@ -216,7 +216,7 @@ public class SyntaxTree {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
       }
       data.getFunctions().put(this.functionName, null);
-      this.program = NameSpaces.addNameSpaces(nextNameSpace(), program, new ArrayList<>(Arrays.asList(args)));
+      this.program = NameSpaces.addNameSpaces("F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
     }
 
     public Function(String functionName, ProgramBase program, String... args) {
@@ -250,6 +250,7 @@ public class SyntaxTree {
     private String functionName;
     private ProgramBase[] programs;
     private final ValueBase[] args;
+    private boolean isRecursion = false;
     public CallFunction(String functionName, ValueBase... args) {
       this.functionName = functionName;
       this.args = args;
@@ -282,6 +283,14 @@ public class SyntaxTree {
     @Override
     public ValueBase getData() {
       findFunction();
+      HashMap<String, ValueBase> tmp = null;
+      if (isRecursion) {
+        tmp = new HashMap<>();
+        for (Map.Entry<String, ValueBase> entry : data.getVariables().entrySet()) {
+          if (entry.getKey().startsWith("F" + this.functionName) && entry.getValue() != null)
+            tmp.put(entry.getKey(), entry.getValue());
+        }
+      }
       for (ProgramBase program : programs) {
         program.eval();
       }
@@ -291,14 +300,19 @@ public class SyntaxTree {
         return new Null();
       }
       program.eval();
-      ValueBase tmp;
+      ValueBase tmp2;
       if (program.getData().getReturnedData() != null) {
-        tmp = program.getData().getReturnedData();
+        tmp2 = program.getData().getReturnedData();
         program.getData().setReturnedData(null);
       } else {
-        tmp = new Null();
+        tmp2 = new Null();
       }
-      return tmp;
+      if (!(tmp2 instanceof Number || tmp2 instanceof Text || tmp2 instanceof Boolean || tmp2 instanceof Null)) {
+        tmp2 = (ValueBase)tmp2.getData();
+      }
+      if (isRecursion)
+        data.getVariables().putAll(tmp);
+      return tmp2;
     }
 
     public String getFunctionName() {
@@ -307,6 +321,14 @@ public class SyntaxTree {
 
     public ProgramBase[] getVariableSetters() {
       return programs;
+    }
+
+    public void setRecursion(boolean recursion) {
+      isRecursion = recursion;
+    }
+
+    public boolean isRecursion() {
+      return isRecursion;
     }
   }
 
