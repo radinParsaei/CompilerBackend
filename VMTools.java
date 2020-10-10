@@ -108,8 +108,14 @@ public class VMTools {
         if (!functions.containsKey(((SyntaxTree.CallFunction)val).getFunctionName())) {
           Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction)val).getFunctionName());
         }
+        if (((SyntaxTree.CallFunction) val).isRecursion()) {
+          output.append("//save ").append(((SyntaxTree.CallFunction) val).getFunctionName()).append(" variables\n");
+        }
         output.append(SyntaxTreeToVMByteCode(new SyntaxTree.Programs(((SyntaxTree.CallFunction)val).getVariableSetters())))
                 .append("PUT\tNUM").append(functionCode).append("\nCALLFN\n");
+        if (((SyntaxTree.CallFunction) val).isRecursion()) {
+          output.append("//load ").append(((SyntaxTree.CallFunction) val).getFunctionName()).append(" variables\n");
+        }
       }
     }
     return output.toString();
@@ -214,6 +220,14 @@ public class VMTools {
     if (checkVariables2) {
       for (Map.Entry<String, Integer> entry : variables.entrySet()) {
         result = result.replace("PUT\tNUM&" + entry.getKey() + "\n", "PUT\tNUM" + entry.getValue() + "\n");
+        for (Map.Entry<String, Integer> entry1 : functions.entrySet()) {
+          if (entry.getKey().startsWith("F" + entry1.getKey())) {
+            result = result.replace("\n//save " + entry1.getKey() + " variables\n", "\nPUT\tNUM" +
+                    variables.get(entry.getKey()) + "\nMEMGET\nPUT\tNUM0\nSTCKMOV\n//save " + entry1.getKey() + " variables\n");
+            result = result.replace("\n//load " + entry1.getKey() + " variables\n", "\nPUT\tNUM0\nSTCKGET\nPUT\tNUM" +
+                    variables.get(entry.getKey()) + "\nMEMSET\n//load " + entry1.getKey() + " variables\n");
+          }
+        }
       }
       int index = result.indexOf("PUT\tNUM&");
       if (index != -1) {
