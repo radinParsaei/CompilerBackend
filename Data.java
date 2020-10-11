@@ -5,6 +5,16 @@ public class Data implements java.io.Serializable {
     transient private HashMap<String, ProgramBase> functions = SyntaxTree.getFunctions();
     transient private boolean isBreaked = false;
     transient private ValueBase returnedData = null;
+    transient private String instanceName;
+
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+    public Data setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
+        return this;
+    }
 
     public ValueBase getReturnedData() {
         return returnedData;
@@ -14,12 +24,12 @@ public class Data implements java.io.Serializable {
         this.returnedData = returnedData;
     }
 
-    public boolean isBreaked() {
+    public boolean isBroken() {
         return isBreaked;
     }
 
-    public void setBreaked(boolean breaked) {
-        isBreaked = breaked;
+    public void setBroken(boolean broken) {
+        isBreaked = broken;
     }
 
     public Data setVariables(HashMap<String, ValueBase> variables) {
