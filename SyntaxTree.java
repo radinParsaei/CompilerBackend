@@ -116,7 +116,7 @@ public class SyntaxTree {
     public Object getData() {
       if (variableName.startsWith("#C")) variableName = variableName.replace("#F", "");
       ValueBase tmp = data.getVariables().get(variableName + (useInstanceName? getConfigData().getInstanceName():""));
-      if (error && tmp == null) Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, variableName + useInstanceName + data.getInstanceName());
+      if (error && tmp == null) Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, variableName);
       if (!error && tmp == null) tmp = new SyntaxTree.Null();
       return tmp;
     }
@@ -209,7 +209,9 @@ public class SyntaxTree {
     }
 
     public SetVariable setVariableName(String variableName) {
+      data.getVariables().remove(this.variableName);
       this.variableName = variableName;
+      data.getVariables().put(variableName, null);
       return this;
     }
 
@@ -256,6 +258,7 @@ public class SyntaxTree {
       StringBuilder finalFunctionName = new StringBuilder(functionName).append(":");
       for (String string : args) {
         finalFunctionName.append(",").append(string);
+        data.getVariables().put(string, new SyntaxTree.Null());
       }
       this.functionName = finalFunctionName.toString();
       if (data.getFunctions().containsKey(this.functionName)) {
@@ -297,6 +300,7 @@ public class SyntaxTree {
     private ProgramBase[] programs;
     private final ValueBase[] args;
     private boolean isRecursion = false;
+    private ValueBase instance = null;
     public CallFunction(String functionName, ValueBase... args) {
       this.functionName = functionName;
       this.args = args;
@@ -330,6 +334,9 @@ public class SyntaxTree {
 
     @Override
     public ValueBase getData() {
+      if (instance != null) {
+        getConfigData().setInstanceName(instance.toString());
+      }
       findFunction();
       HashMap<String, ValueBase> tmp = null;
       if (isRecursion) {
@@ -380,6 +387,19 @@ public class SyntaxTree {
 
     public boolean isRecursion() {
       return isRecursion;
+    }
+
+    public CallFunction fromInstance(ValueBase instance) {
+      this.instance = instance;
+      return this;
+    }
+
+    public boolean isFromInstance() {
+      return instance != null;
+    }
+
+    public ValueBase getInstance() {
+      return instance;
     }
   }
 
@@ -1418,10 +1438,21 @@ public class SyntaxTree {
   }
 
   public static class CreateClass extends ProgramBase implements java.io.Serializable {
+    private final Programs programs;
+    private final String className;
     public CreateClass(String className, ProgramBase... programs) {
+      this.className = className;
       ArrayList<SetVariable> variables = new ArrayList<>();
       classesParameters.put(className, variables);
-      NameSpaces.addNameSpaces("#C" + className, new SyntaxTree.Programs(programs), null);
+      this.programs = NameSpaces.addNameSpaces("#C" + className, new SyntaxTree.Programs(programs), null);
+    }
+
+    public ProgramBase getPrograms() {
+      return programs;
+    }
+
+    public String getClassName() {
+      return className;
     }
   }
 
@@ -1446,7 +1477,11 @@ public class SyntaxTree {
       for (SetVariable setVariable : parameters) {
         setVariable.eval();
       }
-      return new SyntaxTree.Text(className);
+      return new SyntaxTree.Text(getConfigData().getInstanceName());
+    }
+
+    public String getClassName() {
+      return className;
     }
   }
 }

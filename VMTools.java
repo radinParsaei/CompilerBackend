@@ -3,11 +3,12 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 public class VMTools {
-  private final HashMap<String, Integer> variables = new HashMap<>();
+  private HashMap<String, Integer> variables = new HashMap<>();
   private int variablesCounter = 0;
   private int functionsCounter = 0;
   private boolean checkVariables = true;
   private final HashMap<String, Integer> functions = new HashMap<>();
+  private final HashMap<String, String> classesParameters = new HashMap<>();
   private String putVals(ValueBase... vals) {
     StringBuilder output = new StringBuilder();
     for (ValueBase val : vals) {
@@ -20,7 +21,20 @@ public class VMTools {
       } else if (val instanceof SyntaxTree.Null) {
         output.append("PUT\tNULL\n");
       } else if (val instanceof SyntaxTree.Variable) {
-        output.append("PUT\tNUM&").append(((SyntaxTree.Variable) val).getVariableName()).append("\nMEMGET\n");
+        if (((SyntaxTree.Variable) val).isUseInstanceName()) {
+          output.append("PUT\tNUM0\nSTCKGET2\n");
+        }
+        if (((SyntaxTree.Variable) val).getVariableName().startsWith("#C") ||
+                ((SyntaxTree.Variable) val).getVariableName().startsWith("#F")) {
+          if (!variables.containsKey(((SyntaxTree.Variable) val).getVariableName())) {
+            variables.put(((SyntaxTree.Variable) val).getVariableName(), variablesCounter++);
+          }
+        }
+        output.append("PUT\tNUM&").append(((SyntaxTree.Variable) val).getVariableName());
+        if (((SyntaxTree.Variable) val).isUseInstanceName()) {
+          output.append("\nADD");
+        }
+        output.append("\nMEMGET\n");
       } else if (val instanceof SyntaxTree.Add) {
         output.append(putVals(((SyntaxTree.Add)val).getV2()));
         output.append(putVals(((SyntaxTree.Add)val).getV1()));
@@ -102,6 +116,9 @@ public class VMTools {
       } else if (val instanceof SyntaxTree.BitwiseNot) {
         output.append(putVals(((SyntaxTree.BitwiseNot)val).getValue()));
         output.append("NOT\n");
+      } else if (val instanceof SyntaxTree.CreateInstance) {
+        output.append("MEMSIZE\n");
+        output.append(classesParameters.get(((SyntaxTree.CreateInstance) val).getClassName()));
       } else if (val instanceof SyntaxTree.CallFunction) {
         ((SyntaxTree.CallFunction)val).findFunction();
         Integer functionCode = functions.get(((SyntaxTree.CallFunction)val).getFunctionName());
@@ -111,8 +128,15 @@ public class VMTools {
         if (((SyntaxTree.CallFunction) val).isRecursion()) {
           output.append("//save ").append(((SyntaxTree.CallFunction) val).getFunctionName()).append(" variables\n");
         }
-        output.append(SyntaxTreeToVMByteCode(new SyntaxTree.Programs(((SyntaxTree.CallFunction)val).getVariableSetters())))
+        if (((SyntaxTree.CallFunction) val).isFromInstance()) {
+          output.append(putVals(((SyntaxTree.CallFunction) val).getInstance()));
+          output.append("PUT\tNUM0\nSTCKMOV\n");
+        }
+        output.append(SyntaxTreeToVMByteCode2(new SyntaxTree.Programs(((SyntaxTree.CallFunction)val).getVariableSetters())))
                 .append("PUT\tNUM").append(functionCode).append("\nCALLFN\n");
+        if (((SyntaxTree.CallFunction) val).isFromInstance()) {
+          output.append("PUT\tNUM0\nSTCKDEL\n");
+        }
         if (((SyntaxTree.CallFunction) val).isRecursion()) {
           output.append("//load ").append(((SyntaxTree.CallFunction) val).getFunctionName()).append(" variables\n");
         }
@@ -122,12 +146,22 @@ public class VMTools {
   }
 
   public String SyntaxTreeToVMByteCode(ProgramBase program) {
+    String result = SyntaxTreeToVMByteCode2(program);
+    return "REC\n" +
+            "PUT NULL\n" +
+            "MEMPUT\n" +
+            "END\n" +
+            "PUT NUM" + variablesCounter + "\n" +
+            "REPEAT\n" + result;
+  }
+
+  public String SyntaxTreeToVMByteCode2(ProgramBase program) {
     boolean checkVariables2 = checkVariables;
     if (checkVariables2) checkVariables = false;
     StringBuilder output = new StringBuilder();
     if (program instanceof SyntaxTree.Programs) {
       for (ProgramBase program2 : ((SyntaxTree.Programs) program).getPrograms()) {
-        output.append(SyntaxTreeToVMByteCode(program2));
+        output.append(SyntaxTreeToVMByteCode2(program2));
       }
     } else if (program instanceof SyntaxTree.Print) {
       ValueBase[] args = ((SyntaxTree.Print) program).getArgs();
@@ -141,18 +175,18 @@ public class VMTools {
       }
     } else if (program instanceof SyntaxTree.If) {
       ProgramBase programBase = ((SyntaxTree.If) program).getElseProgram();
-      String elseByteCode = SyntaxTreeToVMByteCode(programBase);
+      String elseByteCode = SyntaxTreeToVMByteCode2(programBase);
       output.append(putVals(new SyntaxTree.Number(new BigDecimal(elseByteCode.split("\n").length + 2 - (programBase == null ? 1 : 0)))));
       output.append(putVals(((SyntaxTree.If) program).getCondition()));
       output.append("TOBOOL\nIFSKIP\n");
       output.append(elseByteCode);
-      String byteCode = SyntaxTreeToVMByteCode(((SyntaxTree.If) program).getProgram());
+      String byteCode = SyntaxTreeToVMByteCode2(((SyntaxTree.If) program).getProgram());
       output.append(putVals(new SyntaxTree.Number(new BigDecimal(byteCode.split("\n").length))));
       output.append("SKIP\n");
       output.append(byteCode);
     } else if (program instanceof SyntaxTree.While) {
       output.append("REC\n");
-      output.append(SyntaxTreeToVMByteCode(((SyntaxTree.While) program).getProgram()));
+      output.append(SyntaxTreeToVMByteCode2(((SyntaxTree.While) program).getProgram()));
       output.append(putVals(((SyntaxTree.While) program).getCondition()));
       output.append("END\n");
       output.append(putVals(((SyntaxTree.While) program).getCondition()));
@@ -186,15 +220,15 @@ public class VMTools {
       }
       functions.put(((SyntaxTree.Function) program).getFunctionName(), functionsCounter);
       functionsCounter++;
-      String functionCode = SyntaxTreeToVMByteCode(((SyntaxTree.Function) program).getProgram());
+      String functionCode = SyntaxTreeToVMByteCode2(((SyntaxTree.Function) program).getProgram());
       output.append("REC\n").append(functionCode)
               .append("END\nPUT\tNUM").append(functions.get(((SyntaxTree.Function) program).getFunctionName()))
-              .append("\nMKFN\n");
+              .append("\nMKFN - ").append(((SyntaxTree.Function) program).getFunctionName()).append("\n");
     } else if (program instanceof SyntaxTree.ExecuteValue) {
-      output.append(putVals(((SyntaxTree.ExecuteValue) program).getValue()));
+      output.append(putVals(((SyntaxTree.ExecuteValue) program).getValue()));//.append("POP\n");
     } else if (program instanceof SyntaxTree.Repeat) {
       output.append("REC\n");
-      output.append(SyntaxTreeToVMByteCode(((SyntaxTree.Repeat) program).getProgram()));
+      output.append(SyntaxTreeToVMByteCode2(((SyntaxTree.Repeat) program).getProgram()));
       output.append("END\n");
       output.append(putVals(((SyntaxTree.Repeat) program).getCount()));
       output.append("REPEAT\n");
@@ -205,16 +239,29 @@ public class VMTools {
       if (variables.get(((SyntaxTree.SetVariable) program).getVariableName()) == null) {
         variables.put(((SyntaxTree.SetVariable) program).getVariableName(), variablesCounter);
         output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
-        output.append("PUT\tNUM").append(variablesCounter).append("\nMEMSET\n");
+        output.append("PUT\tNUM").append(variablesCounter);
+        if (((SyntaxTree.SetVariable) program).isUseInstanceName()) {
+          output.append("\nPUT\tNUM0\nSTCKGET2\nADD");
+        }
+        output.append("\nMEMSET\n");
+        variablesCounter++;
       } else {
         output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
-        output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable) program).getVariableName())).append("\nMEMSET\n");
+        output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable) program).getVariableName()));
+        if (((SyntaxTree.SetVariable) program).isUseInstanceName()) {
+          output.append("\nPUT\tNUM0\nSTCKGET2\nADD");
+        }
+        output.append("\nMEMSET\n");
       }
-      variablesCounter++;
     } else if (program instanceof SyntaxTree.Break) {
       output.append("BREAK\n");
     } else if (program instanceof SyntaxTree.Return) {
       output.append(putVals(((SyntaxTree.Return) program).getValue())).append("EXITFN\n");
+    } else if (program instanceof SyntaxTree.CreateClass) {
+      VMTools vmTools = new VMTools();
+      vmTools.setVariables((HashMap<String, Integer>) variables.clone());
+      vmTools.setFunctionsCounter(functionsCounter);
+      output.append(createClass(((SyntaxTree.CreateClass) program).getPrograms(), vmTools, ((SyntaxTree.CreateClass) program).getClassName()));
     }
     String result = output.toString();
     if (checkVariables2) {
@@ -231,9 +278,50 @@ public class VMTools {
       }
       int index = result.indexOf("PUT\tNUM&");
       if (index != -1) {
-        Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, result.substring(index + 8, result.indexOf("\n", index)));
+        String value = result.substring(index + 8, result.indexOf("\n", index));
+        Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, value);
       }
     }
     return result;
+  }
+
+  private String createClass(ProgramBase program, VMTools vmTools, String className) {
+    if (program instanceof SyntaxTree.Function) {
+      String result = vmTools.SyntaxTreeToVMByteCode2(program);
+      functions.putAll(vmTools.getFunctions());
+      variables.putAll(vmTools.getVariables());
+      return result;
+    } else if (program instanceof SyntaxTree.SetVariable) {
+      if (classesParameters.containsKey(className)) {
+        classesParameters.put(className, classesParameters.get(className) + vmTools.SyntaxTreeToVMByteCode2(program));
+      } else {
+        classesParameters.put(className, vmTools.SyntaxTreeToVMByteCode2(program));
+      }
+      variables.putAll(vmTools.getVariables());
+      return "";
+    } else if (program instanceof SyntaxTree.Programs) {
+      StringBuilder stringBuilder = new StringBuilder();
+      for (ProgramBase program1 : ((SyntaxTree.Programs) program).getPrograms()) {
+        stringBuilder.append(createClass(program1, vmTools, className));
+      }
+      return stringBuilder.toString();
+    }
+    return "";
+  }
+
+  public void setVariables(HashMap<String, Integer> variables) {
+    this.variables = variables;
+  }
+
+  public HashMap<String, Integer> getVariables() {
+    return variables;
+  }
+
+  public HashMap<String, Integer> getFunctions() {
+    return functions;
+  }
+
+  public void setFunctionsCounter(int functionsCounter) {
+    this.functionsCounter = functionsCounter;
   }
 }
