@@ -5,7 +5,7 @@ public class Data implements java.io.Serializable {
     transient private HashMap<String, ProgramBase> functions = SyntaxTree.getFunctions();
     transient private boolean isBreaked = false;
     transient private ValueBase returnedData = null;
-    transient private String instanceName;
+    private String instanceName;
 
     public String getInstanceName() {
         return instanceName;

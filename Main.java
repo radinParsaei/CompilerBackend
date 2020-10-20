@@ -32,9 +32,9 @@ public class Main {
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("#CTestsetMsg", new SyntaxTree.Text("Data From Class")).fromInstance(new SyntaxTree.Variable("test"))),
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("#CTestprintMsg").fromInstance(new SyntaxTree.Variable("test")))
     );
-    program.eval();
-//    serializer.serialize("file.ser", program);
-//    serializer.deserialize("file.ser").eval();
+//    program.eval();
+    serializer.serialize("file.ser", program);
+    serializer.deserialize("file.ser").eval();
     try {
       FileWriter writer = new FileWriter("a");
       VMTools vmTools = new VMTools();
