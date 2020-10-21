@@ -1,3 +1,4 @@
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 public class Main {
@@ -42,6 +43,17 @@ public class Main {
       writer.close();
     } catch (IOException e) {
       System.out.println("ERROR");
+      e.printStackTrace();
+    }
+    System.out.println("\n\n-----JVMTool Test-----\n\n");
+    ProgramBase program2 = new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Text("Hello"), new SyntaxTree.Text("World"), new SyntaxTree.Number(10)));
+    try {
+      JVMTool jvmTool = new JVMTool();
+      byte[] out = jvmTool.SyntaxTreeToVMByteCode(program2);
+      FileOutputStream fileOutputStream = new FileOutputStream("Test.class");
+      fileOutputStream.write(out);
+      fileOutputStream.close();
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }

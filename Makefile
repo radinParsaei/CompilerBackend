@@ -47,6 +47,8 @@ output.jar: $(classes)
 	echo Main-Class: Main >> manifest.txt
 	jar cvfm output.jar manifest.txt *.class
 	$(RM) manifest.txt
+JVMTool.class: JVMTool.java
+	javac -source 1.8 -XDignore.symbol.file=true JVMTool.java
 %.class: %.java
 	javac $<
 native-image: INF
