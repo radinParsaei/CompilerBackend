@@ -12,9 +12,17 @@ public class JVMTool {
                 methodWriter.visitInsn(DUP);
                 methodWriter.visitLdcInsn(val.toString());
                 methodWriter.visitMethodInsn(INVOKESPECIAL, "java/math/BigDecimal", "<init>", "(Ljava/lang/String;)V", false);
-            } else
-            if (val instanceof SyntaxTree.Text) {
+            } else if (val instanceof SyntaxTree.Text) {
                 methodWriter.visitLdcInsn(val.getData());
+            } else if (val instanceof SyntaxTree.Boolean) {
+                if ((boolean)val.getData()) {
+                    methodWriter.visitInsn(ICONST_1);
+                } else {
+                    methodWriter.visitInsn(ICONST_0);
+                }
+                methodWriter.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
+            } else if (val instanceof SyntaxTree.Null) {
+                methodWriter.visitInsn(ACONST_NULL);
             }
         }
     }
@@ -46,7 +54,7 @@ public class JVMTool {
             for (ProgramBase program1 : ((SyntaxTree.Programs) program).getPrograms()) {
                 SyntaxTreeToVMByteCode2(program1, methodVisitor);
             }
-        } else if (program instanceof  SyntaxTree.Print) {
+        } else if (program instanceof SyntaxTree.Print) {
             ValueBase[] args = ((SyntaxTree.Print) program).getArgs();
             for (int i = 0; i < args.length; i++) {
                 methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
@@ -56,7 +64,6 @@ public class JVMTool {
                     methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
                     putVals(methodVisitor, (((SyntaxTree.Print) program).getSeparator()));
                     methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "print", "(Ljava/lang/Object;)V", false);
-//                    methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "print", "(Ljava/lang/String;)V", false);
                 }
             }
         }
