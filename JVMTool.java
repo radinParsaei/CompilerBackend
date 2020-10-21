@@ -2,9 +2,13 @@ import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Label;
 import jdk.internal.org.objectweb.asm.MethodVisitor;
 
+import java.util.HashMap;
+
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
 
 public class JVMTool {
+    private final HashMap<String, Integer> variables = new HashMap<>();
+    private int variablesCounter = 0;
     private void putVals(MethodVisitor methodWriter, ValueBase... vals) {
         for (ValueBase val : vals) {
             if (val instanceof SyntaxTree.Number) {
@@ -23,6 +27,13 @@ public class JVMTool {
                 methodWriter.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Z)Ljava/lang/Boolean;", false);
             } else if (val instanceof SyntaxTree.Null) {
                 methodWriter.visitInsn(ACONST_NULL);
+            } else if (val instanceof SyntaxTree.Variable) {
+                Integer address;
+                address = variables.get(((SyntaxTree.Variable) val).getVariableName());
+                if (address == null) {
+                    Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, ((SyntaxTree.Variable) val).getVariableName());
+                }
+                methodWriter.visitVarInsn(ALOAD, address);
             }
         }
     }
@@ -66,6 +77,17 @@ public class JVMTool {
                     methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "print", "(Ljava/lang/Object;)V", false);
                 }
             }
+        } else if (program instanceof SyntaxTree.SetVariable) {
+            putVals(methodVisitor, ((SyntaxTree.SetVariable) program).getVariableValue());
+            int address;
+            if (variables.containsKey(((SyntaxTree.SetVariable) program).getVariableName())) {
+                address = variables.get(((SyntaxTree.SetVariable) program).getVariableName());
+            } else {
+                variablesCounter++;
+                address = variablesCounter++;
+                variables.put(((SyntaxTree.SetVariable) program).getVariableName(), address);
+            }
+            methodVisitor.visitVarInsn(ASTORE, address);
         }
     }
 }

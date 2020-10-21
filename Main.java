@@ -46,7 +46,11 @@ public class Main {
       e.printStackTrace();
     }
     System.out.println("\n\n-----JVMTool Test-----\n\n");
-    ProgramBase program2 = new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Text("Hello"), new SyntaxTree.Boolean(true), new SyntaxTree.Number(10), new SyntaxTree.Null()));
+    ProgramBase program2 = new SyntaxTree.Programs(
+            new SyntaxTree.Print(new SyntaxTree.Boolean(true), new SyntaxTree.Number(10), new SyntaxTree.Null(), new SyntaxTree.Text("Hello\n")),
+            new SyntaxTree.SetVariable("a", new SyntaxTree.Text("Variable Data")),
+            new SyntaxTree.Print(new SyntaxTree.Variable("a"))
+    );
     try {
       JVMTool jvmTool = new JVMTool();
       byte[] out = jvmTool.SyntaxTreeToVMByteCode(program2);
