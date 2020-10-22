@@ -39,7 +39,7 @@ public class Main {
     try {
       FileWriter writer = new FileWriter("a");
       VMTools vmTools = new VMTools();
-      writer.write(vmTools.SyntaxTreeToVMByteCode(program));
+      writer.write(vmTools.syntaxTreeToVMByteCode(program));
       writer.close();
     } catch (IOException e) {
       System.out.println("ERROR");
@@ -53,7 +53,7 @@ public class Main {
     );
     try {
       JVMTool jvmTool = new JVMTool();
-      byte[] out = jvmTool.SyntaxTreeToVMByteCode(program2);
+      byte[] out = jvmTool.syntaxTreeToJVMClass(program2, "Test");
       FileOutputStream fileOutputStream = new FileOutputStream("Test.class");
       fileOutputStream.write(out);
       fileOutputStream.close();
