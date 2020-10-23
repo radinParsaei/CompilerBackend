@@ -53,7 +53,6 @@ public class JVMTool {
     }
 
     public void syntaxTreeToJVMClass1(ProgramBase program, ClassWriter classWriter) {
-        classWriter.visitField(ACC_PRIVATE | ACC_STATIC, "test", "Ljava/lang/Object;", null, null);
         MethodVisitor mainMethodWriter = classWriter.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
         mainMethodWriter.visitCode();
         Label methodStart = new Label();
@@ -98,6 +97,10 @@ public class JVMTool {
                 variables.put(((SyntaxTree.SetVariable) program).getVariableName(), address);
             }
             methodVisitor.visitVarInsn(ASTORE, address);
+        } else if (program instanceof SyntaxTree.Exit) {
+            putVales(methodVisitor, ((SyntaxTree.Exit) program).getStatus());
+            methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "intValue", "()I", false);
+            methodVisitor.visitMethodInsn(INVOKESTATIC, "java/lang/System", "exit", "(I)V", false);
         }
     }
 }
