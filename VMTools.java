@@ -147,12 +147,9 @@ public class VMTools {
 
   public String syntaxTreeToVMByteCode(ProgramBase program) {
     String result = syntaxTreeToVMByteCode2(program);
-    return "REC\n" +
-            "PUT NULL\n" +
-            "MEMPUT\n" +
-            "END\n" +
+    return "PUT NULL\n" +
             "PUT NUM" + variablesCounter + "\n" +
-            "REPEAT\n" + result;
+            "MEMSET\n" + result;
   }
 
   public String syntaxTreeToVMByteCode2(ProgramBase program) {
