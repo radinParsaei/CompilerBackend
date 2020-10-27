@@ -49,7 +49,8 @@ public class Main {
     ProgramBase program2 = new SyntaxTree.Programs(
             new SyntaxTree.Print(new SyntaxTree.Boolean(true), new SyntaxTree.Number(10), new SyntaxTree.Null(), new SyntaxTree.Text("Hello\n")),
             new SyntaxTree.SetVariable("a", new SyntaxTree.Text("Variable Data")),
-            new SyntaxTree.Print(new SyntaxTree.Variable("a"))//,
+            new SyntaxTree.Print(new SyntaxTree.Variable("a")),
+            new SyntaxTree.If(new SyntaxTree.Boolean(true), new SyntaxTree.Print(new SyntaxTree.Text("\ntext from if\n")))
 //            new SyntaxTree.SetVariable("status", new SyntaxTree.Number(10)),
 //            new SyntaxTree.Exit(new SyntaxTree.Variable("status"))
     );

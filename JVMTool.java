@@ -69,8 +69,8 @@ public class JVMTool {
         syntaxTreeToJVMClass2(program, mainMethodWriter, classWriter, className);
         mainMethodWriter.visitInsn(RETURN);
         mainMethodWriter.visitLabel(methodEnd);
-        mainMethodWriter.visitEnd();
         mainMethodWriter.visitMaxs(1, 1);
+        mainMethodWriter.visitEnd();
     }
 
     public void syntaxTreeToJVMClass2(ProgramBase program, MethodVisitor methodVisitor, ClassWriter classWriter, String className) {
@@ -118,6 +118,15 @@ public class JVMTool {
             putVales(methodVisitor, ((SyntaxTree.Exit) program).getStatus(), classWriter, className);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "intValue", "()I", false);
             methodVisitor.visitMethodInsn(INVOKESTATIC, "java/lang/System", "exit", "(I)V", false);
+        } else if (program instanceof SyntaxTree.If) {
+            Label label = new Label();
+            putVales(methodVisitor, ((SyntaxTree.If) program).getCondition(), classWriter, className);
+            methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
+            methodVisitor.visitJumpInsn(IFEQ, label);
+            syntaxTreeToJVMClass2(((SyntaxTree.If) program).getProgram(), methodVisitor, classWriter, className);
+            methodVisitor.visitFrame(F_SAME, 0, null, 0, null);
+            methodVisitor.visitLabel(label);
+//            methodVisitor.visitFrame(F_SAME1, 0, null, 1, new Object[]{ INTEGER });
         }
     }
 }
