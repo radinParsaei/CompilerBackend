@@ -116,17 +116,26 @@ public class JVMTool {
             }
         } else if (program instanceof SyntaxTree.Exit) {
             putVales(methodVisitor, ((SyntaxTree.Exit) program).getStatus(), classWriter, className);
+            methodVisitor.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "intValue", "()I", false);
             methodVisitor.visitMethodInsn(INVOKESTATIC, "java/lang/System", "exit", "(I)V", false);
         } else if (program instanceof SyntaxTree.If) {
             Label label = new Label();
+            Label label1 = null;
+            if (((SyntaxTree.If) program).getElseProgram() != null) {
+                label1 = new Label();
+            }
             putVales(methodVisitor, ((SyntaxTree.If) program).getCondition(), classWriter, className);
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
             methodVisitor.visitJumpInsn(IFEQ, label);
             syntaxTreeToJVMClass2(((SyntaxTree.If) program).getProgram(), methodVisitor, classWriter, className);
-            methodVisitor.visitFrame(F_SAME, 0, null, 0, null);
+            if (((SyntaxTree.If) program).getElseProgram() != null)
+                methodVisitor.visitJumpInsn(GOTO, label1);
             methodVisitor.visitLabel(label);
-//            methodVisitor.visitFrame(F_SAME1, 0, null, 1, new Object[]{ INTEGER });
+            if (((SyntaxTree.If) program).getElseProgram() != null) {
+                syntaxTreeToJVMClass2(((SyntaxTree.If) program).getElseProgram(), methodVisitor, classWriter, className);
+                methodVisitor.visitLabel(label1);
+            }
         }
     }
 }
