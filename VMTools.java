@@ -211,6 +211,8 @@ public class VMTools {
         }
         output.append("\n");
       }
+    } else if (program instanceof OpCode.PutToVM) {
+      output.append(putVals(((OpCode.PutToVM) program).getValue()));
     } else if (program instanceof SyntaxTree.Function) {
       if (functions.containsKey(((SyntaxTree.Function) program).getFunctionName())) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, ((SyntaxTree.Function) program).getFunctionName());

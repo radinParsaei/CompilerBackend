@@ -16,6 +16,33 @@ public class OpCode extends ProgramBase implements java.io.Serializable {
       return new SyntaxTree.Null();
     }
   }
+
+  public static class PutToVM extends ProgramBase implements java.io.Serializable {
+    private ValueBase value;
+    public PutToVM(ValueBase data) {
+      this.value = data;
+    }
+
+    @Override
+    public void eval() {
+      if (!(value instanceof SyntaxTree.Number || value instanceof SyntaxTree.Text || value instanceof SyntaxTree.Boolean || value instanceof SyntaxTree.Null)) {
+        value = (ValueBase) value.getData();
+      }
+      if (value instanceof SyntaxTree.Number) {
+        vm.run(VM.PUT, (BigDecimal)((SyntaxTree.Number) value).getData());
+      } else if (value instanceof SyntaxTree.Text) {
+        vm.run(VM.PUT, (String)((SyntaxTree.Text) value).getData());
+      } else if (value instanceof SyntaxTree.Boolean) {
+        vm.run(VM.PUT, (boolean)((SyntaxTree.Boolean) value).getData());
+      } else {
+        vm.run(VM.PUT);
+      }
+    }
+
+    public ValueBase getValue() {
+      return value;
+    }
+  }
   private ValueBase[] program;
   public ValueBase[] getProgram() {
     return this.program;
