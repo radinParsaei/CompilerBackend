@@ -18,13 +18,14 @@ public class OpCode extends ProgramBase implements java.io.Serializable {
   }
 
   public static class PutToVM extends ProgramBase implements java.io.Serializable {
-    private ValueBase value;
+    private final ValueBase value;
     public PutToVM(ValueBase data) {
       this.value = data;
     }
 
     @Override
     public void eval() {
+      ValueBase value = this.value;
       if (!(value instanceof SyntaxTree.Number || value instanceof SyntaxTree.Text || value instanceof SyntaxTree.Boolean || value instanceof SyntaxTree.Null)) {
         value = (ValueBase) value.getData();
       }

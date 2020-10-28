@@ -312,12 +312,17 @@ public class SyntaxTree {
       ArrayList<String> params = new ArrayList<>();
       for (Map.Entry<String, ProgramBase> entry : data.getFunctions().entrySet()) {
         if (entry.getKey().split(":")[0].equals(functionName)) {
+          String previousFunctionName = functionName;
           this.functionName = entry.getKey();
           if (this.functionName.split(":").length > 1) {
             for (String string : this.functionName.split(":")[1].split(",")) {
               if (string.equals("")) continue;
               params.add(string);
             }
+          }
+          if (params.size() != args.length) {
+            this.functionName = previousFunctionName;
+            continue;
           }
         }
       }

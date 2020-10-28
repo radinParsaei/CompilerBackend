@@ -110,6 +110,7 @@ public class JVMTool {
                 if (!fields.contains(((SyntaxTree.SetVariable) program).getVariableName())) {
                     classWriter.visitField(ACC_PRIVATE | ACC_STATIC, ((SyntaxTree.SetVariable) program).getVariableName(),
                             "Ljava/lang/Object;", null, null);
+                    fields.add(((SyntaxTree.SetVariable) program).getVariableName());
                 }
                 methodVisitor.visitFieldInsn(PUTSTATIC, className, ((SyntaxTree.SetVariable) program).getVariableName(),
                         "Ljava/lang/Object;");
