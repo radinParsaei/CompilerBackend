@@ -322,7 +322,7 @@ public class SyntaxTree {
           }
           if (params.size() != args.length) {
             this.functionName = previousFunctionName;
-            continue;
+            params.clear();
           }
         }
       }
