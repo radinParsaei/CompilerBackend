@@ -31,7 +31,7 @@ public class Main {
             new SyntaxTree.SetVariable("test", new SyntaxTree.CreateInstance("Test")),
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("#CTestprintMsg").fromInstance(new SyntaxTree.Variable("test"))),
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("#CTestsetMsg", new SyntaxTree.Text("Data From Class")).fromInstance(new SyntaxTree.Variable("test"))),
-            new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("#CTestprintMsg").fromInstance(new SyntaxTree.Variable("test"))),
+            new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg").fromInstance(new SyntaxTree.Variable("test")).setAddInstanceName(true)),
             new OpCode.PutToVM(new SyntaxTree.Variable("a")),
             new OpCode(SyntaxTree.objectToValue(VM.PRINT))
     );

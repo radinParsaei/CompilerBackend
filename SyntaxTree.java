@@ -301,6 +301,7 @@ public class SyntaxTree {
     private final ValueBase[] args;
     private boolean isRecursion = false;
     private ValueBase instance = null;
+    private boolean addInstanceName = false;
     public CallFunction(String functionName, ValueBase... args) {
       this.functionName = functionName;
       this.args = args;
@@ -340,7 +341,10 @@ public class SyntaxTree {
     @Override
     public ValueBase getData() {
       if (instance != null) {
-        getConfigData().setInstanceName(instance.toString());
+        getConfigData().setInstanceName(instance.toString().split(":")[0]);
+        if (addInstanceName) {
+            functionName = "#C" + instance.toString().split(":")[1] + functionName;
+        }
       }
       findFunction();
       HashMap<String, ValueBase> tmp = null;
@@ -386,7 +390,16 @@ public class SyntaxTree {
       return programs;
     }
 
-    public void setRecursion(boolean recursion) {
+      public boolean isAddInstanceName() {
+          return addInstanceName;
+      }
+
+      public CallFunction setAddInstanceName(boolean addInstanceName) {
+          this.addInstanceName = addInstanceName;
+          return this;
+      }
+
+      public void setRecursion(boolean recursion) {
       isRecursion = recursion;
     }
 
@@ -1482,7 +1495,7 @@ public class SyntaxTree {
       for (SetVariable setVariable : parameters) {
         setVariable.eval();
       }
-      return new SyntaxTree.Text(getConfigData().getInstanceName());
+      return new SyntaxTree.Text(getConfigData().getInstanceName() + ":" + className);
     }
 
     public String getClassName() {
