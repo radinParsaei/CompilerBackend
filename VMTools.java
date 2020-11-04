@@ -117,12 +117,12 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.BitwiseNot)val).getValue()));
         output.append("NOT\n");
       } else if (val instanceof SyntaxTree.CreateInstance) {
-        output.append("MEMSIZE\n");
+        output.append("MEMSIZE\nPUT\tTXT").append(((SyntaxTree.CreateInstance) val).getClassName()).append("\nMEMPUT\n");
         output.append(classesParameters.get(((SyntaxTree.CreateInstance) val).getClassName()));
       } else if (val instanceof SyntaxTree.CallFunction) {
         ((SyntaxTree.CallFunction)val).findFunction();
         Integer functionCode = functions.get(((SyntaxTree.CallFunction)val).getFunctionName());
-        if (!functions.containsKey(((SyntaxTree.CallFunction)val).getFunctionName())) {
+        if ((!functions.containsKey(((SyntaxTree.CallFunction)val).getFunctionName())) && !((SyntaxTree.CallFunction) val).isAddInstanceName()) {
           Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction)val).getFunctionName());
         }
         if (((SyntaxTree.CallFunction) val).isRecursion()) {
@@ -132,8 +132,15 @@ public class VMTools {
           output.append(putVals(((SyntaxTree.CallFunction) val).getInstance()));
           output.append("PUT\tNUM0\nSTCKMOV\n");
         }
-        output.append(syntaxTreeToVMByteCode2(new SyntaxTree.Programs(((SyntaxTree.CallFunction)val).getVariableSetters())))
-                .append("PUT\tNUM").append(functionCode).append("\nCALLFN\n");
+        if (((SyntaxTree.CallFunction) val).isAddInstanceName()) {
+          output.append(syntaxTreeToVMByteCode2(new SyntaxTree.Programs(((SyntaxTree.CallFunction) val).getVariableSetters())))
+                  .append("PUT\tTXT").append(((SyntaxTree.CallFunction) val).getFunctionName())
+                  .append("\nPUT\tNUM0\nSTCKGET2\nMEMGET\nPUT\tTXT#C\nADD")
+                  .append("\nADD\nCALLFN\n");
+        } else {
+          output.append(syntaxTreeToVMByteCode2(new SyntaxTree.Programs(((SyntaxTree.CallFunction) val).getVariableSetters())))
+                  .append("PUT\tNUM").append(functionCode).append("\nCALLFN\n");
+        }
         if (((SyntaxTree.CallFunction) val).isFromInstance()) {
           output.append("PUT\tNUM0\nSTCKDEL\n");
         }
@@ -260,6 +267,7 @@ public class VMTools {
       VMTools vmTools = new VMTools();
       vmTools.setVariables((HashMap<String, Integer>) variables.clone());
       vmTools.setFunctionsCounter(functionsCounter);
+      vmTools.setVariablesCounter(1);
       output.append(createClass(((SyntaxTree.CreateClass) program).getPrograms(), vmTools, ((SyntaxTree.CreateClass) program).getClassName()));
     }
     String result = output.toString();
@@ -289,7 +297,8 @@ public class VMTools {
       String result = vmTools.syntaxTreeToVMByteCode2(program);
       functions.putAll(vmTools.getFunctions());
       variables.putAll(vmTools.getVariables());
-      return result;
+      return result + "PUT\tTXTnf" + ((SyntaxTree.Function) program).getFunctionName().split(":")[0] + ":" +
+              functions.get(((SyntaxTree.Function) program).getFunctionName()) + "\nDLCALL\n";
     } else if (program instanceof SyntaxTree.SetVariable) {
       if (classesParameters.containsKey(className)) {
         classesParameters.put(className, classesParameters.get(className) + vmTools.syntaxTreeToVMByteCode2(program));
@@ -310,6 +319,10 @@ public class VMTools {
 
   public void setVariables(HashMap<String, Integer> variables) {
     this.variables = variables;
+  }
+
+  public void setVariablesCounter(int variablesCounter) {
+    this.variablesCounter = variablesCounter;
   }
 
   public HashMap<String, Integer> getVariables() {
