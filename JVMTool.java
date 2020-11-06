@@ -15,6 +15,7 @@ public class JVMTool {
     private final HashMap<String, Integer> variables = new HashMap<>();
     private int variablesCounter = 0;
     private final ArrayList<String> fields = new ArrayList<>();
+    private boolean addAddFunction = false;
     private String putVales(MethodVisitor methodWriter, ValueBase val, ClassWriter classWriter, String className) {
         if (val instanceof SyntaxTree.Number) {
             methodWriter.visitTypeInsn(NEW, "java/math/BigDecimal");
@@ -47,6 +48,11 @@ public class JVMTool {
                 methodWriter.visitFieldInsn(GETSTATIC, className, ((SyntaxTree.Variable) val).getVariableName(),
                         "Ljava/lang/Object;");
             }
+        } else if (val instanceof SyntaxTree.Add) {
+            addAddFunction = true;
+            putVales(methodWriter, ((SyntaxTree.Add) val).getV1(), classWriter, className);
+            putVales(methodWriter, ((SyntaxTree.Add) val).getV2(), classWriter, className);
+            methodWriter.visitMethodInsn(INVOKESTATIC, className, "#add", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
         }
         return TYPE_NULL_OR_UNKNOWN;
     }
@@ -71,6 +77,36 @@ public class JVMTool {
         mainMethodWriter.visitLabel(methodEnd);
         mainMethodWriter.visitMaxs(1, 1);
         mainMethodWriter.visitEnd();
+
+        if (addAddFunction) {
+            MethodVisitor addMethodWriter = classWriter.visitMethod(ACC_PUBLIC | ACC_STATIC, "#add", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", null, null);
+            addMethodWriter.visitCode();
+            addMethodWriter.visitVarInsn(ALOAD, 0);
+            addMethodWriter.visitTypeInsn(INSTANCEOF, "java/math/BigDecimal");
+            Label label = new Label();
+            addMethodWriter.visitJumpInsn(IFEQ, label);
+            addMethodWriter.visitVarInsn(ALOAD, 1);
+            addMethodWriter.visitTypeInsn(INSTANCEOF, "java/math/BigDecimal");
+            addMethodWriter.visitJumpInsn(IFEQ, label);
+            addMethodWriter.visitVarInsn(ALOAD, 0);
+            addMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
+            addMethodWriter.visitVarInsn(ALOAD, 1);
+            addMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
+            addMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "add", "(Ljava/math/BigDecimal;)Ljava/math/BigDecimal;", false);
+            addMethodWriter.visitInsn(ARETURN);
+            addMethodWriter.visitLabel(label);
+            addMethodWriter.visitTypeInsn(NEW, "java/lang/StringBuilder");
+            addMethodWriter.visitInsn(DUP);
+            addMethodWriter.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
+            addMethodWriter.visitVarInsn(ALOAD, 0);
+            addMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/Object;)Ljava/lang/StringBuilder;", false);
+            addMethodWriter.visitVarInsn(ALOAD, 1);
+            addMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/Object;)Ljava/lang/StringBuilder;", false);
+            addMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+            addMethodWriter.visitInsn(ARETURN);
+            addMethodWriter.visitMaxs(1, 1);
+            addMethodWriter.visitEnd();
+        }
     }
 
     public void syntaxTreeToJVMClass2(ProgramBase program, MethodVisitor methodVisitor, ClassWriter classWriter, String className) {
