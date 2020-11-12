@@ -33,7 +33,8 @@ public class Main {
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("#CTestsetMsg", new SyntaxTree.Text("Data From Class")).fromInstance(new SyntaxTree.Variable("test"))),
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg").fromInstance(new SyntaxTree.Variable("test")).setAddInstanceName(true)),
             new OpCode.PutToVM(new SyntaxTree.Variable("a")),
-            new OpCode(SyntaxTree.objectToValue(VM.PRINT))
+            new OpCode(SyntaxTree.objectToValue(VM.PRINT)),
+            new SyntaxTree.Print(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("test")))
     );
 //    program.eval();
     serializer.serialize("file.ser", program);

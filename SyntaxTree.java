@@ -101,6 +101,7 @@ public class SyntaxTree {
     private String variableName;
     private boolean error = true;
     private boolean useInstanceName = false;
+    private ValueBase instance;
     public boolean isUseInstanceName() {
       return useInstanceName;
     }
@@ -112,8 +113,22 @@ public class SyntaxTree {
       this.variableName = variableName;
     }
 
+    public Variable fromInstance(ValueBase value) {
+      useInstanceName = true;
+      instance = value;
+      return this;
+    }
+
+    public ValueBase getInstance() {
+      return instance;
+    }
+
     @Override
     public Object getData() {
+      if (instance != null) {
+        getConfigData().setInstanceName(instance.toString().split(":")[0]);
+        variableName = "#C" + instance.toString().split(":")[1] + variableName;
+      }
       if (variableName.startsWith("#C")) variableName = variableName.replace("#F", "");
       ValueBase tmp = data.getVariables().get(variableName + (useInstanceName? getConfigData().getInstanceName():""));
       if (error && tmp == null) Errors.error(ErrorCodes.ERROR_VARIABLE_DOES_NOT_EXISTS, variableName);
