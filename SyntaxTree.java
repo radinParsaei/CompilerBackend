@@ -1253,8 +1253,18 @@ public class SyntaxTree {
       separator.setConfigData(data);
       for (int i = 0; i < args.length; i++) {
         args[i].setConfigData(data);
-        System.out.print(args[i]);
-        if (i < args.length - 1) System.out.print(separator);
+        if (Targets.systemPrint) {
+          System.out.print(args[i]);
+        } else {
+          Targets.print(args[i]);
+        }
+        if (i < args.length - 1) {
+          if (Targets.systemPrint) {
+            System.out.print(separator);
+          } else {
+            Targets.print(separator);
+          }
+        }
       }
     }
   }

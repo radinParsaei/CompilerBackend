@@ -30,6 +30,10 @@ endif
 all: $(rmobjs) $(objs) VM_JNI.o $(NAME).$(EXT) output.jar # native-image
 .PHONY: all
 
+Targets.class: Targets.java
+	$(RM) *.class
+	javac Targets.java
+
 rmobjs:
 	$(RM) $(objs)
 
@@ -42,7 +46,7 @@ VM_JNI.o: VM_JNI.cpp VM_JNI.h
 $(NAME).$(EXT): VM_JNI.o
 	$(CXX) $(CFLAGS) $(EXT_CFLAGS) $(objs) VM_JNI.o VM/VM.cpp $(LDFLAGS) -o $(NAME).$(EXT) $(EXT_LDFLAGS)
 
-output.jar: JVMTool.class $(classes)
+output.jar: Targets.class JVMTool.class $(classes)
 	echo Manifest-Version: 1.0 > manifest.txt
 	echo Main-Class: Main >> manifest.txt
 	jar cvfm output.jar manifest.txt *.class
