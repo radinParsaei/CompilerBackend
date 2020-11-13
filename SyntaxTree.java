@@ -65,6 +65,14 @@ public class SyntaxTree {
     return lastNameSpace;
   }
 
+  public static void declareNativeFunction(String parent, String name, int argumentCount) {
+    name += ":N#" + argumentCount + "#" + parent;
+    if (data.getFunctions().containsKey(name)) {
+      Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, name);
+    }
+    data.getFunctions().put(name, null);
+  }
+
   public static class Number extends ValueBase {
     public Number(BigDecimal number) {
       this.setData(number);
@@ -317,6 +325,7 @@ public class SyntaxTree {
     private boolean isRecursion = false;
     private ValueBase instance = null;
     private boolean addInstanceName = false;
+    private boolean nativeFunction = false;
     public CallFunction(String functionName, ValueBase... args) {
       this.functionName = functionName;
       this.args = args;
@@ -331,25 +340,44 @@ public class SyntaxTree {
           String previousFunctionName = functionName;
           this.functionName = entry.getKey();
           if (this.functionName.split(":").length > 1) {
-            for (String string : this.functionName.split(":")[1].split(",")) {
-              if (string.equals("")) continue;
-              params.add(string);
+            if (this.functionName.split(":")[1].startsWith("N#")) {
+              if (!("" + args.length).equals(this.functionName.split(":")[1].substring(2).split("#")[0])) {
+                this.functionName = previousFunctionName;
+                continue;
+              }
+              programs = new ProgramBase[args.length + 3];
+              int i = 0;
+              for (; i < args.length; i++) {
+                programs[i] = new OpCode.PutToVM(args[i]);
+              }
+              programs[i] = new OpCode.PutToVM(new SyntaxTree.Text(functionName.split(":")[0]));
+              String[] tmp = functionName.split("#");
+              programs[++i] = new OpCode.PutToVM(new SyntaxTree.Text(tmp[tmp.length - 1]));
+              programs[++i] = new OpCode(new SyntaxTree.Number(VM.DLCALL));
+              nativeFunction = true;
+            } else {
+              for (String string : this.functionName.split(":")[1].split(",")) {
+                if (string.equals("")) continue;
+                params.add(string);
+              }
             }
           }
-          if (params.size() != args.length) {
+          if (!nativeFunction && (params.size() != args.length)) {
             this.functionName = previousFunctionName;
             params.clear();
           }
         }
       }
-      if (params.size() != args.length) {
+      if (!nativeFunction && params.size() != args.length) {
         Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
       }
-      int i = 0;
-      boolean hasF = true;
-      for (ValueBase value : args) {
-        if (this.functionName.startsWith("#C")) hasF = false;
-        programs[i] = new SyntaxTree.SetVariable((hasF? "#F":"") + this.functionName + ":" + params.get(i++), value);
+      if (!nativeFunction) {
+        int i = 0;
+        boolean hasF = true;
+        for (ValueBase value : args) {
+          if (this.functionName.startsWith("#C")) hasF = false;
+          programs[i] = new SyntaxTree.SetVariable((hasF ? "#F" : "") + this.functionName + ":" + params.get(i++), value);
+        }
       }
     }
 
@@ -358,43 +386,50 @@ public class SyntaxTree {
       if (instance != null) {
         getConfigData().setInstanceName(instance.toString().split(":")[0]);
         if (addInstanceName) {
-            functionName = "#C" + instance.toString().split(":")[1] + functionName;
+          functionName = "#C" + instance.toString().split(":")[1] + functionName;
         }
       }
       findFunction();
-      HashMap<String, ValueBase> tmp = null;
-      if (isRecursion) {
-        tmp = new HashMap<>();
-        for (Map.Entry<String, ValueBase> entry : data.getVariables().entrySet()) {
-          if (entry.getKey().startsWith("#F" + this.functionName) && entry.getValue() != null)
-            tmp.put(entry.getKey(), entry.getValue());
+      if (!nativeFunction) {
+        HashMap<String, ValueBase> tmp = null;
+        if (isRecursion) {
+          tmp = new HashMap<>();
+          for (Map.Entry<String, ValueBase> entry : data.getVariables().entrySet()) {
+            if (entry.getKey().startsWith("#F" + this.functionName) && entry.getValue() != null)
+              tmp.put(entry.getKey(), entry.getValue());
+          }
         }
-      }
-      if (programs != null) {
+        if (programs != null) {
+          for (ProgramBase program : programs) {
+            program.eval();
+          }
+        }
+        ProgramBase program = data.getFunctions().get(functionName);
+        if (program == null) {
+          Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, functionName);
+          return new Null();
+        }
+        program.setData(getConfigData());
+        program.eval();
+        ValueBase tmp2;
+        if (program.getData().getReturnedData() != null) {
+          tmp2 = program.getData().getReturnedData();
+          program.getData().setReturnedData(null);
+        } else {
+          tmp2 = new Null();
+        }
+        if (!(tmp2 instanceof Number || tmp2 instanceof Text || tmp2 instanceof Boolean || tmp2 instanceof Null)) {
+          tmp2 = (ValueBase) tmp2.getData();
+        }
+        if (isRecursion)
+          data.getVariables().putAll(tmp);
+        return tmp2;
+      } else {
         for (ProgramBase program : programs) {
           program.eval();
         }
+        return new OpCode.PopFromVM();
       }
-      ProgramBase program = data.getFunctions().get(functionName);
-      if (program == null) {
-        Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, functionName);
-        return new Null();
-      }
-      program.setData(getConfigData());
-      program.eval();
-      ValueBase tmp2;
-      if (program.getData().getReturnedData() != null) {
-        tmp2 = program.getData().getReturnedData();
-        program.getData().setReturnedData(null);
-      } else {
-        tmp2 = new Null();
-      }
-      if (!(tmp2 instanceof Number || tmp2 instanceof Text || tmp2 instanceof Boolean || tmp2 instanceof Null)) {
-        tmp2 = (ValueBase)tmp2.getData();
-      }
-      if (isRecursion)
-        data.getVariables().putAll(tmp);
-      return tmp2;
     }
 
     public String getFunctionName() {

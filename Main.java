@@ -6,6 +6,7 @@ public class Main {
     ValueBase val = new SyntaxTree.Number(10.5);
     SyntaxTreeSerializer serializer = new SyntaxTreeSerializer();
     ValueBase[] vals = {val, new SyntaxTree.Text("Hello World")};
+    SyntaxTree.declareNativeFunction("test.vmso" , "test", 1);
     ProgramBase program = new SyntaxTree.Programs(new SyntaxTree.Function("main", new SyntaxTree.Programs(
             new SyntaxTree.SetVariable("a", new SyntaxTree.Number(10.5)),
             new SyntaxTree.SetVariable("b", new SyntaxTree.Text("Hello")),
@@ -34,7 +35,8 @@ public class Main {
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg").fromInstance(new SyntaxTree.Variable("test")).setAddInstanceName(true)),
             new OpCode.PutToVM(new SyntaxTree.Variable("a")),
             new OpCode(SyntaxTree.objectToValue(VM.PRINT)),
-            new SyntaxTree.Print(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("test")))
+            new SyntaxTree.Print(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("test"))),
+            new SyntaxTree.Print(new SyntaxTree.CallFunction("test", new SyntaxTree.Text("Data passed to function")))
     );
 //    program.eval();
     serializer.serialize("file.ser", program);
