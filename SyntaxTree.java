@@ -135,7 +135,8 @@ public class SyntaxTree {
     public Object getData() {
       if (instance != null) {
         getConfigData().setInstanceName(instance.toString().split(":")[0]);
-        variableName = "#C" + instance.toString().split(":")[1] + variableName;
+        if (!variableName.startsWith("#C"))
+          variableName = "#C" + instance.toString().split(":")[1] + variableName;
       }
       if (variableName.startsWith("#C")) variableName = variableName.replace("#F", "");
       ValueBase tmp = data.getVariables().get(variableName + (useInstanceName? getConfigData().getInstanceName():""));

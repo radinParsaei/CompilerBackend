@@ -21,6 +21,10 @@ public class VMTools {
       } else if (val instanceof SyntaxTree.Null) {
         output.append("PUT\tNULL\n");
       } else if (val instanceof SyntaxTree.Variable) {
+        if (((SyntaxTree.Variable) val).getInstance() != null) {
+          output.append(putVals(((SyntaxTree.Variable) val).getInstance()))
+                  .append("PUT\tNUM0\nSTCKMOV\n");
+        }
         if (((SyntaxTree.Variable) val).isUseInstanceName()) {
           output.append("PUT\tNUM0\nSTCKGET2\n");
         }
@@ -30,7 +34,12 @@ public class VMTools {
             variables.put(((SyntaxTree.Variable) val).getVariableName(), variablesCounter++);
           }
         }
-        output.append("PUT\tNUM&").append(((SyntaxTree.Variable) val).getVariableName());
+        if (((SyntaxTree.Variable) val).getInstance() == null) {
+          output.append("PUT\tNUM&").append(((SyntaxTree.Variable) val).getVariableName());
+        } else {
+          output.append("PUT\tTXT").append(((SyntaxTree.Variable) val).getVariableName())
+                  .append("\nPUT\tNUM0\nSTCKGET2\nMEMGET\nPUT\tTXT#C\nADD\nADD\nPUT\tTXTgpm\nDLCALL\n");
+        }
         if (((SyntaxTree.Variable) val).isUseInstanceName()) {
           output.append("\nADD");
         }
@@ -310,7 +319,8 @@ public class VMTools {
         classesParameters.put(className, vmTools.syntaxTreeToVMByteCode2(program));
       }
       variables.putAll(vmTools.getVariables());
-      return "";
+      return "PUT\tTXTnm" + ((SyntaxTree.SetVariable) program).getVariableName() + ":" +
+              variables.get(((SyntaxTree.SetVariable) program).getVariableName()) + "\nDLCALL\n";
     } else if (program instanceof SyntaxTree.Programs) {
       StringBuilder stringBuilder = new StringBuilder();
       for (ProgramBase program1 : ((SyntaxTree.Programs) program).getPrograms()) {
