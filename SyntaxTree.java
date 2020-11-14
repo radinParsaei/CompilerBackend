@@ -469,6 +469,10 @@ public class SyntaxTree {
     public ValueBase getInstance() {
       return instance;
     }
+
+    public boolean isNativeFunction() {
+      return nativeFunction;
+    }
   }
 
   public static class Add extends ValueBase implements java.io.Serializable {

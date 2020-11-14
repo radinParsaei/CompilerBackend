@@ -13,7 +13,7 @@ public class VMTools {
     StringBuilder output = new StringBuilder();
     for (ValueBase val : vals) {
       if (val instanceof SyntaxTree.Number) {
-        output.append("PUT\tNUM").append((BigDecimal)val.getData()).append("\n");
+        output.append("PUT\tNUM").append((BigDecimal) val.getData()).append("\n");
       } else if (val instanceof SyntaxTree.Text) {
         output.append("PUT\tTXT").append(val.getData().toString().replace("\n", "\\n").replace("\t", "\\t")).append("\n");
       } else if (val instanceof SyntaxTree.Boolean) {
@@ -36,116 +36,120 @@ public class VMTools {
         }
         output.append("\nMEMGET\n");
       } else if (val instanceof SyntaxTree.Add) {
-        output.append(putVals(((SyntaxTree.Add)val).getV2()));
-        output.append(putVals(((SyntaxTree.Add)val).getV1()));
+        output.append(putVals(((SyntaxTree.Add) val).getV2()));
+        output.append(putVals(((SyntaxTree.Add) val).getV1()));
         output.append("ADD\n");
       } else if (val instanceof SyntaxTree.Sub) {
-        output.append(putVals(((SyntaxTree.Sub)val).getV2()));
-        output.append(putVals(((SyntaxTree.Sub)val).getV1()));
+        output.append(putVals(((SyntaxTree.Sub) val).getV2()));
+        output.append(putVals(((SyntaxTree.Sub) val).getV1()));
         output.append("SUB\n");
       } else if (val instanceof SyntaxTree.Mul) {
-        output.append(putVals(((SyntaxTree.Mul)val).getV2()));
-        output.append(putVals(((SyntaxTree.Mul)val).getV1()));
+        output.append(putVals(((SyntaxTree.Mul) val).getV2()));
+        output.append(putVals(((SyntaxTree.Mul) val).getV1()));
         output.append("MUL\n");
       } else if (val instanceof SyntaxTree.Div) {
-        output.append(putVals(((SyntaxTree.Div)val).getV2()));
-        output.append(putVals(((SyntaxTree.Div)val).getV1()));
+        output.append(putVals(((SyntaxTree.Div) val).getV2()));
+        output.append(putVals(((SyntaxTree.Div) val).getV1()));
         output.append("DIV\n");
       } else if (val instanceof SyntaxTree.Mod) {
-        output.append(putVals(((SyntaxTree.Mod)val).getV2()));
-        output.append(putVals(((SyntaxTree.Mod)val).getV1()));
+        output.append(putVals(((SyntaxTree.Mod) val).getV2()));
+        output.append(putVals(((SyntaxTree.Mod) val).getV1()));
         output.append("MOD\n");
       } else if (val instanceof SyntaxTree.Equals) {
-        output.append(putVals(((SyntaxTree.Equals)val).getV2()));
-        output.append(putVals(((SyntaxTree.Equals)val).getV1()));
+        output.append(putVals(((SyntaxTree.Equals) val).getV2()));
+        output.append(putVals(((SyntaxTree.Equals) val).getV1()));
         output.append("EQ\n");
       } else if (val instanceof SyntaxTree.StrictEquals) {
-        output.append(putVals(((SyntaxTree.StrictEquals)val).getV2()));
-        output.append(putVals(((SyntaxTree.StrictEquals)val).getV1()));
+        output.append(putVals(((SyntaxTree.StrictEquals) val).getV2()));
+        output.append(putVals(((SyntaxTree.StrictEquals) val).getV1()));
         output.append("FEQ\n");
       } else if (val instanceof SyntaxTree.GreaterThan) {
-        output.append(putVals(((SyntaxTree.GreaterThan)val).getV2()));
-        output.append(putVals(((SyntaxTree.GreaterThan)val).getV1()));
+        output.append(putVals(((SyntaxTree.GreaterThan) val).getV2()));
+        output.append(putVals(((SyntaxTree.GreaterThan) val).getV1()));
         output.append("GT\n");
       } else if (val instanceof SyntaxTree.GreaterThanOrEqual) {
-        output.append(putVals(((SyntaxTree.GreaterThanOrEqual)val).getV2()));
-        output.append(putVals(((SyntaxTree.GreaterThanOrEqual)val).getV1()));
+        output.append(putVals(((SyntaxTree.GreaterThanOrEqual) val).getV2()));
+        output.append(putVals(((SyntaxTree.GreaterThanOrEqual) val).getV1()));
         output.append("GE\n");
       } else if (val instanceof SyntaxTree.LesserThan) {
-        output.append(putVals(((SyntaxTree.LesserThan)val).getV2()));
-        output.append(putVals(((SyntaxTree.LesserThan)val).getV1()));
+        output.append(putVals(((SyntaxTree.LesserThan) val).getV2()));
+        output.append(putVals(((SyntaxTree.LesserThan) val).getV1()));
         output.append("LT\n");
       } else if (val instanceof SyntaxTree.LesserThanOrEqual) {
-        output.append(putVals(((SyntaxTree.LesserThanOrEqual)val).getV2()));
-        output.append(putVals(((SyntaxTree.LesserThanOrEqual)val).getV1()));
+        output.append(putVals(((SyntaxTree.LesserThanOrEqual) val).getV2()));
+        output.append(putVals(((SyntaxTree.LesserThanOrEqual) val).getV1()));
         output.append("LE\n");
       } else if (val instanceof SyntaxTree.And) {
-        output.append(putVals(((SyntaxTree.And)val).getV2()));
-        output.append(putVals(((SyntaxTree.And)val).getV1()));
+        output.append(putVals(((SyntaxTree.And) val).getV2()));
+        output.append(putVals(((SyntaxTree.And) val).getV1()));
         output.append("LAND\n");
       } else if (val instanceof SyntaxTree.Or) {
-        output.append(putVals(((SyntaxTree.Or)val).getV2()));
-        output.append(putVals(((SyntaxTree.Or)val).getV1()));
+        output.append(putVals(((SyntaxTree.Or) val).getV2()));
+        output.append(putVals(((SyntaxTree.Or) val).getV1()));
         output.append("LOR\n");
       } else if (val instanceof SyntaxTree.Xor) {
-        output.append(putVals(((SyntaxTree.Xor)val).getV2()));
-        output.append(putVals(((SyntaxTree.Xor)val).getV1()));
+        output.append(putVals(((SyntaxTree.Xor) val).getV2()));
+        output.append(putVals(((SyntaxTree.Xor) val).getV1()));
         output.append("XOR\n");
       } else if (val instanceof SyntaxTree.BitwiseAnd) {
-        output.append(putVals(((SyntaxTree.BitwiseAnd)val).getV2()));
-        output.append(putVals(((SyntaxTree.BitwiseAnd)val).getV1()));
+        output.append(putVals(((SyntaxTree.BitwiseAnd) val).getV2()));
+        output.append(putVals(((SyntaxTree.BitwiseAnd) val).getV1()));
         output.append("AND\n");
       } else if (val instanceof SyntaxTree.LeftShift) {
-        output.append(putVals(((SyntaxTree.LeftShift)val).getV2()));
-        output.append(putVals(((SyntaxTree.LeftShift)val).getV1()));
+        output.append(putVals(((SyntaxTree.LeftShift) val).getV2()));
+        output.append(putVals(((SyntaxTree.LeftShift) val).getV1()));
         output.append("LSHIFT\n");
       } else if (val instanceof SyntaxTree.RightShift) {
-        output.append(putVals(((SyntaxTree.RightShift)val).getV2()));
-        output.append(putVals(((SyntaxTree.RightShift)val).getV1()));
+        output.append(putVals(((SyntaxTree.RightShift) val).getV2()));
+        output.append(putVals(((SyntaxTree.RightShift) val).getV1()));
         output.append("RSHIFT\n");
       } else if (val instanceof SyntaxTree.BitwiseOr) {
-        output.append(putVals(((SyntaxTree.BitwiseOr)val).getV2()));
-        output.append(putVals(((SyntaxTree.BitwiseOr)val).getV1()));
+        output.append(putVals(((SyntaxTree.BitwiseOr) val).getV2()));
+        output.append(putVals(((SyntaxTree.BitwiseOr) val).getV1()));
         output.append("OR\n");
       } else if (val instanceof SyntaxTree.Negative) {
-        output.append(putVals(((SyntaxTree.Negative)val).getValue()));
+        output.append(putVals(((SyntaxTree.Negative) val).getValue()));
         output.append("NEG\n");
       } else if (val instanceof SyntaxTree.Not) {
-        output.append(putVals(((SyntaxTree.Not)val).getValue()));
+        output.append(putVals(((SyntaxTree.Not) val).getValue()));
         output.append("LNOT\n");
       } else if (val instanceof SyntaxTree.BitwiseNot) {
-        output.append(putVals(((SyntaxTree.BitwiseNot)val).getValue()));
+        output.append(putVals(((SyntaxTree.BitwiseNot) val).getValue()));
         output.append("NOT\n");
       } else if (val instanceof SyntaxTree.CreateInstance) {
         output.append("MEMSIZE\nPUT\tTXT").append(((SyntaxTree.CreateInstance) val).getClassName()).append("\nMEMPUT\n");
         output.append(classesParameters.get(((SyntaxTree.CreateInstance) val).getClassName()));
       } else if (val instanceof SyntaxTree.CallFunction) {
-        ((SyntaxTree.CallFunction)val).findFunction();
-        Integer functionCode = functions.get(((SyntaxTree.CallFunction)val).getFunctionName());
-        if ((!functions.containsKey(((SyntaxTree.CallFunction)val).getFunctionName())) && !((SyntaxTree.CallFunction) val).isAddInstanceName()) {
-          Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction)val).getFunctionName());
-        }
-        if (((SyntaxTree.CallFunction) val).isRecursion()) {
-          output.append("//save ").append(((SyntaxTree.CallFunction) val).getFunctionName()).append(" variables\n");
-        }
-        if (((SyntaxTree.CallFunction) val).isFromInstance()) {
-          output.append(putVals(((SyntaxTree.CallFunction) val).getInstance()));
-          output.append("PUT\tNUM0\nSTCKMOV\n");
-        }
-        if (((SyntaxTree.CallFunction) val).isAddInstanceName()) {
-          output.append(syntaxTreeToVMByteCode2(new SyntaxTree.Programs(((SyntaxTree.CallFunction) val).getVariableSetters())))
-                  .append("PUT\tTXT").append(((SyntaxTree.CallFunction) val).getFunctionName())
-                  .append("\nPUT\tNUM0\nSTCKGET2\nMEMGET\nPUT\tTXT#C\nADD")
-                  .append("\nADD\nCALLFN\n");
+        ((SyntaxTree.CallFunction) val).findFunction();
+        if (((SyntaxTree.CallFunction) val).isNativeFunction()) {
+          output.append(syntaxTreeToVMByteCode2(new SyntaxTree.Programs(((SyntaxTree.CallFunction) val).getVariableSetters())));
         } else {
-          output.append(syntaxTreeToVMByteCode2(new SyntaxTree.Programs(((SyntaxTree.CallFunction) val).getVariableSetters())))
-                  .append("PUT\tNUM").append(functionCode).append("\nCALLFN\n");
-        }
-        if (((SyntaxTree.CallFunction) val).isFromInstance()) {
-          output.append("PUT\tNUM0\nSTCKDEL\n");
-        }
-        if (((SyntaxTree.CallFunction) val).isRecursion()) {
-          output.append("//load ").append(((SyntaxTree.CallFunction) val).getFunctionName()).append(" variables\n");
+          Integer functionCode = functions.get(((SyntaxTree.CallFunction) val).getFunctionName());
+          if ((!functions.containsKey(((SyntaxTree.CallFunction) val).getFunctionName())) && !((SyntaxTree.CallFunction) val).isAddInstanceName()) {
+            Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, ((SyntaxTree.CallFunction) val).getFunctionName());
+          }
+          if (((SyntaxTree.CallFunction) val).isRecursion()) {
+            output.append("//save ").append(((SyntaxTree.CallFunction) val).getFunctionName()).append(" variables\n");
+          }
+          if (((SyntaxTree.CallFunction) val).isFromInstance()) {
+            output.append(putVals(((SyntaxTree.CallFunction) val).getInstance()));
+            output.append("PUT\tNUM0\nSTCKMOV\n");
+          }
+          if (((SyntaxTree.CallFunction) val).isAddInstanceName()) {
+            output.append(syntaxTreeToVMByteCode2(new SyntaxTree.Programs(((SyntaxTree.CallFunction) val).getVariableSetters())))
+                    .append("PUT\tTXT").append(((SyntaxTree.CallFunction) val).getFunctionName())
+                    .append("\nPUT\tNUM0\nSTCKGET2\nMEMGET\nPUT\tTXT#C\nADD")
+                    .append("\nADD\nCALLFN\n");
+          } else {
+            output.append(syntaxTreeToVMByteCode2(new SyntaxTree.Programs(((SyntaxTree.CallFunction) val).getVariableSetters())))
+                    .append("PUT\tNUM").append(functionCode).append("\nCALLFN\n");
+          }
+          if (((SyntaxTree.CallFunction) val).isFromInstance()) {
+            output.append("PUT\tNUM0\nSTCKDEL\n");
+          }
+          if (((SyntaxTree.CallFunction) val).isRecursion()) {
+            output.append("//load ").append(((SyntaxTree.CallFunction) val).getFunctionName()).append(" variables\n");
+          }
         }
       }
     }
