@@ -269,6 +269,10 @@ public class SyntaxTree {
       useInstanceName = true;
       return this;
     }
+
+    public ValueBase getInstance() {
+      return instance;
+    }
   }
 
   public static class Function extends ProgramBase implements java.io.Serializable {

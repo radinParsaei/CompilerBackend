@@ -38,7 +38,7 @@ public class VMTools {
           output.append("PUT\tNUM&").append(((SyntaxTree.Variable) val).getVariableName());
         } else {
           output.append("PUT\tTXT").append(((SyntaxTree.Variable) val).getVariableName())
-                  .append("\nPUT\tNUM0\nSTCKGET2\nMEMGET\nPUT\tTXT#C\nADD\nADD\nPUT\tTXTgpm\nDLCALL\n");
+                  .append("\nPUT\tNUM0\nSTCKGET\nMEMGET\nPUT\tTXT#C\nADD\nADD\nPUT\tTXTgpm\nDLCALL\n");
         }
         if (((SyntaxTree.Variable) val).isUseInstanceName()) {
           output.append("\nADD");
@@ -255,22 +255,30 @@ public class VMTools {
       output.append(putVals(((SyntaxTree.Exit) program).getStatus()));
       output.append("EXIT\n");
     } else if (program instanceof SyntaxTree.SetVariable) {
-      if (variables.get(((SyntaxTree.SetVariable) program).getVariableName()) == null) {
-        variables.put(((SyntaxTree.SetVariable) program).getVariableName(), variablesCounter);
+      if (((SyntaxTree.SetVariable) program).getInstance() != null) {
         output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
-        output.append("PUT\tNUM").append(variablesCounter);
-        if (((SyntaxTree.SetVariable) program).isUseInstanceName()) {
-          output.append("\nPUT\tNUM0\nSTCKGET2\nADD");
-        }
-        output.append("\nMEMSET\n");
-        variablesCounter++;
+        output.append(putVals(((SyntaxTree.SetVariable) program).getInstance())).append("PUT\tNUM0\nSTCKMOV\n");
+        output.append("PUT\tTXT").append(((SyntaxTree.SetVariable) program).getVariableName())
+                .append("\nPUT\tNUM0\nSTCKGET2\nMEMGET\nPUT\tTXT#C\nADD\nADD\nPUT\tTXTgpm\nDLCALL\n");
+        output.append("PUT\tNUM0\nSTCKGET\nADD\nMEMSET\n");
       } else {
-        output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
-        output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable) program).getVariableName()));
-        if (((SyntaxTree.SetVariable) program).isUseInstanceName()) {
-          output.append("\nPUT\tNUM0\nSTCKGET2\nADD");
+        if (variables.get(((SyntaxTree.SetVariable) program).getVariableName()) == null) {
+          variables.put(((SyntaxTree.SetVariable) program).getVariableName(), variablesCounter);
+          output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
+          output.append("PUT\tNUM").append(variablesCounter);
+          if (((SyntaxTree.SetVariable) program).isUseInstanceName()) {
+            output.append("\nPUT\tNUM0\nSTCKGET2\nADD");
+          }
+          output.append("\nMEMSET\n");
+          variablesCounter++;
+        } else {
+          output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
+          output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable) program).getVariableName()));
+          if (((SyntaxTree.SetVariable) program).isUseInstanceName()) {
+            output.append("\nPUT\tNUM0\nSTCKGET2\nADD");
+          }
+          output.append("\nMEMSET\n");
         }
-        output.append("\nMEMSET\n");
       }
     } else if (program instanceof SyntaxTree.Break) {
       output.append("BREAK\n");
