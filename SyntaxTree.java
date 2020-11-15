@@ -166,6 +166,7 @@ public class SyntaxTree {
     private boolean isDeclaration = false;
     private boolean checkDeclarationInRuntime = false;
     private boolean useInstanceName = false;
+    private ValueBase instance = null;
 
     public boolean getIsDeclaration() {
       return isDeclaration;
@@ -220,6 +221,11 @@ public class SyntaxTree {
 
     @Override
     void eval() {
+      if (instance != null) {
+        getData().setInstanceName(instance.toString().split(":")[0]);
+        if (!variableName.startsWith("#C"))
+          variableName = "#C" + instance.toString().split(":")[1] + variableName;
+      }
       if (checkDeclarationInRuntime) checkDeclaration();
       ValueBase value = this.value;
       if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null)) {
@@ -256,6 +262,12 @@ public class SyntaxTree {
 
     public void setUseInstanceName(boolean useInstanceName) {
       this.useInstanceName = useInstanceName;
+    }
+
+    public SetVariable fromInstance(Variable instance) {
+      this.instance = instance;
+      useInstanceName = true;
+      return this;
     }
   }
 
