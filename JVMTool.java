@@ -17,6 +17,7 @@ public class JVMTool {
     private final ArrayList<String> fields = new ArrayList<>();
     private boolean addAddFunction = false;
     private boolean addSubFunction = false;
+    private boolean addMulFunction = false;
     private String putVales(MethodVisitor methodWriter, ValueBase val, ClassWriter classWriter, String className) {
         if (val instanceof SyntaxTree.Number) {
             methodWriter.visitTypeInsn(NEW, "java/math/BigDecimal");
@@ -59,6 +60,11 @@ public class JVMTool {
             putVales(methodWriter, ((SyntaxTree.Sub) val).getV1(), classWriter, className);
             putVales(methodWriter, ((SyntaxTree.Sub) val).getV2(), classWriter, className);
             methodWriter.visitMethodInsn(INVOKESTATIC, className, "#sub", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
+        } else if (val instanceof SyntaxTree.Mul) {
+            addMulFunction = true;
+            putVales(methodWriter, ((SyntaxTree.Mul) val).getV1(), classWriter, className);
+            putVales(methodWriter, ((SyntaxTree.Mul) val).getV2(), classWriter, className);
+            methodWriter.visitMethodInsn(INVOKESTATIC, className, "#mul", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
         }
         return TYPE_NULL_OR_UNKNOWN;
     }
@@ -139,6 +145,84 @@ public class JVMTool {
             subMethodWriter.visitInsn(ARETURN);
             subMethodWriter.visitMaxs(1, 1);
             subMethodWriter.visitEnd();
+        }
+        if (addMulFunction) {
+            MethodVisitor mulMethodWriter = classWriter.visitMethod(ACC_PRIVATE | ACC_STATIC, "#mul", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", null, null);
+            mulMethodWriter.visitCode();
+            mulMethodWriter.visitVarInsn(ALOAD, 0);
+            mulMethodWriter.visitTypeInsn(INSTANCEOF, "java/math/BigDecimal");
+            Label label = new Label();
+            Label label1 = new Label();
+            Label label2 = new Label();
+            Label labelLoop = new Label();
+            Label labelLoop1 = new Label();
+            Label labelLoopStart = new Label();
+            Label labelLoopStart1 = new Label();
+            mulMethodWriter.visitJumpInsn(IFEQ, label);
+            mulMethodWriter.visitVarInsn(ALOAD, 1);
+            mulMethodWriter.visitTypeInsn(INSTANCEOF, "java/math/BigDecimal");
+            mulMethodWriter.visitJumpInsn(IFEQ, label);
+            mulMethodWriter.visitVarInsn(ALOAD, 0);
+            mulMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
+            mulMethodWriter.visitVarInsn(ALOAD, 1);
+            mulMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
+            mulMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "multiply", "(Ljava/math/BigDecimal;)Ljava/math/BigDecimal;", false);
+            mulMethodWriter.visitInsn(ARETURN);
+            mulMethodWriter.visitLabel(label);
+            mulMethodWriter.visitVarInsn(ALOAD, 0);
+            mulMethodWriter.visitTypeInsn(INSTANCEOF, "java/math/BigDecimal");
+            mulMethodWriter.visitJumpInsn(IFEQ, label1);
+            mulMethodWriter.visitTypeInsn(NEW, "java/lang/StringBuilder");
+            mulMethodWriter.visitInsn(DUP);
+            mulMethodWriter.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
+            mulMethodWriter.visitVarInsn(ASTORE, 2);
+            mulMethodWriter.visitVarInsn(ALOAD, 0);
+            mulMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
+            mulMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "intValue", "()I", false);
+            mulMethodWriter.visitVarInsn(ISTORE, 3);
+            mulMethodWriter.visitLabel(labelLoopStart);
+            mulMethodWriter.visitVarInsn(ILOAD, 3);
+            mulMethodWriter.visitJumpInsn(IFLE, labelLoop);
+            mulMethodWriter.visitVarInsn(ALOAD, 2);
+            mulMethodWriter.visitVarInsn(ALOAD, 1);
+            mulMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/Object;)Ljava/lang/StringBuilder;", false);
+            mulMethodWriter.visitInsn(POP);
+            mulMethodWriter.visitIincInsn(3, -1);
+            mulMethodWriter.visitJumpInsn(GOTO, labelLoopStart);
+            mulMethodWriter.visitLabel(labelLoop);
+            mulMethodWriter.visitVarInsn(ALOAD, 2);
+            mulMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+            mulMethodWriter.visitInsn(ARETURN);
+            mulMethodWriter.visitLabel(label1);
+            mulMethodWriter.visitVarInsn(ALOAD, 1);
+            mulMethodWriter.visitTypeInsn(INSTANCEOF, "java/math/BigDecimal");
+            mulMethodWriter.visitJumpInsn(IFEQ, label2);
+            mulMethodWriter.visitTypeInsn(NEW, "java/lang/StringBuilder");
+            mulMethodWriter.visitInsn(DUP);
+            mulMethodWriter.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
+            mulMethodWriter.visitVarInsn(ASTORE, 2);
+            mulMethodWriter.visitVarInsn(ALOAD, 1);
+            mulMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
+            mulMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "intValue", "()I", false);
+            mulMethodWriter.visitVarInsn(ISTORE, 3);
+            mulMethodWriter.visitLabel(labelLoopStart1);
+            mulMethodWriter.visitVarInsn(ILOAD, 3);
+            mulMethodWriter.visitJumpInsn(IFLE, labelLoop1);
+            mulMethodWriter.visitVarInsn(ALOAD, 2);
+            mulMethodWriter.visitVarInsn(ALOAD, 0);
+            mulMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/Object;)Ljava/lang/StringBuilder;", false);
+            mulMethodWriter.visitInsn(POP);
+            mulMethodWriter.visitIincInsn(3, -1);
+            mulMethodWriter.visitJumpInsn(GOTO, labelLoopStart1);
+            mulMethodWriter.visitLabel(labelLoop1);
+            mulMethodWriter.visitVarInsn(ALOAD, 2);
+            mulMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+            mulMethodWriter.visitInsn(ARETURN);
+            mulMethodWriter.visitLabel(label2);
+            mulMethodWriter.visitInsn(ACONST_NULL);
+            mulMethodWriter.visitInsn(ARETURN);
+            mulMethodWriter.visitMaxs(1, 1);
+            mulMethodWriter.visitEnd();
         }
     }
 
