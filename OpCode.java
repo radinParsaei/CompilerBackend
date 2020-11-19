@@ -11,7 +11,7 @@ public class OpCode extends ProgramBase implements java.io.Serializable {
       } else if (tmp.charAt(0) == 'N') {
         return new SyntaxTree.Number(new BigDecimal(tmp.substring(1)));
       } else if (tmp.charAt(0) == 'B') {
-        return new SyntaxTree.Number(new BigDecimal(tmp.substring(1)));
+        return new SyntaxTree.Boolean(tmp.charAt(1) == '1');
       }
       return new SyntaxTree.Null();
     }

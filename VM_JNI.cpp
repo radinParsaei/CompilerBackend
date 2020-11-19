@@ -1,7 +1,7 @@
 #include <VM_JNI.h>
 
 JNIEXPORT void JNICALL Java_VM_run (JNIEnv *, jobject, jbyte opcode) {
-  vm.run1((int)opcode);
+  vm.run1((int)opcode, null);
 }
 
 JNIEXPORT void JNICALL Java_VM_runWithString (JNIEnv* env, jobject, jbyte opcode, jstring str) {
@@ -62,7 +62,8 @@ JNIEXPORT jstring JNICALL Java_VM_pop(JNIEnv *env, jobject) {
     tmp = "T" + value.toString();
   } else if (value.getType() == True || value.getType() == False) {
     tmp = "B";
-    tmp += (int)value.getBool();
+    char a = value.getBool()? '1' : '0';
+    tmp += a;
   } else if (value.getType() == null) {
     tmp = "0";
   }
