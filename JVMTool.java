@@ -18,6 +18,7 @@ public class JVMTool {
     private boolean addAddFunction = false;
     private boolean addSubFunction = false;
     private boolean addMulFunction = false;
+    private boolean addDivFunction = false;
     private String putVales(MethodVisitor methodWriter, ValueBase val, ClassWriter classWriter, String className) {
         if (val instanceof SyntaxTree.Number) {
             methodWriter.visitTypeInsn(NEW, "java/math/BigDecimal");
@@ -65,6 +66,11 @@ public class JVMTool {
             putVales(methodWriter, ((SyntaxTree.Mul) val).getV1(), classWriter, className);
             putVales(methodWriter, ((SyntaxTree.Mul) val).getV2(), classWriter, className);
             methodWriter.visitMethodInsn(INVOKESTATIC, className, "#mul", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
+        } else if (val instanceof SyntaxTree.Div) {
+            addDivFunction = true;
+            putVales(methodWriter, ((SyntaxTree.Div) val).getV1(), classWriter, className);
+            putVales(methodWriter, ((SyntaxTree.Div) val).getV2(), classWriter, className);
+            methodWriter.visitMethodInsn(INVOKESTATIC, className, "#div", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
         }
         return TYPE_NULL_OR_UNKNOWN;
     }
@@ -223,6 +229,28 @@ public class JVMTool {
             mulMethodWriter.visitInsn(ARETURN);
             mulMethodWriter.visitMaxs(1, 1);
             mulMethodWriter.visitEnd();
+        }
+        if (addDivFunction) {
+            MethodVisitor addMethodWriter = classWriter.visitMethod(ACC_PRIVATE | ACC_STATIC, "#div", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", null, null);
+            addMethodWriter.visitCode();
+            addMethodWriter.visitVarInsn(ALOAD, 0);
+            addMethodWriter.visitTypeInsn(INSTANCEOF, "java/math/BigDecimal");
+            Label label = new Label();
+            addMethodWriter.visitJumpInsn(IFEQ, label);
+            addMethodWriter.visitVarInsn(ALOAD, 1);
+            addMethodWriter.visitTypeInsn(INSTANCEOF, "java/math/BigDecimal");
+            addMethodWriter.visitJumpInsn(IFEQ, label);
+            addMethodWriter.visitVarInsn(ALOAD, 0);
+            addMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
+            addMethodWriter.visitVarInsn(ALOAD, 1);
+            addMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
+            addMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "divide", "(Ljava/math/BigDecimal;)Ljava/math/BigDecimal;", false);
+            addMethodWriter.visitInsn(ARETURN);
+            addMethodWriter.visitLabel(label);
+            addMethodWriter.visitInsn(ACONST_NULL);
+            addMethodWriter.visitInsn(ARETURN);
+            addMethodWriter.visitMaxs(1, 1);
+            addMethodWriter.visitEnd();
         }
     }
 
