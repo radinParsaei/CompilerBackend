@@ -126,8 +126,8 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.BitwiseNot) val).getValue()));
         output.append("NOT\n");
       } else if (val instanceof SyntaxTree.CreateInstance) {
-        output.append("MEMSIZE\nPUT\tTXT").append(((SyntaxTree.CreateInstance) val).getClassName()).append("\nMEMPUT\n");
-        output.append(classesParameters.get(((SyntaxTree.CreateInstance) val).getClassName()));
+        output.append("MEMSIZE\nMEMSIZE\nPUT\tNUM0\nSTCKMOV\nPUT\tTXT").append(((SyntaxTree.CreateInstance) val).getClassName())
+                .append("\nMEMPUT\n//PUT VARIABLES OF CLASS ").append(((SyntaxTree.CreateInstance) val).getClassName()).append("PUT\tNUM0\nSTCKDEL\n");
       } else if (val instanceof SyntaxTree.CallFunction) {
         ((SyntaxTree.CallFunction) val).findFunction();
         if (((SyntaxTree.CallFunction) val).isNativeFunction()) {
@@ -303,6 +303,9 @@ public class VMTools {
                     variables.get(entry.getKey()) + "\nMEMSET\n//load " + entry1.getKey() + " variables\n");
           }
         }
+      }
+      for (Map.Entry<String, String> entry : classesParameters.entrySet()) {
+        result = result.replace("\n//PUT VARIABLES OF CLASS " + entry.getKey(), "//PUT VARIABLES OF CLASS" + entry.getKey() + "\n" + entry.getValue());
       }
       int index = result.indexOf("PUT\tNUM&");
       if (index != -1) {

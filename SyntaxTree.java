@@ -401,9 +401,10 @@ public class SyntaxTree {
     @Override
     public ValueBase getData() {
       if (instance != null) {
-        getConfigData().setInstanceName(instance.toString().split(":")[0]);
+        String[] splitInstance = instance.toString().split(":");
+        getConfigData().setInstanceName(splitInstance[0]);
         if (addInstanceName) {
-          functionName = "#C" + instance.toString().split(":")[1] + functionName;
+          functionName = "#C" + splitInstance[1] + functionName;
         }
       }
       findFunction();
@@ -1561,18 +1562,19 @@ public class SyntaxTree {
     public CreateInstance(String className) {
       this.className = className;
       String instanceNameSpace = nextNameSpace();
-      Data data = new Data();
-      data.setInstanceName(instanceNameSpace);
-      for (SetVariable setVariable : classesParameters.get(className)) {
-        SetVariable setVariable1 = ((SetVariable) setVariable.clone()).setVariableName(setVariable.getVariableName() + instanceNameSpace);
-        setVariable1.setData(data);
-        parameters.add(setVariable1);
-      }
-      setConfigData(data);
+//      Data data = new Data();
+//      data.setInstanceName(instanceNameSpace);
+//      setConfigData(data);
+      getConfigData().setInstanceName(instanceNameSpace);
     }
 
     @Override
     public Object getData() {
+      for (SetVariable setVariable : classesParameters.get(className)) {
+        SetVariable setVariable1 = ((SetVariable) setVariable.clone()).setVariableName(setVariable.getVariableName() + getConfigData().getInstanceName());
+        setVariable1.setData(getConfigData());
+        parameters.add(setVariable1);
+      }
       for (SetVariable setVariable : parameters) {
         setVariable.eval();
       }
