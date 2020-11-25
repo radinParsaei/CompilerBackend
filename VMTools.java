@@ -128,6 +128,9 @@ public class VMTools {
       } else if (val instanceof SyntaxTree.CreateInstance) {
         output.append("MEMSIZE\nMEMSIZE\nPUT\tNUM0\nSTCKMOV\nPUT\tTXT").append(((SyntaxTree.CreateInstance) val).getClassName())
                 .append("\nMEMPUT\n//PUT VARIABLES OF CLASS ").append(((SyntaxTree.CreateInstance) val).getClassName()).append("PUT\tNUM0\nSTCKDEL\n");
+      } else if (val instanceof SyntaxTree.Lambda) {
+        output.append(syntaxTreeToVMByteCode2(((SyntaxTree.Lambda) val).getCreateLambda()));
+        output.append("PUT\tNUM").append(functions.get(((SyntaxTree.Lambda) val).getCreateLambda().getFunctionName())).append("\n");
       } else if (val instanceof SyntaxTree.CallFunction) {
         ((SyntaxTree.CallFunction) val).findFunction();
         if (((SyntaxTree.CallFunction) val).isNativeFunction()) {
@@ -321,6 +324,7 @@ public class VMTools {
       String result = vmTools.syntaxTreeToVMByteCode2(program);
       functions.putAll(vmTools.getFunctions());
       variables.putAll(vmTools.getVariables());
+      functionsCounter = vmTools.functionsCounter;
       return result + "PUT\tTXTnf" + ((SyntaxTree.Function) program).getFunctionName().split(":")[0] + ":" +
               functions.get(((SyntaxTree.Function) program).getFunctionName()) + "\nDLCALL\n";
     } else if (program instanceof SyntaxTree.SetVariable) {

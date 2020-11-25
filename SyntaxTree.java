@@ -1585,4 +1585,32 @@ public class SyntaxTree {
       return className;
     }
   }
+
+  public static class CreateLambda extends Function implements java.io.Serializable {
+    private static int i = 0;
+    public CreateLambda(ProgramBase program, boolean error, String... args) {
+      super("l#" + i++, program, error, args);
+    }
+
+    public CreateLambda(ProgramBase program, String... args) {
+      super("l#" + i++, program, args);
+    }
+  }
+
+  public static class Lambda extends ValueBase implements java.io.Serializable {
+    private final CreateLambda createLambda;
+    public Lambda(CreateLambda createLambda) {
+      this.createLambda = createLambda;
+    }
+
+    @Override
+    public Object getData() {
+      createLambda.eval();
+      return createLambda.getFunctionName();
+    }
+
+    public CreateLambda getCreateLambda() {
+      return createLambda;
+    }
+  }
 }

@@ -23,7 +23,11 @@ public class Main {
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("main")), new SyntaxTree.Print(new SyntaxTree.CallFunction("func2", new SyntaxTree.Variable("b"), new SyntaxTree.Variable("c"))),
             new OpCode(SyntaxTree.objectToValue(VM.PUT), SyntaxTree.objectToValue("\nText From VM\n")/*, SyntaxTree.objectToValue(VM.PRINT)*/),
             new SyntaxTree.Print(new OpCode.PopFromVM()),
-            new SyntaxTree.CreateClass("Test", new SyntaxTree.SetVariable("msg", new SyntaxTree.Text("Hello"), true, true).setCheckDeclarationInRuntime(false), new SyntaxTree.Function("setMsg", new SyntaxTree.SetVariable("msg", new SyntaxTree.Variable("arg")), "arg"), new SyntaxTree.Function("printMsg", new SyntaxTree.Print(new SyntaxTree.Variable("msg")))),
+            new SyntaxTree.CreateClass("Test", new SyntaxTree.SetVariable("msg", new SyntaxTree.Text("Hello"), true, true).setCheckDeclarationInRuntime(false),
+                    new SyntaxTree.Function("setMsg", new SyntaxTree.SetVariable("msg", new SyntaxTree.Variable("arg")), "arg"),
+                    new SyntaxTree.Function("printMsg", new SyntaxTree.Print(new SyntaxTree.Variable("msg"))),
+                    new SyntaxTree.Function("createInstance", new SyntaxTree.Return(new SyntaxTree.CreateInstance("Test")))
+            ),
             new SyntaxTree.If(new SyntaxTree.Boolean(true), new SyntaxTree.Programs(
                     new SyntaxTree.SetVariable("a", new SyntaxTree.Null(), true, true),
                     new SyntaxTree.Print(new SyntaxTree.Variable("a"))
@@ -37,8 +41,11 @@ public class Main {
             new OpCode(SyntaxTree.objectToValue(VM.PRINT)),
             new SyntaxTree.SetVariable("msg", new SyntaxTree.Text("Data Inserted to class")).fromInstance(new SyntaxTree.Variable("test")),
             new SyntaxTree.Print(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("test"))),
-            new SyntaxTree.Print(new SyntaxTree.CallFunction("test", new SyntaxTree.Text("Data passed to function")))
-    );
+            new SyntaxTree.Print(new SyntaxTree.CallFunction("test", new SyntaxTree.Text("Data passed to function"))),
+            new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg").fromInstance(new SyntaxTree.CallFunction("createInstance").fromInstance(new SyntaxTree.Variable("test")).setAddInstanceName(true)).setAddInstanceName(true)),
+            new SyntaxTree.Print(new SyntaxTree.Text("\nlambda function pointer: ")),
+            new SyntaxTree.Print(new SyntaxTree.Lambda(new SyntaxTree.CreateLambda(new SyntaxTree.Print(new SyntaxTree.Text("Hello")))))
+            );
 //    program.eval();
     serializer.serialize("file.ser", program);
     serializer.deserialize("file.ser").eval();
