@@ -1613,4 +1613,42 @@ public class SyntaxTree {
       return createLambda;
     }
   }
+
+  public static class CallFunctionFromPointer extends ValueBase implements java.io.Serializable {
+    private final ValueBase functionPointer;
+    private final ValueBase[] values;
+    public CallFunctionFromPointer(ValueBase functionPointer, ValueBase... values) {
+      this.functionPointer = functionPointer;
+      this.values = values;
+    }
+
+    @Override
+    public Object getData() {
+      int i = 0;
+      String functionPointerString = functionPointer.toString();
+      try {
+        for (String string : functionPointerString.split(":")[1].split(",")) {
+          new SetVariable("#F" + functionPointerString.split(":")[0] + ":" + string, values[i++]).eval();
+        }
+      } catch (IndexOutOfBoundsException ignore) {}
+      ProgramBase program = data.getFunctions().get(functionPointerString);
+      if (program == null) {
+        Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, functionPointerString.split(":")[0]);
+        return new Null();
+      }
+      program.setData(getConfigData());
+      program.eval();
+      ValueBase tmp2;
+      if (program.getData().getReturnedData() != null) {
+        tmp2 = program.getData().getReturnedData();
+        program.getData().setReturnedData(null);
+      } else {
+        tmp2 = new Null();
+      }
+      if (!(tmp2 instanceof Number || tmp2 instanceof Text || tmp2 instanceof Boolean || tmp2 instanceof Null)) {
+        tmp2 = (ValueBase) tmp2.getData();
+      }
+      return tmp2;
+    }
+  }
 }
