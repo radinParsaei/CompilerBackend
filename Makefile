@@ -44,7 +44,8 @@ VM_JNI.o: VM_JNI.cpp VM_JNI.h
 	$(CXX) -c $(CFLAGS) $(EXT_CFLAGS) VM_JNI.cpp -fPIC $(EXT_LDFLAGS)
 
 $(NAME).$(EXT): VM_JNI.o
-	$(CXX) $(CFLAGS) $(EXT_CFLAGS) $(objs) VM_JNI.o VM/VM.cpp $(LDFLAGS) -o $(NAME).$(EXT) $(EXT_LDFLAGS)
+	test -e VM/CMakeFiles/VM.dir/VM.cpp.o || (echo compile VM with cmake first; exit 1)
+	$(CXX) $(CFLAGS) $(EXT_CFLAGS) $(objs) VM_JNI.o VM/CMakeFiles/VM.dir/VM.cpp.o VM/CMakeFiles/VM.dir/libs/*/*.o  $(LDFLAGS) -o $(NAME).$(EXT) $(EXT_LDFLAGS) -ldl
 
 output.jar: Targets.class JVMTool.class $(classes)
 	echo Manifest-Version: 1.0 > manifest.txt
