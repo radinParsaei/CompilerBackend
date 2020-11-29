@@ -163,6 +163,10 @@ public class VMTools {
             output.append("//load ").append(((SyntaxTree.CallFunction) val).getFunctionName()).append(" variables\n");
           }
         }
+      } else if (val instanceof SyntaxTree.CallFunctionFromPointer) {
+        output.append(putVals(((SyntaxTree.CallFunctionFromPointer) val).getValues()))
+                .append(putVals(((SyntaxTree.CallFunctionFromPointer) val).getFunctionPointer()))
+                .append("PUT\tTXTfp:c:\nADD\nDLCALL\n");
       }
     }
     return output.toString();
@@ -244,8 +248,12 @@ public class VMTools {
       functionsCounter++;
       String functionCode = syntaxTreeToVMByteCode2(((SyntaxTree.Function) program).getProgram());
       output.append("REC\n").append(functionCode)
-              .append("END\nPUT\tNUM").append(functions.get(((SyntaxTree.Function) program).getFunctionName()))
-              .append("\nMKFN - ").append(((SyntaxTree.Function) program).getFunctionName()).append("\n");
+              .append("END\nPUT\tTXT").append(functions.get(((SyntaxTree.Function) program).getFunctionName()));
+      for (String arg : ((SyntaxTree.Function) program).getArgs()) {
+        output.append(",").append(variables.get((((SyntaxTree.Function) program).getFunctionName().startsWith("#C")? "":"#F") +
+                ((SyntaxTree.Function) program).getFunctionName() + ":" + arg));
+      }
+      output.append("\nMKFN - ").append(((SyntaxTree.Function) program).getFunctionName()).append("\n");
     } else if (program instanceof SyntaxTree.ExecuteValue) {
       output.append(putVals(((SyntaxTree.ExecuteValue) program).getValue()));//.append("POP\n");
     } else if (program instanceof SyntaxTree.Repeat) {

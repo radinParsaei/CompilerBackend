@@ -1628,7 +1628,8 @@ public class SyntaxTree {
       String functionPointerString = functionPointer.toString();
       try {
         for (String string : functionPointerString.split(":")[1].split(",")) {
-          new SetVariable("#F" + functionPointerString.split(":")[0] + ":" + string, values[i++]).eval();
+          if (string.isEmpty()) continue;
+          new SetVariable("#F" + functionPointerString + ":" + string, values[i++]).eval();
         }
       } catch (IndexOutOfBoundsException ignore) {}
       ProgramBase program = data.getFunctions().get(functionPointerString);
@@ -1649,6 +1650,14 @@ public class SyntaxTree {
         tmp2 = (ValueBase) tmp2.getData();
       }
       return tmp2;
+    }
+
+    public ValueBase getFunctionPointer() {
+      return functionPointer;
+    }
+
+    public ValueBase[] getValues() {
+      return values;
     }
   }
 }

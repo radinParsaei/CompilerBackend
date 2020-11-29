@@ -43,9 +43,8 @@ public class Main {
             new SyntaxTree.Print(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("test"))),
             new SyntaxTree.Print(new SyntaxTree.CallFunction("test", new SyntaxTree.Text("Data passed to function"))),
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg").fromInstance(new SyntaxTree.CallFunction("createInstance").fromInstance(new SyntaxTree.Variable("test")).setAddInstanceName(true)).setAddInstanceName(true)),
-            new SyntaxTree.Print(new SyntaxTree.Text("\nlambda function pointer: ")),
-            new SyntaxTree.Print(new SyntaxTree.Lambda(new SyntaxTree.CreateLambda(new SyntaxTree.Print(new SyntaxTree.Text("Hello"))))),
-            new SyntaxTree.Print(new SyntaxTree.CallFunctionFromPointer(new SyntaxTree.Text("func2:,a,b"), new SyntaxTree.Number(10), new SyntaxTree.Number(11)))
+            new SyntaxTree.Print(new SyntaxTree.Text("\nlambda function test: ")),
+            new SyntaxTree.Print(new SyntaxTree.CallFunctionFromPointer(new SyntaxTree.Lambda(new SyntaxTree.CreateLambda(new SyntaxTree.Return(new SyntaxTree.Variable("a")), "a")), new SyntaxTree.Text("Passed")))
             );
 //    program.eval();
     serializer.serialize("file.ser", program);
