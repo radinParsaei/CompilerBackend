@@ -275,13 +275,13 @@ public class VMTools {
       } else {
         if (variables.get(((SyntaxTree.SetVariable) program).getVariableName()) == null) {
           variables.put(((SyntaxTree.SetVariable) program).getVariableName(), variablesCounter);
+          variablesCounter++;
           output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
-          output.append("PUT\tNUM").append(variablesCounter);
+          output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable) program).getVariableName()));
           if (((SyntaxTree.SetVariable) program).isUseInstanceName()) {
             output.append("\nPUT\tNUM0\nSTCKGET2\nADD");
           }
           output.append("\nMEMSET\n");
-          variablesCounter++;
         } else {
           output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
           output.append("PUT\tNUM").append(variables.get(((SyntaxTree.SetVariable) program).getVariableName()));

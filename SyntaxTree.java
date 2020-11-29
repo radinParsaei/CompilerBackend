@@ -1606,7 +1606,7 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       createLambda.eval();
-      return createLambda.getFunctionName();
+      return new Text(createLambda.getFunctionName());
     }
 
     public CreateLambda getCreateLambda() {
