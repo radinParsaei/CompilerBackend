@@ -178,6 +178,11 @@ public class NameSpaces {
             for (ProgramBase setVariable : ((SyntaxTree.CallFunction) value).getVariableSetters()) {
                 addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) setVariable).getVariableValue(), declaredVariables);
             }
+        } else if (value instanceof SyntaxTree.CallFunctionFromPointer) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.CallFunctionFromPointer) value).getFunctionPointer(), declaredVariables);
+            for (ValueBase value1 : ((SyntaxTree.CallFunctionFromPointer) value).getValues()) {
+                addNameSpacesOnValue(nameSpace, value1, declaredVariables);
+            }
         }
     }
 }
