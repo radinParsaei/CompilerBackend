@@ -1595,6 +1595,10 @@ public class SyntaxTree {
     public CreateLambda(ProgramBase program, String... args) {
       super("l#" + i++, program, args);
     }
+
+    public static void setCounter(int i) {
+      CreateLambda.i = i;
+    }
   }
 
   public static class Lambda extends ValueBase implements java.io.Serializable {
