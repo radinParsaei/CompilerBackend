@@ -458,16 +458,16 @@ public class SyntaxTree {
       return programs;
     }
 
-      public boolean isAddInstanceName() {
-          return addInstanceName;
-      }
+    public boolean isAddInstanceName() {
+      return addInstanceName;
+    }
 
-      public CallFunction setAddInstanceName(boolean addInstanceName) {
-          this.addInstanceName = addInstanceName;
-          return this;
-      }
+    public CallFunction setAddInstanceName(boolean addInstanceName) {
+      this.addInstanceName = addInstanceName;
+      return this;
+    }
 
-      public void setRecursion(boolean recursion) {
+    public void setRecursion(boolean recursion) {
       isRecursion = recursion;
     }
 
@@ -1630,12 +1630,12 @@ public class SyntaxTree {
     public Object getData() {
       int i = 0;
       String functionPointerString = functionPointer.toString();
-      try {
+      if (functionPointerString.split(":").length != 1) {
         for (String string : functionPointerString.split(":")[1].split(",")) {
           if (string.isEmpty()) continue;
           new SetVariable("#F" + functionPointerString + ":" + string, values[i++]).eval();
         }
-      } catch (IndexOutOfBoundsException ignore) {}
+      }
       ProgramBase program = data.getFunctions().get(functionPointerString);
       if (program == null) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, functionPointerString.split(":")[0]);
