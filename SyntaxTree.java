@@ -1365,7 +1365,11 @@ public class SyntaxTree {
       return this.elseProgram;
     }
     public If addElse(ProgramBase elseProgram) {
-      this.elseProgram = NameSpaces.addNameSpaces(nextNameSpace(), elseProgram, null);
+      if (elseProgram instanceof If) {
+        this.elseProgram = elseProgram;
+      } else {
+        this.elseProgram = NameSpaces.addNameSpaces(nextNameSpace(), elseProgram, null);
+      }
       return this;
     }
     public If(ValueBase condition, ProgramBase program) {
