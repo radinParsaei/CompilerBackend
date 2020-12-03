@@ -702,7 +702,6 @@ public class SyntaxTree {
       if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
-      boolean equalAsBoolAndNumber = false;
       if (v1 instanceof Boolean && v2 instanceof Number) {
         if (((boolean)v1.getData())) {
           if (!v2.getData().equals(BigDecimal.ZERO)) {
@@ -725,7 +724,8 @@ public class SyntaxTree {
           }
         }
       }
-      return new SyntaxTree.Boolean(v2.toString().equals(v1.toString()));
+      return new SyntaxTree.Boolean(v2.toString().equals(v1.toString()) ||
+              (v1 instanceof Number && v2 instanceof Number && ((BigDecimal)v1.getData()).compareTo((BigDecimal)v2.getData()) == 0));
     }
 
     public ValueBase getV1() {
@@ -756,7 +756,8 @@ public class SyntaxTree {
       if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
         v2 = (ValueBase)v2.getData();
       }
-      return new Boolean((v1.toString().equals(v2.toString()) && v1 instanceof Number == v2 instanceof Number));
+      return new Boolean((v1.toString().equals(v2.toString()) && v1 instanceof Number == v2 instanceof Number) ||
+              (v1 instanceof Number && v2 instanceof Number && ((BigDecimal)v1.getData()).compareTo((BigDecimal)v2.getData()) == 0));
     }
 
     public ValueBase getV1() {
