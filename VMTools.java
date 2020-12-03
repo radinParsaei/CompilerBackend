@@ -331,13 +331,27 @@ public class VMTools {
           }
         }
       }
+      int size = result.length();
       for (Map.Entry<String, Integer> entry : sizes.entrySet()) {
         int tmp = result.indexOf("\n" + entry.getKey());
+        if (tmp < 0) continue;
         int tmp2 = tmp--;
         while (result.charAt(tmp) >= 48 && result.charAt(tmp) <= 57) tmp--;
         tmp++;
         int i = Integer.parseInt(result.substring(tmp, tmp2));
-        result = result.replace(i + "\n" + entry.getKey(), (i + entry.getValue()) + "");
+        result = result.replaceFirst(i + "\n" + entry.getKey(), (i + entry.getValue()) + "");
+      }
+      while (size != result.length()) {
+        size = result.length();
+        for (Map.Entry<String, Integer> entry : sizes.entrySet()) {
+          int tmp = result.indexOf("\n" + entry.getKey());
+          if (tmp < 0) continue;
+          int tmp2 = tmp--;
+          while (result.charAt(tmp) >= 48 && result.charAt(tmp) <= 57) tmp--;
+          tmp++;
+          int i = Integer.parseInt(result.substring(tmp, tmp2));
+          result = result.replaceFirst(i + "\n" + entry.getKey(), (i + entry.getValue()) + "");
+        }
       }
       for (Map.Entry<String, String> entry : classesParameters.entrySet()) {
         result = result.replace("\n//PUT VARIABLES OF CLASS " + entry.getKey(), "//PUT VARIABLES OF CLASS" + entry.getKey() + "\n" + entry.getValue());
