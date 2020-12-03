@@ -315,13 +315,18 @@ public class VMTools {
     }
     String result = output.toString();
     if (checkVariables2) {
+      boolean isFirst = true;
       for (Map.Entry<String, Integer> entry : variables.entrySet()) {
         result = result.replace("PUT\tNUM&" + entry.getKey() + "\n", "PUT\tNUM" + entry.getValue() + "\n");
         for (Map.Entry<String, Integer> entry1 : functions.entrySet()) {
+          if (isFirst) {
+            result = result.replace("\n//save " + entry1.getKey() + " variables\n", "\n//save " + entry1.getKey() + " variables\n//put " + entry1.getKey() + "\n");
+          }
           if (entry.getKey().startsWith("#F" + entry1.getKey())) {
             int tmp = result.length();
             result = result.replace("\n//save " + entry1.getKey() + " variables\n", "\nPUT\tNUM" +
-                    variables.get(entry.getKey()) + "\nMEMGET\nPUT\tNUM0\nSTCKMOV\n//save " + entry1.getKey() + " variables\n");
+                    variables.get(entry.getKey()) + "\nMEMGET\n//save " + entry1.getKey() + " variables\n");
+            result = result.replace("\n//put " + entry1.getKey(), "\nPUT\tNUM0\nSTCKMOV\n//put " + entry1.getKey());
             if (!sizes.containsKey("//add size of " + entry1.getKey() + " variables"))
               sizes.put("//add size of " + entry1.getKey() + " variables", 0);
             if (tmp != result.length())
@@ -329,20 +334,10 @@ public class VMTools {
             result = result.replace("\n//load " + entry1.getKey() + " variables\n", "\nPUT\tNUM0\nSTCKGET\nPUT\tNUM" +
                     variables.get(entry.getKey()) + "\nMEMSET\n//load " + entry1.getKey() + " variables\n");
           }
+          isFirst = false;
         }
       }
-      int size = result.length();
-      for (Map.Entry<String, Integer> entry : sizes.entrySet()) {
-        int tmp = result.indexOf("\n" + entry.getKey());
-        if (tmp < 0) continue;
-        int tmp2 = tmp--;
-        while (result.charAt(tmp) >= 48 && result.charAt(tmp) <= 57) tmp--;
-        tmp++;
-        int i = Integer.parseInt(result.substring(tmp, tmp2));
-        result = result.replaceFirst(i + "\n" + entry.getKey(), (i + entry.getValue()) + "");
-      }
-      while (size != result.length()) {
-        size = result.length();
+      do {
         for (Map.Entry<String, Integer> entry : sizes.entrySet()) {
           int tmp = result.indexOf("\n" + entry.getKey());
           if (tmp < 0) continue;
@@ -352,7 +347,7 @@ public class VMTools {
           int i = Integer.parseInt(result.substring(tmp, tmp2));
           result = result.replaceFirst(i + "\n" + entry.getKey(), (i + entry.getValue()) + "");
         }
-      }
+      } while (result.contains("//add"));
       for (Map.Entry<String, String> entry : classesParameters.entrySet()) {
         result = result.replace("\n//PUT VARIABLES OF CLASS " + entry.getKey(), "//PUT VARIABLES OF CLASS" + entry.getKey() + "\n" + entry.getValue());
       }
