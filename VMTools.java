@@ -8,6 +8,7 @@ public class VMTools {
   private int functionsCounter = 0;
   private boolean checkVariables = true;
   private final HashMap<String, Integer> functions = new HashMap<>();
+  private final HashMap<String, Integer> sizes = new HashMap<>();
   private final HashMap<String, String> classesParameters = new HashMap<>();
   private String putVals(ValueBase... vals) {
     StringBuilder output = new StringBuilder();
@@ -200,12 +201,22 @@ public class VMTools {
     } else if (program instanceof SyntaxTree.If) {
       ProgramBase programBase = ((SyntaxTree.If) program).getElseProgram();
       String elseByteCode = syntaxTreeToVMByteCode2(programBase);
-      output.append(putVals(new SyntaxTree.Number(new BigDecimal(elseByteCode.split("\n").length + 2 - (programBase == null ? 1 : 0)))));
+      output.append(putVals(new SyntaxTree.Number(new BigDecimal((elseByteCode.split("\n").length + 2 - (programBase == null ? 1 : 0)) - elseByteCode.split("//").length + 1))));
+      for (String string : elseByteCode.split("\n")) {
+        if (string.startsWith("//load")) {
+          output.append("//add size of").append(string.replace("//load", "")).append('\n');
+        }
+      }
       output.append(putVals(((SyntaxTree.If) program).getCondition()));
       output.append("TOBOOL\nIFSKIP\n");
       output.append(elseByteCode);
       String byteCode = syntaxTreeToVMByteCode2(((SyntaxTree.If) program).getProgram());
-      output.append(putVals(new SyntaxTree.Number(new BigDecimal(byteCode.split("\n").length))));
+      output.append(putVals(new SyntaxTree.Number(new BigDecimal(byteCode.split("\n").length - byteCode.split("//").length + 1))));
+      for (String string : byteCode.split("\n")) {
+        if (string.startsWith("//load")) {
+          output.append("//add size of").append(string.replace("//load", "")).append('\n');
+        }
+      }
       output.append("SKIP\n");
       output.append(byteCode);
     } else if (program instanceof SyntaxTree.While) {
@@ -307,13 +318,26 @@ public class VMTools {
       for (Map.Entry<String, Integer> entry : variables.entrySet()) {
         result = result.replace("PUT\tNUM&" + entry.getKey() + "\n", "PUT\tNUM" + entry.getValue() + "\n");
         for (Map.Entry<String, Integer> entry1 : functions.entrySet()) {
-          if (entry.getKey().startsWith("F" + entry1.getKey())) {
+          if (entry.getKey().startsWith("#F" + entry1.getKey())) {
+            int tmp = result.length();
             result = result.replace("\n//save " + entry1.getKey() + " variables\n", "\nPUT\tNUM" +
                     variables.get(entry.getKey()) + "\nMEMGET\nPUT\tNUM0\nSTCKMOV\n//save " + entry1.getKey() + " variables\n");
+            if (!sizes.containsKey("//add size of " + entry1.getKey() + " variables"))
+              sizes.put("//add size of " + entry1.getKey() + " variables", 0);
+            if (tmp != result.length())
+              sizes.put("//add size of " + entry1.getKey() + " variables", sizes.get("//add size of " + entry1.getKey() + " variables") + 8);
             result = result.replace("\n//load " + entry1.getKey() + " variables\n", "\nPUT\tNUM0\nSTCKGET\nPUT\tNUM" +
                     variables.get(entry.getKey()) + "\nMEMSET\n//load " + entry1.getKey() + " variables\n");
           }
         }
+      }
+      for (Map.Entry<String, Integer> entry : sizes.entrySet()) {
+        int tmp = result.indexOf("\n" + entry.getKey());
+        int tmp2 = tmp--;
+        while (result.charAt(tmp) >= 48 && result.charAt(tmp) <= 57) tmp--;
+        tmp++;
+        int i = Integer.parseInt(result.substring(tmp, tmp2));
+        result = result.replace(i + "\n" + entry.getKey(), (i + entry.getValue()) + "");
       }
       for (Map.Entry<String, String> entry : classesParameters.entrySet()) {
         result = result.replace("\n//PUT VARIABLES OF CLASS " + entry.getKey(), "//PUT VARIABLES OF CLASS" + entry.getKey() + "\n" + entry.getValue());
