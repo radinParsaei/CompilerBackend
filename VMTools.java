@@ -65,6 +65,10 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.Mod) val).getV2()));
         output.append(putVals(((SyntaxTree.Mod) val).getV1()));
         output.append("MOD\n");
+      } else if (val instanceof SyntaxTree.Pow) {
+        output.append(putVals(((SyntaxTree.Pow) val).getV2()));
+        output.append(putVals(((SyntaxTree.Pow) val).getV1()));
+        output.append("POW\n");
       } else if (val instanceof SyntaxTree.Equals) {
         output.append(putVals(((SyntaxTree.Equals) val).getV2()));
         output.append(putVals(((SyntaxTree.Equals) val).getV1()));

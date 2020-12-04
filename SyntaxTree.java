@@ -683,6 +683,42 @@ public class SyntaxTree {
     }
   }
 
+  public static class Pow extends ValueBase implements java.io.Serializable {
+    private final ValueBase v1;
+    private final ValueBase v2;
+    public Pow(ValueBase v1, ValueBase v2) {
+      this.v1 = v1;
+      this.v2 = v2;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase v1 = this.v1, v2 = this.v2;
+      v1.setConfigData(data);
+      v2.setConfigData(data);
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null)) {
+        v1 = (ValueBase)v1.getData();
+      }
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null)) {
+        v2 = (ValueBase)v2.getData();
+      }
+      if (v1 instanceof Number && v2 instanceof Number) {
+        return new Number(((BigDecimal)v1.getData()).pow(((BigDecimal)v2.getData()).intValue()));
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in ^");
+        return new Null();
+      }
+    }
+
+    public ValueBase getV1() {
+      return v1;
+    }
+
+    public ValueBase getV2() {
+      return v2;
+    }
+  }
+
   public static class Equals extends ValueBase implements java.io.Serializable {
     private final ValueBase v1;
     private final ValueBase v2;
