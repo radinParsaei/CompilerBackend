@@ -35,7 +35,7 @@ public class VMTools {
             variables.put(((SyntaxTree.Variable) val).getVariableName(), variablesCounter++);
           }
         }
-        if (((SyntaxTree.Variable) val).getInstance() == null) {
+        if (!((SyntaxTree.Variable) val).isAddInstanceName()) {
           output.append("PUT\tNUM&").append(((SyntaxTree.Variable) val).getVariableName());
         } else {
           output.append("PUT\tTXT").append(((SyntaxTree.Variable) val).getVariableName())
@@ -281,7 +281,7 @@ public class VMTools {
       output.append(putVals(((SyntaxTree.Exit) program).getStatus()));
       output.append("EXIT\n");
     } else if (program instanceof SyntaxTree.SetVariable) {
-      if (((SyntaxTree.SetVariable) program).getInstance() != null) {
+      if (((SyntaxTree.SetVariable) program).isAddInstanceName()) {
         output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
         output.append(putVals(((SyntaxTree.SetVariable) program).getInstance())).append("PUT\tNUM0\nSTCKMOV\n");
         output.append("PUT\tTXT").append(((SyntaxTree.SetVariable) program).getVariableName())

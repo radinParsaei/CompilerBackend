@@ -40,9 +40,12 @@ public class Main {
             new OpCode.PutToVM(new SyntaxTree.Variable("a")),
             new OpCode(SyntaxTree.objectToValue(VM.PRINT)),
             new SyntaxTree.SetVariable("msg", new SyntaxTree.Text("Data Inserted to class")).fromInstance(new SyntaxTree.Variable("test")),
-            new SyntaxTree.Print(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("test"))),
+            new SyntaxTree.Print(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("test")).setAddInstanceName(true)),
             new SyntaxTree.Print(new SyntaxTree.CallFunction("test", new SyntaxTree.Text("Data passed to function"))),
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg").fromInstance(new SyntaxTree.CallFunction("createInstance").fromInstance(new SyntaxTree.Variable("test")).setAddInstanceName(true)).setAddInstanceName(true)),
+            new SyntaxTree.SetVariable("instance", new SyntaxTree.CallFunction("createInstance").fromInstance(new SyntaxTree.Variable("test")).setAddInstanceName(true)),
+            new SyntaxTree.SetVariable("msg", new SyntaxTree.Text("Data Inserted To Instance")).fromInstance(new SyntaxTree.Variable("instance")).setAddInstanceName(true),
+            new SyntaxTree.Print(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("instance")).setAddInstanceName(true)),
             new SyntaxTree.Print(new SyntaxTree.Text("\nlambda function test: ")),
             new SyntaxTree.SetVariable("lambdaFunc", new SyntaxTree.Lambda(new SyntaxTree.CreateLambda(new SyntaxTree.Return(new SyntaxTree.Variable("a")), "a"))),
             new SyntaxTree.Print(new SyntaxTree.CallFunctionFromPointer(new SyntaxTree.Variable("lambdaFunc"), new SyntaxTree.Text("Passed")))

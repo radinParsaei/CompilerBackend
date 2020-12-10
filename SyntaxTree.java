@@ -110,6 +110,8 @@ public class SyntaxTree {
     private boolean error = true;
     private boolean useInstanceName = false;
     private ValueBase instance;
+    private boolean addInstanceName = false;
+
     public boolean isUseInstanceName() {
       return useInstanceName;
     }
@@ -119,6 +121,15 @@ public class SyntaxTree {
     }
     public Variable(String variableName) {
       this.variableName = variableName;
+    }
+
+    public Variable setAddInstanceName(boolean addInstanceName) {
+      this.addInstanceName = addInstanceName;
+      return this;
+    }
+
+    public boolean isAddInstanceName() {
+      return addInstanceName;
     }
 
     public Variable fromInstance(ValueBase value) {
@@ -134,9 +145,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       if (instance != null) {
-        getConfigData().setInstanceName(instance.toString().split(":")[0]);
-        if (!variableName.startsWith("#C"))
-          variableName = "#C" + instance.toString().split(":")[1] + variableName;
+        String[] splitInstance = instance.toString().split(":");
+        getConfigData().setInstanceName(splitInstance[0]);
+        if (addInstanceName && !variableName.startsWith("#C"))
+          variableName = "#C" + splitInstance[1] + variableName;
       }
       if (variableName.startsWith("#C")) variableName = variableName.replace("#F", "");
       ValueBase tmp = data.getVariables().get(variableName + (useInstanceName? getConfigData().getInstanceName():""));
@@ -167,6 +179,7 @@ public class SyntaxTree {
     private boolean checkDeclarationInRuntime = false;
     private boolean useInstanceName = false;
     private ValueBase instance = null;
+    private boolean addInstanceName = false;
 
     public boolean getIsDeclaration() {
       return isDeclaration;
@@ -175,6 +188,15 @@ public class SyntaxTree {
     public SetVariable setIsDeclaration(boolean isDeclaration) {
       this.isDeclaration = isDeclaration;
       return this;
+    }
+
+    public SetVariable setAddInstanceName(boolean addInstanceName) {
+      this.addInstanceName = addInstanceName;
+      return this;
+    }
+
+    public boolean isAddInstanceName() {
+      return addInstanceName;
     }
 
     public boolean getCheckDeclarationInRuntime() {
@@ -222,9 +244,10 @@ public class SyntaxTree {
     @Override
     void eval() {
       if (instance != null) {
-        getData().setInstanceName(instance.toString().split(":")[0]);
-        if (!variableName.startsWith("#C"))
-          variableName = "#C" + instance.toString().split(":")[1] + variableName;
+        String[] splitInstance = instance.toString().split(":");
+        getData().setInstanceName(splitInstance[0]);
+        if (addInstanceName && !variableName.startsWith("#C"))
+          variableName = "#C" + splitInstance[1] + variableName;
       }
       if (checkDeclarationInRuntime) checkDeclaration();
       ValueBase value = this.value;
@@ -264,7 +287,7 @@ public class SyntaxTree {
       this.useInstanceName = useInstanceName;
     }
 
-    public SetVariable fromInstance(Variable instance) {
+    public SetVariable fromInstance(ValueBase instance) {
       this.instance = instance;
       useInstanceName = true;
       return this;
