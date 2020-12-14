@@ -65,6 +65,11 @@ public class SyntaxTree {
     return lastNameSpace;
   }
 
+  public static void resetNameSpaces() {
+    lastNameSpace = "@";
+    location = 0;
+  }
+
   public static void declareNativeFunction(String parent, String name, int argumentCount) {
     name += ":N#" + argumentCount + "#" + parent;
     if (data.getFunctions().containsKey(name)) {
