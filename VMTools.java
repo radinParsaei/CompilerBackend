@@ -280,6 +280,8 @@ public class VMTools {
     } else if (program instanceof SyntaxTree.Exit) {
       output.append(putVals(((SyntaxTree.Exit) program).getStatus()));
       output.append("EXIT\n");
+    } else if (program instanceof SyntaxTree.For) {
+      output.append(syntaxTreeToVMByteCode2(((SyntaxTree.For) program).getCode()));
     } else if (program instanceof SyntaxTree.SetVariable) {
       if (((SyntaxTree.SetVariable) program).isAddInstanceName()) {
         output.append(putVals(((SyntaxTree.SetVariable) program).getVariableValue()));
