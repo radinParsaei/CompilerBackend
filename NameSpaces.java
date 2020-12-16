@@ -74,6 +74,7 @@ public class NameSpaces {
                 addNameSpaces(nameSpace, ((SyntaxTree.If)program).getElseProgram(), declaredVariables);
         } else if (program instanceof SyntaxTree.While) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.While)program).getCondition(), declaredVariables);
+            addNameSpaces(nameSpace, ((SyntaxTree.While)program).getProgram(), declaredVariables);
         } else if (program instanceof SyntaxTree.Repeat) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Repeat)program).getCount(), declaredVariables);
         } else if (program instanceof SyntaxTree.Exit) {
