@@ -310,6 +310,8 @@ public class VMTools {
       }
     } else if (program instanceof SyntaxTree.Break) {
       output.append("BREAK\n");
+    } else if (program instanceof SyntaxTree.Continue) {
+      output.append("CONTINUE\n");
     } else if (program instanceof SyntaxTree.Return) {
       output.append(putVals(((SyntaxTree.Return) program).getValue())).append("EXITFN\n");
     } else if (program instanceof SyntaxTree.CreateClass) {

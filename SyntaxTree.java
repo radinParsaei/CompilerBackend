@@ -1346,6 +1346,7 @@ public class SyntaxTree {
     void eval() {
       for (ProgramBase program : programs) {
         program.setData(data);
+        if (program instanceof Continue) break;
         program.eval();
         if (data.isBroken()) break;
         if (data.getReturnedData() != null) break;
@@ -1620,6 +1621,8 @@ public class SyntaxTree {
       data.setBroken(true);
     }
   }
+
+  public static class Continue extends ProgramBase implements java.io.Serializable {}
 
   public static class Return extends ProgramBase implements java.io.Serializable {
     ValueBase value;
