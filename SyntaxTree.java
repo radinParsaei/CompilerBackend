@@ -1497,40 +1497,81 @@ public class SyntaxTree {
 
     @Override
     void eval() {
-      ValueBase condition2;
-      if (!(condition instanceof Number || condition instanceof Text || condition instanceof Boolean)) {
-        condition2 = (ValueBase)condition.getData();
+      if (Targets.customWhile) {
+        Targets._while(() -> {
+          ValueBase condition2;
+          if (!(condition instanceof Number || condition instanceof Text || condition instanceof Boolean)) {
+            condition2 = (ValueBase)condition.getData();
+          } else {
+            condition2 = condition;
+          }
+          boolean condition3 = false;
+          if (condition2 instanceof Number) {
+            condition3 = ((BigDecimal)condition2.getData()).intValue() != 0;
+          } else if (condition2 instanceof Boolean) {
+            condition3 = (boolean)condition2.getData();
+          } else if (condition2 instanceof Text) {
+            Errors.error(ErrorCodes.ERROR_TYPE, "STR in While");
+          }
+          if (!condition3) return false;
+          program.eval();
+          if (data.isBroken()) {
+            data.setBroken(false);
+            return false;
+          }
+          if (data.getReturnedData() != null) {
+            return false;
+          }
+          if (!(condition instanceof Number || condition instanceof Text || condition instanceof Boolean)) {
+            condition2 = (ValueBase) condition.getData();
+          } else {
+            condition2 = condition;
+          }
+          if (condition2 instanceof Number) {
+            condition3 = ((BigDecimal) condition2.getData()).intValue() != 0;
+          } else if (condition2 instanceof Boolean) {
+            condition3 = (boolean) condition2.getData();
+          } else if (condition2 instanceof Text) {
+            Errors.error(ErrorCodes.ERROR_TYPE, "STR in While");
+          }
+          return condition3;
+        });
       } else {
-        condition2 = condition;
-      }
-      boolean condition3 = false;
-      if (condition2 instanceof Number) {
-        condition3 = ((BigDecimal)condition2.getData()).intValue() != 0;
-      } else if (condition2 instanceof Boolean) {
-        condition3 = (boolean)condition2.getData();
-      } else if (condition2 instanceof Text) {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR in While");
-      }
-      while (condition3) {
-        program.eval();
-        if (data.isBroken()) {
-          data.setBroken(false);
-          return;
-        }
-        if (data.getReturnedData() != null) {
-          return;
-        }
+        ValueBase condition2;
         if (!(condition instanceof Number || condition instanceof Text || condition instanceof Boolean)) {
           condition2 = (ValueBase)condition.getData();
         } else {
           condition2 = condition;
         }
+        boolean condition3 = false;
         if (condition2 instanceof Number) {
           condition3 = ((BigDecimal)condition2.getData()).intValue() != 0;
         } else if (condition2 instanceof Boolean) {
           condition3 = (boolean)condition2.getData();
         } else if (condition2 instanceof Text) {
           Errors.error(ErrorCodes.ERROR_TYPE, "STR in While");
+        }
+        while (condition3) {
+          program.eval();
+          if (data.isBroken()) {
+            data.setBroken(false);
+            return;
+          }
+          if (data.getReturnedData() != null) {
+            return;
+          }
+          if (!(condition instanceof Number || condition instanceof Text || condition instanceof Boolean)) {
+            condition2 = (ValueBase) condition.getData();
+          } else {
+            condition2 = condition;
+          }
+          if (condition2 instanceof Number) {
+            condition3 = ((BigDecimal) condition2.getData()).intValue() != 0;
+          } else if (condition2 instanceof Boolean) {
+            condition3 = (boolean) condition2.getData();
+          } else if (condition2 instanceof Text) {
+            Errors.error(ErrorCodes.ERROR_TYPE, "STR in While");
+          }
         }
       }
     }
