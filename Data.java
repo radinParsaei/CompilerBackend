@@ -4,6 +4,7 @@ public class Data implements java.io.Serializable {
     transient private HashMap<String, ValueBase> variables = SyntaxTree.getVariables();
     transient private HashMap<String, ProgramBase> functions = SyntaxTree.getFunctions();
     transient private boolean isBreaked = false;
+    transient private boolean isContinued = false;
     transient private ValueBase returnedData = null;
     private String instanceName;
 
@@ -53,5 +54,13 @@ public class Data implements java.io.Serializable {
             functions = SyntaxTree.getFunctions();
         }
         return functions;
+    }
+
+    public boolean isContinued() {
+        return isContinued;
+    }
+
+    public void setContinued(boolean continued) {
+        isContinued = continued;
     }
 }

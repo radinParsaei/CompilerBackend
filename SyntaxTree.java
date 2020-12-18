@@ -1345,8 +1345,14 @@ public class SyntaxTree {
     @Override
     void eval() {
       for (ProgramBase program : programs) {
+        if (data.isContinued()) {
+          break;
+        }
         program.setData(data);
-        if (program instanceof Continue) break;
+        if (program instanceof Continue) {
+          program.eval();
+          break;
+        }
         program.eval();
         if (data.isBroken()) break;
         if (data.getReturnedData() != null) break;
@@ -1520,6 +1526,7 @@ public class SyntaxTree {
             data.setBroken(false);
             return false;
           }
+          data.setContinued(false);
           if (data.getReturnedData() != null) {
             return false;
           }
@@ -1558,6 +1565,7 @@ public class SyntaxTree {
             data.setBroken(false);
             return;
           }
+          data.setContinued(false);
           if (data.getReturnedData() != null) {
             return;
           }
@@ -1605,6 +1613,7 @@ public class SyntaxTree {
             data.setBroken(false);
             return;
           }
+          data.setContinued(false);
           if (data.getReturnedData() != null) {
             return;
           }
@@ -1622,7 +1631,12 @@ public class SyntaxTree {
     }
   }
 
-  public static class Continue extends ProgramBase implements java.io.Serializable {}
+  public static class Continue extends ProgramBase implements java.io.Serializable {
+    @Override
+    void eval() {
+      data.setContinued(true);
+    }
+  }
 
   public static class Return extends ProgramBase implements java.io.Serializable {
     ValueBase value;
