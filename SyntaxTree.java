@@ -1475,7 +1475,9 @@ public class SyntaxTree {
     private final Programs code;
 
     public For(ValueBase condition, ProgramBase step, ProgramBase init, ProgramBase program) {
+      NameSpaces.addCodeBeforeContinue(step);
       this.code = NameSpaces.addNameSpaces(nextNameSpace(), new Programs(init, new While(condition, new Programs(program, step))), null);
+      NameSpaces.addCodeBeforeContinue(null);
     }
 
     @Override
@@ -1632,9 +1634,20 @@ public class SyntaxTree {
   }
 
   public static class Continue extends ProgramBase implements java.io.Serializable {
+    private ProgramBase program;
+
     @Override
     void eval() {
+      if (program != null) program.eval();
       data.setContinued(true);
+    }
+
+    public void addProgramBefore(ProgramBase program) {
+      this.program = program;
+    }
+
+    public ProgramBase getProgram() {
+      return program;
     }
   }
 

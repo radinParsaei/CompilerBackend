@@ -10,6 +10,7 @@ public class VMTools {
   private final HashMap<String, Integer> functions = new HashMap<>();
   private final HashMap<String, Integer> sizes = new HashMap<>();
   private final HashMap<String, String> classesParameters = new HashMap<>();
+  private ValueBase parentWhileCondition = null;
   private String putVals(ValueBase... vals) {
     StringBuilder output = new StringBuilder();
     for (ValueBase val : vals) {
@@ -224,6 +225,7 @@ public class VMTools {
       output.append("SKIP\n");
       output.append(byteCode);
     } else if (program instanceof SyntaxTree.While) {
+      parentWhileCondition = ((SyntaxTree.While) program).getCondition();
       output.append("REC\n");
       output.append(syntaxTreeToVMByteCode2(((SyntaxTree.While) program).getProgram()));
       output.append(putVals(((SyntaxTree.While) program).getCondition()));
@@ -309,8 +311,12 @@ public class VMTools {
         }
       }
     } else if (program instanceof SyntaxTree.Break) {
+      if (parentWhileCondition != null) output.append("PUT\tNULL\n");
       output.append("BREAK\n");
     } else if (program instanceof SyntaxTree.Continue) {
+      if (((SyntaxTree.Continue) program).getProgram() != null)
+        output.append(syntaxTreeToVMByteCode2(((SyntaxTree.Continue) program).getProgram()));
+      output.append(putVals(parentWhileCondition));
       output.append("CONTINUE\n");
     } else if (program instanceof SyntaxTree.Return) {
       output.append(putVals(((SyntaxTree.Return) program).getValue())).append("EXITFN\n");

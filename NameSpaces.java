@@ -4,6 +4,7 @@ public class NameSpaces {
     private static String sep = ":";
     private static boolean declarativeVariables = true;
     private static ArrayList<String> globals = null;
+    private static ProgramBase codeBeforeContinue;
 
     public static void setDeclarativeVariables(boolean declarativeVariables) {
         NameSpaces.declarativeVariables = declarativeVariables;
@@ -83,6 +84,11 @@ public class NameSpaces {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Return)program).getValue(), declaredVariables);
         } else if (program instanceof SyntaxTree.ExecuteValue) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.ExecuteValue)program).getValue(), declaredVariables);
+        } else if (program instanceof SyntaxTree.Continue) {
+            if (codeBeforeContinue != null) {
+                addNameSpaces(nameSpace, codeBeforeContinue, declaredVariables);
+                ((SyntaxTree.Continue) program).addProgramBefore(codeBeforeContinue);
+            }
         } else if (program instanceof SyntaxTree.Print) {
             for (ValueBase value : ((SyntaxTree.Print)program).getArgs()) {
                 addNameSpacesOnValue(nameSpace, value, declaredVariables);
@@ -188,5 +194,9 @@ public class NameSpaces {
                 addNameSpacesOnValue(nameSpace, value1, declaredVariables);
             }
         }
+    }
+
+    public static void addCodeBeforeContinue(ProgramBase program) {
+        NameSpaces.codeBeforeContinue = program;
     }
 }
