@@ -238,10 +238,12 @@ public class SyntaxTree {
     }
 
     public void checkDeclaration() {
-      if (isDeclaration && data.getVariables().get(variableName) != null) {
-        Errors.error(ErrorCodes.ERROR_VARIABLE_REDECLARATION, variableName);
+      if (!variableName.startsWith("#C")) {
+        if (isDeclaration && data.getVariables().get(variableName) != null) {
+          Errors.error(ErrorCodes.ERROR_VARIABLE_REDECLARATION, variableName);
+        }
       }
-      if (!isDeclaration && data.getVariables().get(variableName) == null) {
+      if (!isDeclaration && data.getVariables().get(variableName + (useInstanceName? data.getInstanceName():"")) == null) {
         Errors.error(ErrorCodes.ERROR_VARIABLE_NOT_DECLARED, variableName);
       }
     }
@@ -254,6 +256,7 @@ public class SyntaxTree {
         if (addInstanceName && !variableName.startsWith("#C"))
           variableName = "#C" + splitInstance[1] + variableName;
       }
+
       if (checkDeclarationInRuntime) checkDeclaration();
       ValueBase value = this.value;
       if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null)) {
@@ -447,6 +450,7 @@ public class SyntaxTree {
         }
         if (programs != null) {
           for (ProgramBase program : programs) {
+            program.getData().setInstanceName(getConfigData().getInstanceName());
             program.eval();
           }
         }
@@ -1353,6 +1357,7 @@ public class SyntaxTree {
           program.eval();
           break;
         }
+        program.getData().setInstanceName(getData().getInstanceName());
         program.eval();
         if (data.isBroken()) break;
         if (data.getReturnedData() != null) break;
