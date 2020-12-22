@@ -132,8 +132,12 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.BitwiseNot) val).getValue()));
         output.append("NOT\n");
       } else if (val instanceof SyntaxTree.CreateInstance) {
+        if (((SyntaxTree.CreateInstance) val).getCallInit() != null) ((SyntaxTree.CreateInstance) val).getCallInit().fromInstance(null);
         output.append("MEMSIZE\nMEMSIZE\nPUT\tNUM0\nSTCKMOV\nPUT\tTXT").append(((SyntaxTree.CreateInstance) val).getClassName())
-                .append("\nMEMPUT\n//PUT VARIABLES OF CLASS ").append(((SyntaxTree.CreateInstance) val).getClassName()).append("PUT\tNUM0\nSTCKDEL\n");
+                .append("\nMEMPUT\n//PUT VARIABLES OF CLASS ").append(((SyntaxTree.CreateInstance) val).getClassName());
+        if (((SyntaxTree.CreateInstance) val).getCallInit() != null)
+          output.append(syntaxTreeToVMByteCode2(new SyntaxTree.ExecuteValue(((SyntaxTree.CreateInstance) val).getCallInit())));
+        output.append("PUT\tNUM0\nSTCKDEL\n");
       } else if (val instanceof SyntaxTree.Lambda) {
         output.append(syntaxTreeToVMByteCode2(((SyntaxTree.Lambda) val).getCreateLambda()));
         output.append("PUT\tNUM").append(functions.get(((SyntaxTree.Lambda) val).getCreateLambda().getFunctionName())).append("\n");

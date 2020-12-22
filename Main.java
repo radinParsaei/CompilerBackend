@@ -26,6 +26,7 @@ public class Main {
             new SyntaxTree.CreateClass("Test", new SyntaxTree.SetVariable("msg", new SyntaxTree.Text("Hello"), true, true).setCheckDeclarationInRuntime(false),
                     new SyntaxTree.Function("setMsg", new SyntaxTree.SetVariable("msg", new SyntaxTree.Variable("arg")), "arg"),
                     new SyntaxTree.Function("printMsg", new SyntaxTree.Print(new SyntaxTree.Variable("msg"))),
+//                    new SyntaxTree.Function("<init>", new SyntaxTree.Print(new SyntaxTree.Text("Hello, World!!!"))),
                     new SyntaxTree.Function("createInstance", new SyntaxTree.Return(new SyntaxTree.CreateInstance("Test")))
             ),
             new SyntaxTree.If(new SyntaxTree.Boolean(true), new SyntaxTree.Programs(

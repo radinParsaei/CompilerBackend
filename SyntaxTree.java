@@ -1721,8 +1721,10 @@ public class SyntaxTree {
   public static class CreateInstance extends ValueBase implements java.io.Serializable {
     private static final ArrayList<SetVariable> parameters = new ArrayList<>();
     private final String className;
-    public CreateInstance(String className) {
+    private CallFunction callInit;
+    public CreateInstance(String className, ValueBase... args) {
       this.className = className;
+      if (functions.containsKey("#C" + className + "<init>")) this.callInit = new CallFunction("#C" + className + "<init>", args);
       String instanceNameSpace = nextNameSpace();
 //      Data data = new Data();
 //      data.setInstanceName(instanceNameSpace);
@@ -1740,11 +1742,17 @@ public class SyntaxTree {
       for (SetVariable setVariable : parameters) {
         setVariable.eval();
       }
-      return new SyntaxTree.Text(getConfigData().getInstanceName() + ":" + className);
+      Text instance = new SyntaxTree.Text(getConfigData().getInstanceName() + ":" + className);
+      if (callInit != null) callInit.fromInstance(instance).getData();
+      return instance;
     }
 
     public String getClassName() {
       return className;
+    }
+
+    public CallFunction getCallInit() {
+      return callInit;
     }
   }
 
