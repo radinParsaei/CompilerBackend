@@ -103,6 +103,9 @@ public class NameSpaces {
                 ((SyntaxTree.Function) program).setFunctionName(nameSpace + ((SyntaxTree.Function) program).getFunctionName());
                 addNameSpaces(nameSpace, ((SyntaxTree.Function) program).getProgram(), declaredVariables1);
                 program.eval();
+                if (((SyntaxTree.Function) program).getFunctionName().startsWith(nameSpace + "<init>")) {
+                    SyntaxTree.getClassesWithInit().add(nameSpace.replace("#C", ""));
+                }
             }
         }
         if (isFirst) {

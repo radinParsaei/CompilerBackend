@@ -37,6 +37,11 @@ public class SyntaxTree {
   public static HashMap<String, ArrayList<SetVariable>> getClassesParameters() {
     return classesParameters;
   }
+  private static final ArrayList<String> classesWithInit = new ArrayList<>();
+
+  public static ArrayList<String> getClassesWithInit() {
+    return classesWithInit;
+  }
 
   private static Data data = new Data();
 
@@ -1722,9 +1727,10 @@ public class SyntaxTree {
     private static final ArrayList<SetVariable> parameters = new ArrayList<>();
     private final String className;
     private CallFunction callInit;
+    private final ValueBase[] args;
     public CreateInstance(String className, ValueBase... args) {
       this.className = className;
-      if (functions.containsKey("#C" + className + "<init>")) this.callInit = new CallFunction("#C" + className + "<init>", args);
+      this.args = args;
       String instanceNameSpace = nextNameSpace();
 //      Data data = new Data();
 //      data.setInstanceName(instanceNameSpace);
@@ -1742,6 +1748,7 @@ public class SyntaxTree {
       for (SetVariable setVariable : parameters) {
         setVariable.eval();
       }
+      if (classesWithInit.contains(className)) this.callInit = new CallFunction("#C" + className + "<init>", args);
       Text instance = new SyntaxTree.Text(getConfigData().getInstanceName() + ":" + className);
       if (callInit != null) callInit.fromInstance(instance).getData();
       return instance;
