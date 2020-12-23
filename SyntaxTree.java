@@ -154,7 +154,7 @@ public class SyntaxTree {
 
     @Override
     public Object getData() {
-      if (instance != null) {
+      if (instance != null && !(instance instanceof This)) {
         String[] splitInstance = instance.toString().split(":");
         getConfigData().setInstanceName(splitInstance[0]);
         if (addInstanceName && !variableName.startsWith("#C"))
@@ -1391,7 +1391,7 @@ public class SyntaxTree {
     void eval() {
       separator.setConfigData(data);
       for (int i = 0; i < args.length; i++) {
-        args[i].setConfigData(data);
+        args[i].setConfigData(this.getData());
         if (Targets.systemPrint) {
           System.out.print(args[i]);
         } else {
@@ -1761,6 +1761,14 @@ public class SyntaxTree {
     public CallFunction getCallInit() {
       return callInit;
     }
+
+    public ValueBase[] getArgs() {
+      return args;
+    }
+  }
+
+  public static class This extends ValueBase implements java.io.Serializable {
+
   }
 
   public static class CreateLambda extends Function implements java.io.Serializable {

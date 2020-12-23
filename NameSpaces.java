@@ -119,7 +119,7 @@ public class NameSpaces {
             return;
         }
         if (value instanceof SyntaxTree.Variable) {
-            if (declaredVariables.contains(((SyntaxTree.Variable) value).getVariableName())) {
+            if ((!(((SyntaxTree.Variable) value).getInstance() instanceof SyntaxTree.This) || nameSpace.startsWith("#C")) && declaredVariables.contains(((SyntaxTree.Variable) value).getVariableName())) {
                 if (nameSpace.startsWith("#C")) ((SyntaxTree.Variable) value).setUseInstanceName(!((SyntaxTree.Variable) value).getVariableName().startsWith("#F"));
                 ((SyntaxTree.Variable) value).setVariableName(nameSpace + sep + ((SyntaxTree.Variable) value).getVariableName());
             }
