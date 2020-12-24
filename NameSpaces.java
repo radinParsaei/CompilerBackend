@@ -34,7 +34,7 @@ public class NameSpaces {
                     ((SyntaxTree.SetVariable) program).setVariableName(nameSpace + sep +
                             ((SyntaxTree.SetVariable) program).getVariableName());
                 } else {
-                    if (declaredVariables.contains(((SyntaxTree.SetVariable) program).getVariableName())) {
+                    if ((!(((SyntaxTree.SetVariable) program).getInstance() instanceof SyntaxTree.This) || nameSpace.startsWith("#C")) && declaredVariables.contains(((SyntaxTree.SetVariable) program).getVariableName())) {
                         if (nameSpace.startsWith("#C")) ((SyntaxTree.SetVariable) program).setUseInstanceName(!((SyntaxTree.SetVariable) program).getVariableName().startsWith("#F"));
                         ((SyntaxTree.SetVariable) program).setVariableName(nameSpace + sep + ((SyntaxTree.SetVariable) program).getVariableName());
                     }
@@ -53,15 +53,7 @@ public class NameSpaces {
                             ((SyntaxTree.SetVariable) program).getVariableName());
                 }
             }
-            if (((SyntaxTree.SetVariable) program).getVariableValue() instanceof SyntaxTree.Variable) {
-                SyntaxTree.Variable tmp = (SyntaxTree.Variable) ((SyntaxTree.SetVariable) program).getVariableValue();
-                if (declaredVariables.contains(tmp.getVariableName())) {
-                    if (nameSpace.startsWith("#C")) tmp.setUseInstanceName(!tmp.getVariableName().startsWith("#F"));
-                    tmp.setVariableName(nameSpace + sep + tmp.getVariableName());
-                }
-            } else {
-                addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) program).getVariableValue(), declaredVariables);
-            }
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) program).getVariableValue(), declaredVariables);
         } else if (!declarativeVariables && program instanceof SyntaxTree.Global) {
             globals.add(((SyntaxTree.Global)program).getVariableName());
         } else if (program instanceof SyntaxTree.Programs) {

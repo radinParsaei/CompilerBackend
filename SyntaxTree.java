@@ -255,13 +255,13 @@ public class SyntaxTree {
 
     @Override
     void eval() {
-      if (instance != null) {
+      if (instance != null && !(instance instanceof This)) {
         String[] splitInstance = instance.toString().split(":");
         getData().setInstanceName(splitInstance[0]);
         if (addInstanceName && !variableName.startsWith("#C"))
           variableName = "#C" + splitInstance[1] + variableName;
       }
-
+      if (variableName.startsWith("#C")) variableName = variableName.replace("#F", "");
       if (checkDeclarationInRuntime) checkDeclaration();
       ValueBase value = this.value;
       if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null)) {
