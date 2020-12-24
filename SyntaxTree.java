@@ -436,7 +436,7 @@ public class SyntaxTree {
 
     @Override
     public ValueBase getData() {
-      if (instance != null) {
+      if (instance != null && !(instance instanceof This)) {
         String[] splitInstance = instance.toString().split(":");
         getConfigData().setInstanceName(splitInstance[0]);
         if (addInstanceName) {
@@ -527,6 +527,10 @@ public class SyntaxTree {
 
     public boolean isNativeFunction() {
       return nativeFunction;
+    }
+
+    public void setFunctionName(String functionName) {
+      this.functionName = functionName;
     }
   }
 
