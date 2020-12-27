@@ -38,6 +38,17 @@ public class SyntaxTree {
     return classesParameters;
   }
   private static final ArrayList<String> classesWithInit = new ArrayList<>();
+  private static final ArrayList<String> touchedVariables = new ArrayList<>();
+
+  public static void touchFunctionsFromClass(ProgramBase program, String className) {
+    if (program instanceof Programs) {
+      for (ProgramBase program1 : ((Programs) program).getPrograms()) {
+        touchFunctionsFromClass(program1, className);
+      }
+    } else if (program instanceof Function) {
+      functions.put("#C" + className + ((Function) program).getFunctionName(), null);
+    }
+  }
 
   public static ArrayList<String> getClassesWithInit() {
     return classesWithInit;
@@ -322,10 +333,11 @@ public class SyntaxTree {
         finalFunctionName.append(",").append(string);
       }
       this.functionName = finalFunctionName.toString();
-      if (error && data.getFunctions().containsKey(this.functionName)) {
+      if (error && data.getFunctions().get(this.functionName) != null) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
       }
-      data.getFunctions().put(this.functionName, null);
+      if (data.getFunctions().containsKey(this.functionName)) touchedVariables.add(this.functionName);
+      else data.getFunctions().put(this.functionName, null);
       this.program = NameSpaces.addNameSpaces("#F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
     }
 
@@ -337,10 +349,11 @@ public class SyntaxTree {
         data.getVariables().put(string, new SyntaxTree.Null());
       }
       this.functionName = finalFunctionName.toString();
-      if (data.getFunctions().containsKey(this.functionName)) {
+      if (data.getFunctions().get(this.functionName) != null) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
       }
-      data.getFunctions().put(this.functionName, null);
+      if (data.getFunctions().containsKey(this.functionName)) touchedVariables.add(this.functionName);
+      else data.getFunctions().put(this.functionName, null);
       this.program = NameSpaces.addNameSpaces("#F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
     }
 
@@ -354,9 +367,13 @@ public class SyntaxTree {
     }
 
     public void setFunctionName(String functionName) {
-      data.getFunctions().remove(this.functionName);
+      if (functionName.startsWith("#C"))
+        data.getFunctions().remove(this.functionName);
+      for (String string : touchedVariables) {
+        data.getFunctions().put(string, null);
+      }
       this.functionName = functionName;
-      if (data.getFunctions().containsKey(this.functionName)) {
+      if (data.getFunctions().get(this.functionName) != null) {
         Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
       }
       data.getFunctions().put(this.functionName, null);
@@ -1715,7 +1732,9 @@ public class SyntaxTree {
       this.className = className;
       ArrayList<SetVariable> variables = new ArrayList<>();
       classesParameters.put(className, variables);
-      this.programs = NameSpaces.addNameSpaces("#C" + className, new SyntaxTree.Programs(programs), null);
+      Programs programs1 = new Programs(programs);
+      touchFunctionsFromClass(programs1, className);
+      this.programs = NameSpaces.addNameSpaces("#C" + className, programs1, null);
     }
 
     public ProgramBase getPrograms() {

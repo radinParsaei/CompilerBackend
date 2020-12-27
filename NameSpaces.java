@@ -108,7 +108,18 @@ public class NameSpaces {
 
     public static void addNameSpacesOnValue(String nameSpace, ValueBase value, ArrayList<String> declaredVariables) {
         if (value instanceof SyntaxTree.CallFunction && nameSpace.startsWith("#C")) {
-            if (((SyntaxTree.CallFunction) value).getInstance() instanceof SyntaxTree.This) {
+            boolean hasFunctionInClass = false;
+            boolean publicFunctionExists = false;
+            for (String i : SyntaxTree.getFunctions().keySet()) {
+                if (i.startsWith(nameSpace + ((SyntaxTree.CallFunction) value).getFunctionName() + ":")) {
+                    hasFunctionInClass = true;
+                }
+                if (i.startsWith(((SyntaxTree.CallFunction) value).getFunctionName() + ":")) {
+                    publicFunctionExists = true;
+                }
+            }
+            hasFunctionInClass &= !publicFunctionExists;
+            if (((SyntaxTree.CallFunction) value).getInstance() instanceof SyntaxTree.This || hasFunctionInClass) {
                 ((SyntaxTree.CallFunction) value).setFunctionName(nameSpace + sep + ((SyntaxTree.CallFunction) value).getFunctionName());
             }
         }
