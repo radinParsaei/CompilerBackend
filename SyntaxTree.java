@@ -275,7 +275,7 @@ public class SyntaxTree {
       if (variableName.startsWith("#C")) variableName = variableName.replace("#F", "");
       if (checkDeclarationInRuntime) checkDeclaration();
       ValueBase value = this.value;
-      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null)) {
+      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null || value instanceof CreateInstance)) {
         value = (ValueBase)value.getData();
       }
       data.getVariables().put(variableName + (useInstanceName? data.getInstanceName():""), value);
@@ -490,7 +490,7 @@ public class SyntaxTree {
         } else {
           tmp2 = new Null();
         }
-        if (!(tmp2 instanceof Number || tmp2 instanceof Text || tmp2 instanceof Boolean || tmp2 instanceof Null)) {
+        if (!(tmp2 instanceof Number || tmp2 instanceof Text || tmp2 instanceof Boolean || tmp2 instanceof Null || tmp2 instanceof CreateInstance)) {
           tmp2 = (ValueBase) tmp2.getData();
         }
         if (isRecursion)
@@ -1751,6 +1751,8 @@ public class SyntaxTree {
     private final String className;
     private CallFunction callInit;
     private final ValueBase[] args;
+    private boolean isFirst = true;
+    private Text instance;
     public CreateInstance(String className, ValueBase... args) {
       this.className = className;
       this.args = args;
@@ -1763,17 +1765,20 @@ public class SyntaxTree {
 
     @Override
     public Object getData() {
-      for (SetVariable setVariable : classesParameters.get(className)) {
-        SetVariable setVariable1 = ((SetVariable) setVariable.clone()).setVariableName(setVariable.getVariableName() + getConfigData().getInstanceName());
-        setVariable1.setData(getConfigData());
-        parameters.add(setVariable1);
+      if (isFirst) {
+        for (SetVariable setVariable : classesParameters.get(className)) {
+          SetVariable setVariable1 = ((SetVariable) setVariable.clone()).setVariableName(setVariable.getVariableName() + getConfigData().getInstanceName());
+          setVariable1.setData(getConfigData());
+          parameters.add(setVariable1);
+        }
+        for (SetVariable setVariable : parameters) {
+          setVariable.eval();
+        }
+        if (classesWithInit.contains(className)) this.callInit = new CallFunction("#C" + className + "<init>", args);
+        instance = new SyntaxTree.Text(getConfigData().getInstanceName() + ":" + className);
+        if (callInit != null) callInit.fromInstance(instance).getData();
+        isFirst = false;
       }
-      for (SetVariable setVariable : parameters) {
-        setVariable.eval();
-      }
-      if (classesWithInit.contains(className)) this.callInit = new CallFunction("#C" + className + "<init>", args);
-      Text instance = new SyntaxTree.Text(getConfigData().getInstanceName() + ":" + className);
-      if (callInit != null) callInit.fromInstance(instance).getData();
       return instance;
     }
 

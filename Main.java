@@ -56,6 +56,9 @@ public class Main {
 //    program.eval();
     serializer.serialize("file.ser", program);
     serializer.deserialize("file.ser").eval();
+//    new SyntaxTree.SetVariable("variable", new SyntaxTree.CreateInstance("Test")).eval();
+//    System.out.println(new SyntaxTree.Variable("variable").getData().getClass().getName());
+//    System.out.println(new SyntaxTree.CallFunction("createInstance").setAddInstanceName(true).fromInstance(new SyntaxTree.Variable("variable")).getData().getClass().getName());
     try {
       FileWriter writer = new FileWriter("a");
       VMTools vmTools = new VMTools();
