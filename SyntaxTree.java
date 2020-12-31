@@ -1413,6 +1413,16 @@ public class SyntaxTree {
       separator.setConfigData(data);
       for (int i = 0; i < args.length; i++) {
         args[i].setConfigData(this.getData());
+        if (args[i] instanceof Variable) {
+          args[i] = (ValueBase) args[i].getData();
+        }
+        if (args[i] instanceof CallFunction) {
+          args[i] = (ValueBase) args[i].getData();
+        }
+        if (args[i] instanceof CreateInstance) {
+          if (functions.containsKey("#C" + ((CreateInstance) args[i]).getClassName() + "toString:"))
+            args[i] = new SyntaxTree.CallFunction("toString").fromInstance(args[i]).setAddInstanceName(true);
+        }
         if (Targets.systemPrint) {
           System.out.print(args[i]);
         } else {

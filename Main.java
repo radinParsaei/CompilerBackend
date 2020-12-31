@@ -27,7 +27,8 @@ public class Main {
                     new SyntaxTree.Function("setMsg", new SyntaxTree.SetVariable("msg", new SyntaxTree.Variable("arg")), "arg"),
                     new SyntaxTree.Function("printMsg", new SyntaxTree.Print(new SyntaxTree.Variable("msg"))),
                     new SyntaxTree.Function("<init>", new SyntaxTree.Print(new SyntaxTree.Text("Hello, World!!!"))),
-                    new SyntaxTree.Function("createInstance", new SyntaxTree.Return(new SyntaxTree.CreateInstance("Test")))
+                    new SyntaxTree.Function("createInstance", new SyntaxTree.Return(new SyntaxTree.CreateInstance("Test"))),
+                    new SyntaxTree.Function("toString", new SyntaxTree.Return(new SyntaxTree.Text("Test.toString()")))
             ),
             new SyntaxTree.If(new SyntaxTree.Boolean(true), new SyntaxTree.Programs(
                     new SyntaxTree.SetVariable("a", new SyntaxTree.Null(), true, true),
@@ -51,7 +52,8 @@ public class Main {
             new SyntaxTree.SetVariable("lambdaFunc", new SyntaxTree.Lambda(new SyntaxTree.CreateLambda(new SyntaxTree.Return(new SyntaxTree.Variable("a")), "a"))),
             new SyntaxTree.Print(new SyntaxTree.CallFunctionFromPointer(new SyntaxTree.Variable("lambdaFunc"), new SyntaxTree.Text("Passed"))),
             new SyntaxTree.For(new SyntaxTree.Not(new SyntaxTree.Variable("i")), new SyntaxTree.SetVariable("i", new SyntaxTree.Boolean(true)), new SyntaxTree.SetVariable("i", new SyntaxTree.Boolean(false)), new SyntaxTree.Print(new SyntaxTree.Variable("i"))),
-            new SyntaxTree.Repeat(new SyntaxTree.Number(4), new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Text(";")), new SyntaxTree.Continue(), new SyntaxTree.Print(new SyntaxTree.Text("."))))
+            new SyntaxTree.Repeat(new SyntaxTree.Number(4), new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Text(";")), new SyntaxTree.Continue(), new SyntaxTree.Print(new SyntaxTree.Text(".")))),
+            new SyntaxTree.Print(new SyntaxTree.Variable("test"))
             );
 //    program.eval();
     serializer.serialize("file.ser", program);
