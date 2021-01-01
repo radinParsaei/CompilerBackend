@@ -137,7 +137,7 @@ public class VMTools {
           callInit = new SyntaxTree.CallFunction("#C" + ((SyntaxTree.CreateInstance) val).getClassName() + "<init>", ((SyntaxTree.CreateInstance) val).getArgs());
           callInit.fromInstance(null);
         }
-        output.append("MEMSIZE\nMEMSIZE\nPUT\tNUM0\nSTCKMOV\nPUT\tTXT").append(((SyntaxTree.CreateInstance) val).getClassName())
+        output.append("MEMSIZE\nTOPTR\nMEMSIZE\nTOPTR\nPUT\tNUM0\nSTCKMOV\nPUT\tTXT").append(((SyntaxTree.CreateInstance) val).getClassName())
                 .append("\nMEMPUT\n//PUT VARIABLES OF CLASS ").append(((SyntaxTree.CreateInstance) val).getClassName());
         if (callInit != null)
           output.append(syntaxTreeToVMByteCode2(new SyntaxTree.ExecuteValue(callInit)));
