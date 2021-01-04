@@ -1412,27 +1412,40 @@ public class SyntaxTree {
     void eval() {
       separator.setConfigData(data);
       for (int i = 0; i < args.length; i++) {
-        args[i].setConfigData(this.getData());
-        if (args[i] instanceof Variable) {
-          args[i] = (ValueBase) args[i].getData();
+        ValueBase itemToPrint = args[i];
+        ValueBase separator2 = separator;
+        separator2.setConfigData(this.getData());
+        itemToPrint.setConfigData(this.getData());
+        if (itemToPrint instanceof Variable) {
+          itemToPrint = (ValueBase) itemToPrint.getData();
         }
-        if (args[i] instanceof CallFunction) {
-          args[i] = (ValueBase) args[i].getData();
+        if (itemToPrint instanceof CallFunction) {
+          itemToPrint = (ValueBase) itemToPrint.getData();
         }
-        if (args[i] instanceof CreateInstance) {
-          if (functions.containsKey("#C" + ((CreateInstance) args[i]).getClassName() + "toString:"))
-            args[i] = new SyntaxTree.CallFunction("toString").fromInstance(args[i]).setAddInstanceName(true);
+        if (itemToPrint instanceof CreateInstance) {
+          if (functions.containsKey("#C" + ((CreateInstance) itemToPrint).getClassName() + "toString:"))
+            itemToPrint = new SyntaxTree.CallFunction("toString").fromInstance(itemToPrint).setAddInstanceName(true);
+        }
+        if (separator2 instanceof Variable) {
+          separator2 = (ValueBase) separator2.getData();
+        }
+        if (separator2 instanceof CallFunction) {
+          separator2 = (ValueBase) separator2.getData();
+        }
+        if (separator2 instanceof CreateInstance) {
+          if (functions.containsKey("#C" + ((CreateInstance) separator2).getClassName() + "toString:"))
+            separator2 = new SyntaxTree.CallFunction("toString").fromInstance(separator2).setAddInstanceName(true);
         }
         if (Targets.systemPrint) {
-          System.out.print(args[i]);
+          System.out.print(itemToPrint);
         } else {
-          Targets.print(args[i]);
+          Targets.print(itemToPrint);
         }
         if (i < args.length - 1) {
           if (Targets.systemPrint) {
-            System.out.print(separator);
+            System.out.print(separator2);
           } else {
-            Targets.print(separator);
+            Targets.print(separator2);
           }
         }
       }
