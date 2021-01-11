@@ -39,6 +39,15 @@ public class SyntaxTree {
   }
   private static final ArrayList<String> classesWithInit = new ArrayList<>();
   private static final ArrayList<String> touchedVariables = new ArrayList<>();
+  private static int id = 0;
+
+  public static int getId() {
+    return id;
+  }
+
+  public static void setId(int id) {
+    SyntaxTree.id = id;
+  }
 
   public static void touchFunctionsFromClass(ProgramBase program, String className) {
     if (program instanceof Programs) {
@@ -1374,6 +1383,7 @@ public class SyntaxTree {
 
     @Override
     void eval() {
+      int id = getId();
       for (ProgramBase program : programs) {
         if (data.isContinued()) {
           break;
@@ -1383,6 +1393,7 @@ public class SyntaxTree {
           program.eval();
           break;
         }
+        if (id != getId()) break;
         program.getData().setInstanceName(getData().getInstanceName());
         program.eval();
         if (data.isBroken()) break;
@@ -1615,7 +1626,15 @@ public class SyntaxTree {
         } else if (condition2 instanceof Text) {
           Errors.error(ErrorCodes.ERROR_TYPE, "STR in While");
         }
-        while (condition3) {
+        int id = getId();
+        while (condition3 && getId() == id) {
+          if (Targets.isWeb && Targets.isInThread) {
+            try {
+              Thread.sleep(1);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+          }
           program.eval();
           if (data.isBroken()) {
             data.setBroken(false);
@@ -1637,6 +1656,7 @@ public class SyntaxTree {
           } else if (condition2 instanceof Text) {
             Errors.error(ErrorCodes.ERROR_TYPE, "STR in While");
           }
+
         }
       }
     }
@@ -1662,8 +1682,16 @@ public class SyntaxTree {
       if (!(count instanceof Number || count instanceof Text || count instanceof Boolean)) {
         count = (ValueBase)count.getData();
       }
+      int id = getId();
       if (count instanceof Number) {
-        for (BigDecimal i = BigDecimal.ZERO; i.compareTo((BigDecimal)count.getData()) == -1; i = i.add(BigDecimal.ONE)) {
+        for (BigDecimal i = BigDecimal.ZERO; ((i.compareTo((BigDecimal)count.getData()) == -1) && getId() == id); i = i.add(BigDecimal.ONE)) {
+          if (Targets.isWeb && Targets.isInThread) {
+            try {
+              Thread.sleep(1);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+          }
           program.eval();
           if (data.isBroken()) {
             data.setBroken(false);
