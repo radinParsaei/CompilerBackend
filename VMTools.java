@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.math.BigDecimal;
 import java.util.Map;
@@ -22,6 +23,11 @@ public class VMTools {
         output.append("PUT\tBOOL").append(val.getData().toString()).append("\n");
       } else if (val instanceof SyntaxTree.Null) {
         output.append("PUT\tNULL\n");
+      } else if (val instanceof SyntaxTree.List) {
+        for (ValueBase i : (ArrayList<ValueBase>)val.getData()) {
+          output.append(putVals(i));
+        }
+        output.append("PUT\tNUM").append(((ArrayList<?>) val.getData()).size()).append("\nMKARR\n");
       } else if (val instanceof SyntaxTree.Variable) {
         if (((SyntaxTree.Variable) val).getInstance() != null) {
           output.append(putVals(((SyntaxTree.Variable) val).getInstance()))

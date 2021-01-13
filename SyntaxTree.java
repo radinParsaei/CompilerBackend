@@ -135,6 +135,13 @@ public class SyntaxTree {
     }
   }
 
+
+  public static class List extends ValueBase {
+    public List(ValueBase... data) {
+      this.setData(new ArrayList<>(Arrays.asList(data)));
+    }
+  }
+
   public static class Variable extends ValueBase implements java.io.Serializable {
     private String variableName;
     private boolean error = true;
