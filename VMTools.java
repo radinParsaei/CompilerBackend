@@ -28,6 +28,10 @@ public class VMTools {
           output.append(putVals(i));
         }
         output.append("PUT\tNUM").append(((ArrayList<?>) val.getData()).size()).append("\nMKARR\n");
+      } else if (val instanceof SyntaxTree.Append) {
+        output.append(putVals(((SyntaxTree.Append) val).getList()))
+                .append(putVals(((SyntaxTree.Append) val).getValue()))
+                .append("APPEND\n");
       } else if (val instanceof SyntaxTree.Variable) {
         if (((SyntaxTree.Variable) val).getInstance() != null) {
           output.append(putVals(((SyntaxTree.Variable) val).getInstance()))

@@ -140,6 +140,51 @@ public class SyntaxTree {
     public List(ValueBase... data) {
       this.setData(new ArrayList<>(Arrays.asList(data)));
     }
+
+    public static List fromArrayList(ArrayList<ValueBase> arrayList) {
+      List list = new List();
+      list.setData(arrayList);
+      return list;
+    }
+  }
+
+  public static class Append extends ValueBase {
+    ValueBase list;
+    ValueBase value;
+    public Append(ValueBase list, ValueBase value) {
+      this.list = list;
+      this.value = value;
+    }
+
+    @Override
+    public ValueBase getData() {
+      ValueBase list = this.list;
+      ValueBase value = this.value;
+      list.setConfigData(getConfigData());
+      value.setConfigData(getConfigData());
+      if (!(list instanceof Number || list instanceof Text || list instanceof Boolean || list instanceof Null || list instanceof List)) {
+        list = (ValueBase)list.getData();
+      }
+      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null || value instanceof List)) {
+        value = (ValueBase)value.getData();
+      }
+      if (list instanceof List) {
+        ArrayList<ValueBase> arrayList = (ArrayList<ValueBase>) ((ArrayList<ValueBase>) list.getData()).clone();
+        arrayList.add(value);
+        return List.fromArrayList(arrayList);
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "data is not List (Append)");
+        return new SyntaxTree.Null();
+      }
+    }
+
+    public ValueBase getList() {
+      return list;
+    }
+
+    public ValueBase getValue() {
+      return value;
+    }
   }
 
   public static class Variable extends ValueBase implements java.io.Serializable {

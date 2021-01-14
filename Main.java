@@ -55,6 +55,7 @@ public class Main {
             new SyntaxTree.Repeat(new SyntaxTree.Number(4), new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Text(";")), new SyntaxTree.Continue(), new SyntaxTree.Print(new SyntaxTree.Text(".")))),
             new SyntaxTree.Print(new SyntaxTree.Variable("test")),
             new SyntaxTree.SetVariable("l", new SyntaxTree.List(new SyntaxTree.Number(20), new SyntaxTree.Number(10))),
+            new SyntaxTree.Print(new SyntaxTree.Append(new SyntaxTree.Variable("l"), new SyntaxTree.Null())),
             new SyntaxTree.Print(new SyntaxTree.Variable("l"))
             );
 //    program.eval();
