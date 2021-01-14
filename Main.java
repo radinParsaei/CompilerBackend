@@ -54,7 +54,8 @@ public class Main {
             new SyntaxTree.For(new SyntaxTree.Not(new SyntaxTree.Variable("i")), new SyntaxTree.SetVariable("i", new SyntaxTree.Boolean(true)), new SyntaxTree.SetVariable("i", new SyntaxTree.Boolean(false)), new SyntaxTree.Print(new SyntaxTree.Variable("i"))),
             new SyntaxTree.Repeat(new SyntaxTree.Number(4), new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Text(";")), new SyntaxTree.Continue(), new SyntaxTree.Print(new SyntaxTree.Text(".")))),
             new SyntaxTree.Print(new SyntaxTree.Variable("test")),
-            new SyntaxTree.Print(new SyntaxTree.List(new SyntaxTree.Number(20), new SyntaxTree.Number(10)))
+            new SyntaxTree.SetVariable("l", new SyntaxTree.List(new SyntaxTree.Number(20), new SyntaxTree.Number(10))),
+            new SyntaxTree.Print(new SyntaxTree.Variable("l"))
             );
 //    program.eval();
     serializer.serialize("file.ser", program);
