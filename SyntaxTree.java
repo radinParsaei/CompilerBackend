@@ -274,8 +274,7 @@ public class SyntaxTree {
       }
       if (list instanceof List && index instanceof Number) {
         ArrayList<ValueBase> arrayList = (ArrayList<ValueBase>) ((ArrayList<ValueBase>) list.getData()).clone();
-        int i = ((BigDecimal)index.getData()).intValue();
-        arrayList.set(i, value);
+        arrayList.set(((BigDecimal)index.getData()).intValue(), value);
         return List.fromArrayList(arrayList);
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "data is not List AND/OR index is not Number (Set)");
@@ -289,6 +288,43 @@ public class SyntaxTree {
 
     public ValueBase getValue() {
       return value;
+    }
+
+    public ValueBase getIndex() {
+      return index;
+    }
+  }
+
+  public static class Get extends ValueBase {
+    ValueBase list;
+    ValueBase index;
+    public Get(ValueBase list, ValueBase index) {
+      this.list = list;
+      this.index = index;
+    }
+
+    @Override
+    public ValueBase getData() {
+      ValueBase list = this.list;
+      ValueBase index = this.index;
+      list.setConfigData(getConfigData());
+      index.setConfigData(getConfigData());
+      if (!(list instanceof Number || list instanceof Text || list instanceof Boolean || list instanceof Null || list instanceof List)) {
+        list = (ValueBase)list.getData();
+      }
+      if (!(index instanceof Number || index instanceof Text || index instanceof Boolean || index instanceof Null || index instanceof List)) {
+        index = (ValueBase)index.getData();
+      }
+      if (list instanceof List && index instanceof Number) {
+        return ((ArrayList<ValueBase>) list.getData()).get(((BigDecimal)index.getData()).intValue());
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "data is not List AND/OR index is not Number (Set)");
+        return new SyntaxTree.Null();
+      }
+    }
+
+    public ValueBase getList() {
+      return list;
     }
 
     public ValueBase getIndex() {

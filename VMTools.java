@@ -42,6 +42,10 @@ public class VMTools {
                 .append(putVals(((SyntaxTree.Set) val).getValue()))
                 .append(putVals(((SyntaxTree.Set) val).getIndex()))
                 .append("SET\n");
+      } else if (val instanceof SyntaxTree.Get) {
+        output.append(putVals(((SyntaxTree.Get) val).getList()))
+                .append(putVals(((SyntaxTree.Get) val).getIndex()))
+                .append("GET\n");
       } else if (val instanceof SyntaxTree.Variable) {
         if (((SyntaxTree.Variable) val).getInstance() != null) {
           output.append(putVals(((SyntaxTree.Variable) val).getInstance()))
