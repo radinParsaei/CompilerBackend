@@ -216,10 +216,69 @@ public class SyntaxTree {
       }
       if (list instanceof List && index instanceof Number) {
         ArrayList<ValueBase> arrayList = (ArrayList<ValueBase>) ((ArrayList<ValueBase>) list.getData()).clone();
-        arrayList.add(((BigDecimal)index.getData()).intValue(), value);
+        int i = ((BigDecimal)index.getData()).intValue();
+        if (i > arrayList.size()) {
+          Null _null = new Null();
+          arrayList.ensureCapacity(i);
+          while (arrayList.size() < i) {
+            arrayList.add(_null);
+          }
+        }
+        arrayList.add(i, value);
         return List.fromArrayList(arrayList);
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "data is not List AND/OR index is not Number (Insert)");
+        return new SyntaxTree.Null();
+      }
+    }
+
+    public ValueBase getList() {
+      return list;
+    }
+
+    public ValueBase getValue() {
+      return value;
+    }
+
+    public ValueBase getIndex() {
+      return index;
+    }
+  }
+
+  public static class Set extends ValueBase {
+    ValueBase list;
+    ValueBase value;
+    ValueBase index;
+    public Set(ValueBase list, ValueBase value, ValueBase index) {
+      this.list = list;
+      this.value = value;
+      this.index = index;
+    }
+
+    @Override
+    public ValueBase getData() {
+      ValueBase list = this.list;
+      ValueBase value = this.value;
+      ValueBase index = this.index;
+      list.setConfigData(getConfigData());
+      value.setConfigData(getConfigData());
+      index.setConfigData(getConfigData());
+      if (!(list instanceof Number || list instanceof Text || list instanceof Boolean || list instanceof Null || list instanceof List)) {
+        list = (ValueBase)list.getData();
+      }
+      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null || value instanceof List)) {
+        value = (ValueBase)value.getData();
+      }
+      if (!(index instanceof Number || index instanceof Text || index instanceof Boolean || index instanceof Null || index instanceof List)) {
+        index = (ValueBase)index.getData();
+      }
+      if (list instanceof List && index instanceof Number) {
+        ArrayList<ValueBase> arrayList = (ArrayList<ValueBase>) ((ArrayList<ValueBase>) list.getData()).clone();
+        int i = ((BigDecimal)index.getData()).intValue();
+        arrayList.set(i, value);
+        return List.fromArrayList(arrayList);
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "data is not List AND/OR index is not Number (Set)");
         return new SyntaxTree.Null();
       }
     }

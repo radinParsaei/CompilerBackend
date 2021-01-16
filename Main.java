@@ -56,7 +56,7 @@ public class Main {
             new SyntaxTree.Print(new SyntaxTree.Variable("test")),
             new SyntaxTree.SetVariable("l", new SyntaxTree.List(new SyntaxTree.Number(20), new SyntaxTree.Number(10))),
             new SyntaxTree.Print(new SyntaxTree.Insert(new SyntaxTree.Variable("l"), new SyntaxTree.Null(), new SyntaxTree.Number(1))),
-            new SyntaxTree.Print(new SyntaxTree.Variable("l"))
+            new SyntaxTree.Print(new SyntaxTree.Set(new SyntaxTree.Variable("l"), new SyntaxTree.Boolean(true), new SyntaxTree.Number(1)))
             );
 //    program.eval();
     serializer.serialize("file.ser", program);
