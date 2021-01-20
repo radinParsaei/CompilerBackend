@@ -46,6 +46,9 @@ public class VMTools {
         output.append(putVals(((SyntaxTree.Get) val).getList()))
                 .append(putVals(((SyntaxTree.Get) val).getIndex()))
                 .append("GET\n");
+      } else if (val instanceof SyntaxTree.ProgramWithReturn) {
+        output.append(syntaxTreeToVMByteCode2(((SyntaxTree.ProgramWithReturn) val).getProgram()))
+                .append(putVals(((SyntaxTree.ProgramWithReturn) val).getValue()));
       } else if (val instanceof SyntaxTree.Variable) {
         if (((SyntaxTree.Variable) val).getInstance() != null) {
           output.append(putVals(((SyntaxTree.Variable) val).getInstance()))

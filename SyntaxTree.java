@@ -1962,6 +1962,28 @@ public class SyntaxTree {
     }
   }
 
+  public static class ProgramWithReturn extends ValueBase implements java.io.Serializable {
+    ProgramBase program;
+    ValueBase value;
+    public ProgramWithReturn(ValueBase value, ProgramBase program) {
+      this.value = value;
+      this.program = program;
+    }
+
+    @Override
+    public ValueBase getData() {
+      program.eval();
+      return value;
+    }
+
+    public ValueBase getValue() {
+      return value;
+    }
+    public ProgramBase getProgram() {
+      return program;
+    }
+  }
+
   public static class Global extends ProgramBase implements java.io.Serializable {
     String variableName;
     public Global(String variableName) {
