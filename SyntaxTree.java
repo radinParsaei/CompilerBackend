@@ -1962,24 +1962,19 @@ public class SyntaxTree {
     }
   }
 
-  public static class ProgramWithReturn extends ValueBase implements java.io.Serializable {
-    ProgramBase program;
-    ValueBase value;
-    public ProgramWithReturn(ValueBase value, ProgramBase program) {
-      this.value = value;
+  public static class PrintFunction extends ValueBase implements java.io.Serializable {
+    Print program;
+    public PrintFunction(Print program) {
       this.program = program;
     }
 
     @Override
     public ValueBase getData() {
       program.eval();
-      return value;
+      return new Null();
     }
 
-    public ValueBase getValue() {
-      return value;
-    }
-    public ProgramBase getProgram() {
+    public Print getProgram() {
       return program;
     }
   }

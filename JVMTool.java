@@ -77,6 +77,8 @@ public class JVMTool {
             putVales(methodWriter, ((SyntaxTree.Pow) val).getV1(), classWriter, className);
             putVales(methodWriter, ((SyntaxTree.Pow) val).getV2(), classWriter, className);
             methodWriter.visitMethodInsn(INVOKESTATIC, className, "#pow", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
+        } else if (val instanceof SyntaxTree.PrintFunction) {
+            syntaxTreeToJVMClass2(((SyntaxTree.PrintFunction) val).getProgram(), methodWriter, classWriter, className);
         }
         return TYPE_NULL_OR_UNKNOWN;
     }
