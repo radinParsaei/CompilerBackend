@@ -332,6 +332,8 @@ public class JVMTool {
             methodVisitor.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
             methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "intValue", "()I", false);
             methodVisitor.visitMethodInsn(INVOKESTATIC, "java/lang/System", "exit", "(I)V", false);
+        } else if (program instanceof SyntaxTree.ExecuteValue) {
+            putVales(methodVisitor, ((SyntaxTree.ExecuteValue) program).getValue(), classWriter, className);
         } else if (program instanceof SyntaxTree.If) {
             Label label = new Label();
             Label label1 = null;
