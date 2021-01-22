@@ -1963,7 +1963,7 @@ public class SyntaxTree {
   }
 
   public static class PrintFunction extends ValueBase implements java.io.Serializable {
-    Print program;
+    private Print program;
     public PrintFunction(Print program) {
       this.program = program;
     }

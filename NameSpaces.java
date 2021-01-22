@@ -146,6 +146,11 @@ public class NameSpaces {
         } else if (value instanceof SyntaxTree.Mod) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Mod) value).getV1(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Mod) value).getV2(), declaredVariables);
+        } else if (value instanceof SyntaxTree.Pow) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Pow) value).getV1(), declaredVariables);
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Pow) value).getV2(), declaredVariables);
+        } else if (value instanceof SyntaxTree.PrintFunction) {
+            addNameSpaces(nameSpace, ((SyntaxTree.PrintFunction) value).getProgram(), declaredVariables);
         } else if (value instanceof SyntaxTree.Equals) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Equals) value).getV1(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Equals) value).getV2(), declaredVariables);
