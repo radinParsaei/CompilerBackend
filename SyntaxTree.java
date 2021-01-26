@@ -532,16 +532,15 @@ public class SyntaxTree {
     private String functionName;
     private final ProgramBase program;
     private final String[] args;
+    private boolean error = true;
     public Function(String functionName, ProgramBase program, boolean error, String... args) {
       this.args = args;
+      this.error = error;
       StringBuilder finalFunctionName = new StringBuilder(functionName).append(":");
       for (String string : args) {
         finalFunctionName.append(",").append(string);
       }
       this.functionName = finalFunctionName.toString();
-      if (error && data.getFunctions().get(this.functionName) != null) {
-        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
-      }
       if (data.getFunctions().containsKey(this.functionName)) touchedVariables.add(this.functionName);
       else data.getFunctions().put(this.functionName, null);
       this.program = NameSpaces.addNameSpaces("#F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
@@ -555,9 +554,6 @@ public class SyntaxTree {
         data.getVariables().put(string, new SyntaxTree.Null());
       }
       this.functionName = finalFunctionName.toString();
-      if (data.getFunctions().get(this.functionName) != null) {
-        Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
-      }
       if (data.getFunctions().containsKey(this.functionName)) touchedVariables.add(this.functionName);
       else data.getFunctions().put(this.functionName, null);
       this.program = NameSpaces.addNameSpaces("#F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
@@ -565,6 +561,20 @@ public class SyntaxTree {
 
     @Override
     void eval() {
+      if (error) {
+        for (String name : data.getFunctions().keySet()) {
+          String[] splitFunctionName = functionName.split(":");
+          String[] splitName = name.split(":");
+          if (name.startsWith(splitFunctionName[0]) && splitName.length > 1 && splitFunctionName.length > 1 &&
+                  splitName[1].split(",").length == splitFunctionName[1].split(",").length &&
+                  !name.equals(functionName)) {
+            Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
+          }
+        }
+        if (data.getFunctions().get(this.functionName) != null) {
+          Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
+        }
+      }
       data.getFunctions().put(functionName, program);
     }
 
