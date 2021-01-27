@@ -670,6 +670,127 @@ public class SyntaxTree {
     @Override
     public ValueBase getData() {
       if (instance != null && !(instance instanceof This)) {
+        ValueBase instance = this.instance;
+        if (!(instance instanceof Number || instance instanceof Text || instance instanceof Boolean || instance instanceof Null || instance instanceof List || instance instanceof CreateInstance)) {
+          instance = (ValueBase) instance.getData();
+        }
+        if (instance instanceof Text) {
+          String string = (String) instance.getData();
+          if (functionName.equals("replace")) {
+            if (args.length != 2) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Text(string.replace(args[0].toString(), args[1].toString()));
+          } else if (functionName.equals("charAt")) {
+            if (args.length != 1) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            if (!(args[0] instanceof Number || args[0] instanceof Text || args[0] instanceof Boolean || args[0] instanceof Null || args[0] instanceof List || args[0] instanceof CreateInstance)) {
+              args[0] = (ValueBase) args[0].getData();
+            }
+            if (args[0] instanceof Number) {
+              return new Text("" + string.charAt(((BigDecimal) args[0].getData()).intValue()));
+            } else {
+              Errors.error(ErrorCodes.ERROR_TYPE, "ARG0 MUST BE NUMBER");
+              return new Null();
+            }
+          } else if (functionName.equals("toUpper") || functionName.equals("toUpperCase")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Text(string.toUpperCase());
+          } else if (functionName.equals("toLower") || functionName.equals("toLowerCase")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Text(string.toLowerCase());
+          } else if (functionName.equals("startsWith")) {
+            if (args.length != 1) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Boolean(string.startsWith(args[0].toString()));
+          } else if (functionName.equals("endsWith")) {
+            if (args.length != 1) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Boolean(string.endsWith(args[0].toString()));
+          } else if (functionName.equals("contains") || functionName.equals("includes")) {
+            if (args.length != 1) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Boolean(string.contains(args[0].toString()));
+          } else if (functionName.equals("equalsIgnoreCase")) {
+            if (args.length != 1) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Boolean(string.equalsIgnoreCase(args[0].toString()));
+          } else if (functionName.equals("matches")) {
+            if (args.length != 1) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Boolean(string.matches(args[0].toString()));
+          }  else if (functionName.equals("codePointAt")) {
+            if (args.length != 1) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            if (!(args[0] instanceof Number || args[0] instanceof Text || args[0] instanceof Boolean || args[0] instanceof Null || args[0] instanceof List || args[0] instanceof CreateInstance)) {
+              args[0] = (ValueBase) args[0].getData();
+            }
+            if (args[0] instanceof Number) {
+              return new Number(string.codePointAt(((BigDecimal) args[0].getData()).intValue()));
+            } else {
+              Errors.error(ErrorCodes.ERROR_TYPE, "ARG0 MUST BE NUMBER");
+              return new Null();
+            }
+          } else if (functionName.equals("trim")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Text(string.trim());
+          } else if (functionName.equals("trimLeft")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Text(string.replaceAll("^\\s+", ""));
+          } else if (functionName.equals("trimRight")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Text(string.replaceAll("\\s+$", ""));
+          } else if (functionName.equals("indexOf")) {
+            if (args.length != 1 && args.length != 2) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            if (args.length == 1) {
+              return new Number(string.indexOf(args[0].toString()));
+            } else {
+              if (!(args[1] instanceof Number || args[1] instanceof Text || args[1] instanceof Boolean || args[1] instanceof Null || args[1] instanceof List || args[1] instanceof CreateInstance)) {
+                args[1] = (ValueBase) args[1].getData();
+              }
+              if (args[1] instanceof Number) {
+                return new Number(string.indexOf(args[0].toString(), ((BigDecimal) args[1].getData()).intValue()));
+              } else {
+                Errors.error(ErrorCodes.ERROR_TYPE, "ARG1 MUST BE NUMBER");
+                return new Null();
+              }
+            }
+          }
+          return new Null();
+        }
         String[] splitInstance = instance.toString().split(":");
         getConfigData().setInstanceName(splitInstance[0]);
         if (addInstanceName) {
