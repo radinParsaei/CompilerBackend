@@ -554,7 +554,6 @@ public class SyntaxTree {
       StringBuilder finalFunctionName = new StringBuilder(functionName).append(":");
       for (String string : args) {
         finalFunctionName.append(",").append(string);
-        data.getVariables().put(string, new SyntaxTree.Null());
       }
       this.functionName = finalFunctionName.toString();
       if (data.getFunctions().containsKey(this.functionName)) touchedVariables.add(this.functionName);

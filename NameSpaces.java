@@ -196,6 +196,20 @@ public class NameSpaces {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Not) value).getValue(), declaredVariables);
         } else if (value instanceof SyntaxTree.BitwiseNot) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.BitwiseNot) value).getValue(), declaredVariables);
+        } else if (value instanceof SyntaxTree.Append) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Append) value).getValue(), declaredVariables);
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Append) value).getList(), declaredVariables);
+        } else if (value instanceof SyntaxTree.Set) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Set) value).getValue(), declaredVariables);
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Set) value).getList(), declaredVariables);
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Set) value).getIndex(), declaredVariables);
+        } else if (value instanceof SyntaxTree.Get) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Get) value).getIndex(), declaredVariables);
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Get) value).getList(), declaredVariables);
+        } else if (value instanceof SyntaxTree.Insert) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getIndex(), declaredVariables);
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getList(), declaredVariables);
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getValue(), declaredVariables);
         } else if (value instanceof SyntaxTree.CallFunction) {
             ((SyntaxTree.CallFunction) value).findFunction();
             if (nameSpace.equals("#F" + ((SyntaxTree.CallFunction) value).getFunctionName())) {
