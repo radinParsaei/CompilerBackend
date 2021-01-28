@@ -484,6 +484,9 @@ public class SyntaxTree {
       if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null || value instanceof CreateInstance || value instanceof List)) {
         value = (ValueBase)value.getData();
       }
+      if (value instanceof CreateInstance) {
+        value.getData();
+      }
       data.getVariables().put(variableName + (useInstanceName? data.getInstanceName():""), value);
     }
 
@@ -2172,8 +2175,8 @@ public class SyntaxTree {
         }
         if (classesWithInit.contains(className)) this.callInit = new CallFunction("#C" + className + "<init>", args);
         instance = new SyntaxTree.Text(getConfigData().getInstanceName() + ":" + className);
-        if (callInit != null) callInit.fromInstance(instance).getData();
         isFirst = false;
+        if (callInit != null) callInit.fromInstance(this).getData();
       }
       return instance;
     }
