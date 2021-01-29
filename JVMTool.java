@@ -19,6 +19,7 @@ public class JVMTool {
     private boolean addSubFunction = false;
     private boolean addMulFunction = false;
     private boolean addDivFunction = false;
+    private boolean addModFunction = false;
     private boolean addPowFunction = false;
     private String putVales(MethodVisitor methodWriter, ValueBase val, ClassWriter classWriter, String className) {
         if (val instanceof SyntaxTree.Number) {
@@ -71,6 +72,11 @@ public class JVMTool {
             addDivFunction = true;
             putVales(methodWriter, ((SyntaxTree.Div) val).getV1(), classWriter, className);
             putVales(methodWriter, ((SyntaxTree.Div) val).getV2(), classWriter, className);
+            methodWriter.visitMethodInsn(INVOKESTATIC, className, "#div", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
+        } else if (val instanceof SyntaxTree.Mod) {
+            addModFunction = true;
+            putVales(methodWriter, ((SyntaxTree.Mod) val).getV1(), classWriter, className);
+            putVales(methodWriter, ((SyntaxTree.Mod) val).getV2(), classWriter, className);
             methodWriter.visitMethodInsn(INVOKESTATIC, className, "#div", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
         } else if (val instanceof SyntaxTree.Pow) {
             addPowFunction = true;
@@ -253,6 +259,28 @@ public class JVMTool {
             divMethodWriter.visitVarInsn(ALOAD, 1);
             divMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
             divMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "divide", "(Ljava/math/BigDecimal;)Ljava/math/BigDecimal;", false);
+            divMethodWriter.visitInsn(ARETURN);
+            divMethodWriter.visitLabel(label);
+            divMethodWriter.visitInsn(ACONST_NULL);
+            divMethodWriter.visitInsn(ARETURN);
+            divMethodWriter.visitMaxs(1, 1);
+            divMethodWriter.visitEnd();
+        }
+        if (addModFunction) {
+            MethodVisitor divMethodWriter = classWriter.visitMethod(ACC_PRIVATE | ACC_STATIC, "#div", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", null, null);
+            divMethodWriter.visitCode();
+            divMethodWriter.visitVarInsn(ALOAD, 0);
+            divMethodWriter.visitTypeInsn(INSTANCEOF, "java/math/BigDecimal");
+            Label label = new Label();
+            divMethodWriter.visitJumpInsn(IFEQ, label);
+            divMethodWriter.visitVarInsn(ALOAD, 1);
+            divMethodWriter.visitTypeInsn(INSTANCEOF, "java/math/BigDecimal");
+            divMethodWriter.visitJumpInsn(IFEQ, label);
+            divMethodWriter.visitVarInsn(ALOAD, 0);
+            divMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
+            divMethodWriter.visitVarInsn(ALOAD, 1);
+            divMethodWriter.visitTypeInsn(CHECKCAST, "java/math/BigDecimal");
+            divMethodWriter.visitMethodInsn(INVOKEVIRTUAL, "java/math/BigDecimal", "remainder", "(Ljava/math/BigDecimal;)Ljava/math/BigDecimal;", false);
             divMethodWriter.visitInsn(ARETURN);
             divMethodWriter.visitLabel(label);
             divMethodWriter.visitInsn(ACONST_NULL);
