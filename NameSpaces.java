@@ -34,7 +34,7 @@ public class NameSpaces {
                     ((SyntaxTree.SetVariable) program).setVariableName(nameSpace + sep +
                             ((SyntaxTree.SetVariable) program).getVariableName());
                 } else {
-                    if ((!(((SyntaxTree.SetVariable) program).getInstance() instanceof SyntaxTree.This) || nameSpace.startsWith("#C")) && declaredVariables.contains(((SyntaxTree.SetVariable) program).getVariableName())) {
+                    if ((nameSpace.startsWith("#C")) && declaredVariables.contains(((SyntaxTree.SetVariable) program).getVariableName())) {
                         if (nameSpace.startsWith("#C")) ((SyntaxTree.SetVariable) program).setUseInstanceName(!((SyntaxTree.SetVariable) program).getVariableName().startsWith("#F"));
                         ((SyntaxTree.SetVariable) program).setVariableName(nameSpace + sep + ((SyntaxTree.SetVariable) program).getVariableName());
                     }
@@ -54,6 +54,7 @@ public class NameSpaces {
                 }
             }
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) program).getVariableValue(), declaredVariables);
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) program).getInstance(), declaredVariables);
         } else if (!declarativeVariables && program instanceof SyntaxTree.Global) {
             globals.add(((SyntaxTree.Global)program).getVariableName());
         } else if (program instanceof SyntaxTree.Programs) {
@@ -110,27 +111,31 @@ public class NameSpaces {
         if (value instanceof SyntaxTree.CallFunction && nameSpace.startsWith("#C")) {
             boolean hasFunctionInClass = false;
             boolean publicFunctionExists = false;
-            for (String i : SyntaxTree.getFunctions().keySet()) {
-                if (i.startsWith(nameSpace + ((SyntaxTree.CallFunction) value).getFunctionName() + ":")) {
-                    hasFunctionInClass = true;
+            if (!(((SyntaxTree.CallFunction) value).getInstance() instanceof SyntaxTree.Variable &&
+                    ((SyntaxTree.Variable) ((SyntaxTree.CallFunction) value).getInstance()).getVariableName().equals("%"))) {
+                for (String i : SyntaxTree.getFunctions().keySet()) {
+                    if (i.startsWith(nameSpace + ((SyntaxTree.CallFunction) value).getFunctionName() + ":")) {
+                        hasFunctionInClass = true;
+                    }
+                    if (i.startsWith(((SyntaxTree.CallFunction) value).getFunctionName() + ":")) {
+                        publicFunctionExists = true;
+                    }
                 }
-                if (i.startsWith(((SyntaxTree.CallFunction) value).getFunctionName() + ":")) {
-                    publicFunctionExists = true;
+                hasFunctionInClass &= !publicFunctionExists;
+                if (hasFunctionInClass) {
+                    ((SyntaxTree.CallFunction) value).setFunctionName(nameSpace + sep + ((SyntaxTree.CallFunction) value).getFunctionName());
                 }
-            }
-            hasFunctionInClass &= !publicFunctionExists;
-            if (((SyntaxTree.CallFunction) value).getInstance() instanceof SyntaxTree.This || hasFunctionInClass) {
-                ((SyntaxTree.CallFunction) value).setFunctionName(nameSpace + sep + ((SyntaxTree.CallFunction) value).getFunctionName());
             }
         }
         if (declaredVariables == null || declaredVariables.size() == 0) {
             return;
         }
         if (value instanceof SyntaxTree.Variable) {
-            if ((!(((SyntaxTree.Variable) value).getInstance() instanceof SyntaxTree.This) || nameSpace.startsWith("#C")) && declaredVariables.contains(((SyntaxTree.Variable) value).getVariableName())) {
+            if ((nameSpace.startsWith("#C")) && declaredVariables.contains(((SyntaxTree.Variable) value).getVariableName())) {
                 if (nameSpace.startsWith("#C")) ((SyntaxTree.Variable) value).setUseInstanceName(!((SyntaxTree.Variable) value).getVariableName().startsWith("#F"));
                 ((SyntaxTree.Variable) value).setVariableName(nameSpace + sep + ((SyntaxTree.Variable) value).getVariableName());
             }
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Variable) value).getInstance(), declaredVariables);
         } else if (value instanceof SyntaxTree.Add) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Add) value).getV1(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Add) value).getV2(), declaredVariables);
@@ -210,6 +215,9 @@ public class NameSpaces {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getIndex(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getList(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getValue(), declaredVariables);
+        } else if (value instanceof SyntaxTree.CreateInstance) {
+            for (ValueBase arg : ((SyntaxTree.CreateInstance) value).getArgs())
+                addNameSpacesOnValue(nameSpace, arg, declaredVariables);
         } else if (value instanceof SyntaxTree.CallFunction) {
             ((SyntaxTree.CallFunction) value).findFunction();
             if (nameSpace.equals("#F" + ((SyntaxTree.CallFunction) value).getFunctionName())) {
@@ -218,6 +226,7 @@ public class NameSpaces {
             for (ProgramBase setVariable : ((SyntaxTree.CallFunction) value).getVariableSetters()) {
                 addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) setVariable).getVariableValue(), declaredVariables);
             }
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.CallFunction) value).getInstance(), declaredVariables);
         } else if (value instanceof SyntaxTree.CallFunctionFromPointer) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.CallFunctionFromPointer) value).getFunctionPointer(), declaredVariables);
             for (ValueBase value1 : ((SyntaxTree.CallFunctionFromPointer) value).getValues()) {

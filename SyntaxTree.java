@@ -1,8 +1,5 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.math.BigDecimal;
-import java.util.Map;
 
 public class SyntaxTree {
   public static ValueBase objectToValue(Object object) {
@@ -371,7 +368,7 @@ public class SyntaxTree {
 
     @Override
     public Object getData() {
-      if (instance != null && !(instance instanceof This)) {
+      if (instance != null) {
         String[] splitInstance = instance.toString().split(":");
         getConfigData().setInstanceName(splitInstance[0]);
         if (addInstanceName && !variableName.startsWith("#C"))
@@ -472,7 +469,7 @@ public class SyntaxTree {
 
     @Override
     void eval() {
-      if (instance != null && !(instance instanceof This)) {
+      if (instance != null) {
         String[] splitInstance = instance.toString().split(":");
         getData().setInstanceName(splitInstance[0]);
         if (addInstanceName && !variableName.startsWith("#C"))
@@ -671,7 +668,7 @@ public class SyntaxTree {
 
     @Override
     public ValueBase getData() {
-      if (instance != null && !(instance instanceof This)) {
+      if (instance != null) {
         ValueBase instance = this.instance;
         if (!(instance instanceof Number || instance instanceof Text || instance instanceof Boolean || instance instanceof Null || instance instanceof List || instance instanceof CreateInstance)) {
           instance = (ValueBase) instance.getData();
@@ -2096,7 +2093,7 @@ public class SyntaxTree {
   }
 
   public static class PrintFunction extends ValueBase implements java.io.Serializable {
-    private Print program;
+    private final Print program;
     public PrintFunction(Print program) {
       this.program = program;
     }
@@ -2129,10 +2126,11 @@ public class SyntaxTree {
     public CreateClass(String className, ProgramBase... programs) {
       this.className = className;
       ArrayList<SetVariable> variables = new ArrayList<>();
+      variables.add(new SetVariable("%", new Null()).setIsDeclaration(true));
       classesParameters.put(className, variables);
       Programs programs1 = new Programs(programs);
       touchFunctionsFromClass(programs1, className);
-      this.programs = NameSpaces.addNameSpaces("#C" + className, programs1, null);
+      this.programs = NameSpaces.addNameSpaces("#C" + className, programs1, new ArrayList<String>(Collections.singleton("%")));
     }
 
     public ProgramBase getPrograms() {
@@ -2175,6 +2173,7 @@ public class SyntaxTree {
         if (classesWithInit.contains(className)) this.callInit = new CallFunction("#C" + className + "<init>", args);
         instance = new SyntaxTree.Text(getConfigData().getInstanceName() + ":" + className);
         isFirst = false;
+        new SetVariable("#C" + className + "%", this).fromInstance(this).setIsDeclaration(true).eval();
         if (callInit != null) callInit.fromInstance(this).getData();
       }
       return instance;
@@ -2193,8 +2192,10 @@ public class SyntaxTree {
     }
   }
 
-  public static class This extends ValueBase implements java.io.Serializable {
-
+  public static class This extends Variable implements java.io.Serializable {
+    public This() {
+      super("%");
+    }
   }
 
   public static class CreateLambda extends Function implements java.io.Serializable {
