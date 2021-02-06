@@ -1,3 +1,5 @@
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -72,6 +74,15 @@ public class Main {
       writer.close();
     } catch (IOException e) {
       System.out.println("ERROR");
+      e.printStackTrace();
+    }
+    System.out.println("\n");
+    String xml = new XMLGenerator().syntaxTreeToXML(new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Number(10)))).getResult();
+    System.out.println(xml);
+    System.out.println("\n");
+    try {
+      new XMLToSyntaxTree().xmlToProgram(xml).eval();
+    } catch (Exception e) {
       e.printStackTrace();
     }
     System.out.println("\n\n-----JVMTool Test-----\n\n");
