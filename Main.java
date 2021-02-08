@@ -77,7 +77,7 @@ public class Main {
       e.printStackTrace();
     }
     System.out.println("\n");
-    String xml = new XMLGenerator().syntaxTreeToXML(new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Number(10)))).getResult();
+    String xml = new XMLGenerator().syntaxTreeToXML(new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Number(10))));
     System.out.println(xml);
     System.out.println("\n");
     try {

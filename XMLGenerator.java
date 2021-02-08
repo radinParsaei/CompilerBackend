@@ -1,5 +1,5 @@
 public class XMLGenerator {
-    StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program>\n");
+    boolean isFirst = true;
     int tabCount = 1;
 
     String getTabs(int add) {
@@ -7,7 +7,13 @@ public class XMLGenerator {
         return new SyntaxTree.Mul(new SyntaxTree.Text("\t"), new SyntaxTree.Number(tabCount)).toString();
     }
 
-    XMLGenerator syntaxTreeToXML(ProgramBase program) {
+    String syntaxTreeToXML(ProgramBase program) {
+        boolean isFirst1 = false;
+        StringBuilder stringBuilder = new StringBuilder(isFirst? "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<program>\n":"");
+        if (isFirst) {
+            isFirst = false;
+            isFirst1 = true;
+        }
         if (program instanceof SyntaxTree.Print) {
             stringBuilder.append(getTabs(0)).append("<print>\n").append(getTabs(1)).append("<separator>\n")
                     .append(getValueAsXMLString(((SyntaxTree.Print) program).getSeparator())).append(getTabs(-1)).append("</separator>\n");
@@ -17,14 +23,17 @@ public class XMLGenerator {
             stringBuilder.append(getTabs(-1)).append("</print>\n");
         } else if (program instanceof SyntaxTree.Programs) {
             for (ProgramBase program1 : ((SyntaxTree.Programs) program).getPrograms()) {
-                syntaxTreeToXML(program1);
+                stringBuilder.append(syntaxTreeToXML(program1));
             }
+        } else if (program instanceof SyntaxTree.ExecuteValue) {
+            stringBuilder.append(getTabs(0)).append("<executeValue>\n").append(getTabs(1)).append("<value>\n")
+                    .append(getValueAsXMLString(((SyntaxTree.ExecuteValue) program).getValue()))
+                    .append(getTabs(-1)).append("</value>\n").append(getTabs(-1)).append("</executeValue>\n");
         }
-        return this;
-    }
-
-    String getResult() {
-        return stringBuilder.append("</program>\n").toString();
+        if (isFirst1) {
+            stringBuilder.append(getTabs(-1)).append("</program>");
+        }
+        return stringBuilder.toString();
     }
 
     private String getValueAsXMLString(ValueBase value) {
@@ -32,6 +41,11 @@ public class XMLGenerator {
             return getTabs(1) + "<number>" + value.getData() + "</number>\n";
         } else if (value instanceof SyntaxTree.Text) {
             return getTabs(1) + "<text data=\"" + value.getData() + "\"></text>\n";
+        } else if (value instanceof SyntaxTree.PrintFunction) {
+            String string = getTabs(1) + "<printFunction>\n";
+            tabCount++;
+            string += syntaxTreeToXML(((SyntaxTree.PrintFunction) value).getProgram()) + getTabs(-1) + "</printFunction>\n";
+            return string;
         }
         tabCount--;
         return "";
