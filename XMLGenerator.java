@@ -40,7 +40,7 @@ public class XMLGenerator {
         if (value instanceof SyntaxTree.Number) {
             return getTabs(1) + "<number>" + value.getData() + "</number>\n";
         } else if (value instanceof SyntaxTree.Text) {
-            return getTabs(1) + "<text data=\"" + value.getData() + "\"></text>\n";
+            return getTabs(1) + "<text data=\"" + value.getData() + "\"/>\n";
         } else if (value instanceof SyntaxTree.PrintFunction) {
             String string = getTabs(1) + "<printFunction>\n";
             tabCount++;
