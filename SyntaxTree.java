@@ -1801,16 +1801,20 @@ public class SyntaxTree {
 
     @Override
     void eval() {
-      ValueBase status = this.status;
-      if (!(status instanceof Number || status instanceof Text || status instanceof Boolean)) {
-        status = (ValueBase)status.getData();
-      }
-      if (status instanceof Number) {
-        System.exit(((BigDecimal)status.getData()).intValue());
-      } else if (status instanceof Null) {
-        System.exit(0);
+      if (Targets.isWeb) {
+        setId(getId() + 1);
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL in exit");
+        ValueBase status = this.status;
+        if (!(status instanceof Number || status instanceof Text || status instanceof Boolean)) {
+          status = (ValueBase) status.getData();
+        }
+        if (status instanceof Number) {
+          System.exit(((BigDecimal) status.getData()).intValue());
+        } else if (status instanceof Null) {
+          System.exit(0);
+        } else {
+          Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL in exit");
+        }
       }
     }
   }
@@ -2105,6 +2109,23 @@ public class SyntaxTree {
     }
 
     public Print getProgram() {
+      return program;
+    }
+  }
+
+  public static class ExitFunction extends ValueBase implements java.io.Serializable {
+    private final Exit program;
+    public ExitFunction(Exit program) {
+      this.program = program;
+    }
+
+    @Override
+    public ValueBase getData() {
+      program.eval();
+      return new Null();
+    }
+
+    public Exit getProgram() {
       return program;
     }
   }
