@@ -1805,7 +1805,7 @@ public class SyntaxTree {
         setId(getId() + 1);
       } else {
         ValueBase status = this.status;
-        if (!(status instanceof Number || status instanceof Text || status instanceof Boolean)) {
+        if (!(status instanceof Number || status instanceof Text || status instanceof Boolean || status instanceof Null)) {
           status = (ValueBase) status.getData();
         }
         if (status instanceof Number) {
