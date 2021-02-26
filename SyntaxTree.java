@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 public class SyntaxTree {
   public static ValueBase objectToValue(Object object) {
     try {
-      if (object instanceof BigDecimal) {
+      if (object == null) {
+        return new SyntaxTree.Null();
+      } else if (object instanceof BigDecimal) {
         return new SyntaxTree.Number((BigDecimal)object);
       } else if (object instanceof String) {
         return new SyntaxTree.Text((String)object);
@@ -12,10 +14,10 @@ public class SyntaxTree {
         return new SyntaxTree.Number((int)object);
       } else if (object instanceof Byte) {
         return new SyntaxTree.Number((byte)object);
-      } else if (object instanceof Boolean || (boolean) object || !((boolean) object)) {
+      } else if (object instanceof ArrayList) {
+        return List.fromArrayList((ArrayList<ValueBase>) object);
+      }  else if (object instanceof Boolean || (boolean) object || !((boolean) object)) {
         return new SyntaxTree.Boolean((boolean)object);
-      } else if (object == null) {
-        return new SyntaxTree.Null();
       }
     } catch (ClassCastException ignore) {}
     assert object instanceof ValueBase;

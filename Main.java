@@ -1,8 +1,7 @@
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+
 public class Main {
   public static void main(String[] args) {
     ValueBase val = new SyntaxTree.Number(10.5);
