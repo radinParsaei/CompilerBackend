@@ -953,6 +953,8 @@ public class SyntaxTree {
       if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List)) {
         v2 = (ValueBase)v2.getData();
       }
+      if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
+      if (v2 instanceof CreateInstance) v2 = getTextFromInstance(v2);
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((BigDecimal)v1.getData()).subtract((BigDecimal)v2.getData()));
       } else {
