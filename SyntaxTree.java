@@ -910,10 +910,10 @@ public class SyntaxTree {
       ValueBase v1 = this.v1, v2 = this.v2;
       v1.setConfigData(data);
       v2.setConfigData(data);
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List || v1 instanceof CreateInstance)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v1 instanceof CreateInstance)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
@@ -947,10 +947,10 @@ public class SyntaxTree {
       ValueBase v1 = this.v1, v2 = this.v2;
       v1.setConfigData(data);
       v2.setConfigData(data);
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List || v1 instanceof CreateInstance)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v1 instanceof CreateInstance)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
@@ -984,10 +984,10 @@ public class SyntaxTree {
       ValueBase v1 = this.v1, v2 = this.v2;
       v1.setConfigData(data);
       v2.setConfigData(data);
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List || v1 instanceof CreateInstance)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v1 instanceof CreateInstance)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
