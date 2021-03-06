@@ -913,11 +913,35 @@ public class SyntaxTree {
       if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List || v1 instanceof CreateInstance)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v1 instanceof CreateInstance)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v2 instanceof CreateInstance)) {
         v2 = (ValueBase)v2.getData();
       }
-      if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
-      if (v2 instanceof CreateInstance) v2 = getTextFromInstance(v2);
+      while (v1 instanceof CreateInstance) {
+        boolean hasAdd = false;
+        for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Add:,((?!,).)+")) {
+            hasAdd = true;
+            break;
+          }
+        }
+        if (hasAdd) {
+          v1 = new SyntaxTree.CallFunction("Add", v2).fromInstance(v1).setAddInstanceName(true).getData();
+        }
+        if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
+      }
+      while (v2 instanceof CreateInstance) {
+        boolean hasAdd = false;
+        for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Add:,((?!,).)+")) {
+            hasAdd = true;
+            break;
+          }
+        }
+        if (hasAdd) {
+          v2 = new SyntaxTree.CallFunction("Add", v1).fromInstance(v2).setAddInstanceName(true).getData();
+        }
+        if (v2 instanceof CreateInstance) v2 = getTextFromInstance(v2);
+      }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((BigDecimal)v1.getData()).add((BigDecimal)v2.getData()));
       } else {
@@ -950,7 +974,7 @@ public class SyntaxTree {
       if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List || v1 instanceof CreateInstance)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v1 instanceof CreateInstance)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v2 instanceof CreateInstance)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
@@ -987,7 +1011,7 @@ public class SyntaxTree {
       if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List || v1 instanceof CreateInstance)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v1 instanceof CreateInstance)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v2 instanceof CreateInstance)) {
         v2 = (ValueBase)v2.getData();
       }
       if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
