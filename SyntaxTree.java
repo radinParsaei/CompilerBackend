@@ -891,8 +891,10 @@ public class SyntaxTree {
 
 
   public static ValueBase getTextFromInstance(ValueBase instance) {
-    if (functions.containsKey("#C" + ((CreateInstance) instance).getClassName() + "toString:"))
-      instance = new SyntaxTree.CallFunction("toString").fromInstance(instance).setAddInstanceName(true);
+    String className = ((CreateInstance) instance).getClassName();
+    if (functions.containsKey("#C" + className + "toString:"))
+      instance = new SyntaxTree.CallFunction("toString").fromInstance(instance).setAddInstanceName(true).getData();
+    if (instance instanceof CreateInstance && !((CreateInstance) instance).getClassName().equals(className)) instance = getTextFromInstance(instance);
     return new Text(instance.toString());
   }
 
