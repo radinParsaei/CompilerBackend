@@ -140,6 +140,22 @@ public class SyntaxTree {
       this.setData(new ArrayList<>(Arrays.asList(data)));
     }
 
+    @Override
+    public String toString() {
+      StringBuilder stringBuilder = new StringBuilder("[");
+      boolean isFirst = true;
+      for (ValueBase value : (ArrayList<ValueBase>) getData()) {
+        if (isFirst) {
+          isFirst = false;
+        } else {
+          stringBuilder.append(", ");
+        }
+        if (value instanceof CreateInstance) value = getTextFromInstance(value);
+        stringBuilder.append(value.toString());
+      }
+      return stringBuilder.append("]").toString();
+    }
+
     public static List fromArrayList(ArrayList<ValueBase> arrayList) {
       List list = new List();
       list.setData(arrayList);
