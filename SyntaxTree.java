@@ -998,26 +998,26 @@ public class SyntaxTree {
       while (v1 instanceof CreateInstance) {
         boolean hasSub = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Sub:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Subtract:,((?!,).)+")) {
             hasSub = true;
             break;
           }
         }
         if (hasSub) {
-          v1 = new SyntaxTree.CallFunction("Sub", v2).fromInstance(v1).setAddInstanceName(true).getData();
+          v1 = new SyntaxTree.CallFunction("Subtract", v2).fromInstance(v1).setAddInstanceName(true).getData();
         }
         if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
       }
       while (v2 instanceof CreateInstance) {
         boolean hasSub = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Sub:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Subtract:,((?!,).)+")) {
             hasSub = true;
             break;
           }
         }
         if (hasSub) {
-          v2 = new SyntaxTree.CallFunction("Sub", v1).fromInstance(v2).setAddInstanceName(true).getData();
+          v2 = new SyntaxTree.CallFunction("Subtract", v1).fromInstance(v2).setAddInstanceName(true).getData();
         }
         if (v2 instanceof CreateInstance) v2 = getTextFromInstance(v2);
       }
@@ -1056,8 +1056,32 @@ public class SyntaxTree {
       if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v2 instanceof CreateInstance)) {
         v2 = (ValueBase)v2.getData();
       }
-      if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
-      if (v2 instanceof CreateInstance) v2 = getTextFromInstance(v2);
+      while (v1 instanceof CreateInstance) {
+        boolean hasMul = false;
+        for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Multiply:,((?!,).)+")) {
+            hasMul = true;
+            break;
+          }
+        }
+        if (hasMul) {
+          v1 = new SyntaxTree.CallFunction("Multiply", v2).fromInstance(v1).setAddInstanceName(true).getData();
+        }
+        if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
+      }
+      while (v2 instanceof CreateInstance) {
+        boolean hasMul = false;
+        for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Multiply:,((?!,).)+")) {
+            hasMul = true;
+            break;
+          }
+        }
+        if (hasMul) {
+          v2 = new SyntaxTree.CallFunction("Multiply", v1).fromInstance(v2).setAddInstanceName(true).getData();
+        }
+        if (v2 instanceof CreateInstance) v2 = getTextFromInstance(v2);
+      }
       if (v1 instanceof Number && v2 instanceof Number) {
         return new Number(((BigDecimal)v1.getData()).multiply((BigDecimal)v2.getData()));
       } else if (v1 instanceof Number && v2 instanceof Text) {
