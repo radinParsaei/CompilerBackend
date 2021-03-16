@@ -1364,12 +1364,38 @@ public class SyntaxTree {
       ValueBase v1 = this.v1, v2 = this.v2;
       v1.setConfigData(data);
       v2.setConfigData(data);
-      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List)) {
+      if (!(v1 instanceof Number || v1 instanceof Text || v1 instanceof Boolean || v1 instanceof Null || v1 instanceof List || v1 instanceof CreateInstance)) {
         v1 = (ValueBase)v1.getData();
       }
-      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List)) {
+      if (!(v2 instanceof Number || v2 instanceof Text || v2 instanceof Boolean || v2 instanceof Null || v2 instanceof List || v2 instanceof CreateInstance)) {
         v2 = (ValueBase)v2.getData();
       }
+      if (v1 instanceof CreateInstance) {
+        boolean hasMod = false;
+        for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Equals:,((?!,).)+")) {
+            hasMod = true;
+            break;
+          }
+        }
+        if (hasMod) {
+          return new SyntaxTree.CallFunction("Equals", v2).fromInstance(v1).setAddInstanceName(true).getData();
+        }
+      }
+      if (v2 instanceof CreateInstance) {
+        boolean hasMod = false;
+        for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Equals:,((?!,).)+")) {
+            hasMod = true;
+            break;
+          }
+        }
+        if (hasMod) {
+          return new SyntaxTree.CallFunction("Equals", v1).fromInstance(v2).setAddInstanceName(true).getData();
+        }
+      }
+      if (v1 instanceof CreateInstance) v1 = getTextFromInstance(v1);
+      if (v2 instanceof CreateInstance) v2 = getTextFromInstance(v2);
       return new Boolean((v1.toString().equals(v2.toString()) && v1 instanceof Number == v2 instanceof Number) ||
               (v1 instanceof Number && v2 instanceof Number && ((BigDecimal)v1.getData()).compareTo((BigDecimal)v2.getData()) == 0));
     }
