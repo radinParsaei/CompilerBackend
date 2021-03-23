@@ -22,6 +22,10 @@ public class Analyzer {
         }
     }
 
+    static void clear() {
+        variables.clear();
+    }
+
     static void initTypeFromValue(Type type, ValueBase value) {
         if (value instanceof SyntaxTree.Number) {
             type.addType(NUMBER);
