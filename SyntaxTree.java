@@ -455,6 +455,7 @@ public class SyntaxTree {
       this.isDeclaration = isDeclaration;
       checkDeclaration();
       if (!data.getVariables().containsKey(variableName)) data.getVariables().put(variableName, null);
+      if (Targets.useAnalyzer) Analyzer.setVariable(variableName, value);
     }
 
     public SetVariable(String variableName, ValueBase value, boolean isDeclaration, boolean checkDeclarationInRuntime) {
@@ -466,12 +467,14 @@ public class SyntaxTree {
         checkDeclaration();
       }
       if (!data.getVariables().containsKey(variableName)) data.getVariables().put(variableName, null);
+      if (Targets.useAnalyzer) Analyzer.setVariable(variableName, value);
     }
 
     public SetVariable(String variableName, ValueBase value) {
       this.variableName = variableName;
       this.value = value;
       if (!data.getVariables().containsKey(variableName)) data.getVariables().put(variableName, null);
+      if (Targets.useAnalyzer) Analyzer.setVariable(variableName, value);
     }
 
     public void checkDeclaration() {
