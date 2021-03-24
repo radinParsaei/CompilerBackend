@@ -912,6 +912,10 @@ public class SyntaxTree {
     public void setFunctionName(String functionName) {
       this.functionName = functionName;
     }
+
+    public ValueBase[] getArgs() {
+      return args;
+    }
   }
 
 
