@@ -728,6 +728,23 @@ public class SyntaxTree {
               return new Null();
             }
             return new Text(string.toLowerCase());
+          } else if (functionName.equals("toTitleCase")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            StringBuilder stringBuilder = new StringBuilder(string.length());
+            boolean spaceFound = true;
+            for (char c : string.toCharArray()) {
+              if (Character.isSpaceChar(c)) {
+                spaceFound = true;
+              } else if (spaceFound) {
+                c = Character.toTitleCase(c);
+                spaceFound = false;
+              }
+              stringBuilder.append(c);
+            }
+            return new Text(stringBuilder.toString());
           } else if (functionName.equals("startsWith")) {
             if (args.length != 1) {
               Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
