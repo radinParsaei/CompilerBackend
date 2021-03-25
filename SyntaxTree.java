@@ -739,7 +739,7 @@ public class SyntaxTree {
               if (Character.isSpaceChar(c)) {
                 spaceFound = true;
               } else if (spaceFound) {
-                c = Character.toTitleCase(c);
+                c = Character.toUpperCase(c);
                 spaceFound = false;
               }
               stringBuilder.append(c);
