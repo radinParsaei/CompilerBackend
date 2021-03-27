@@ -781,7 +781,7 @@ public class SyntaxTree {
               return new Null();
             }
             return new Boolean(string.matches(args[0].toString()));
-          }  else if (functionName.equals("codePointAt")) {
+          } else if (functionName.equals("codePointAt")) {
             if (args.length != 1) {
               Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
               return new Null();
@@ -791,6 +791,32 @@ public class SyntaxTree {
             }
             if (args[0] instanceof Number) {
               return new Number(string.codePointAt(((BigDecimal) args[0].getData()).intValue()));
+            } else {
+              Errors.error(ErrorCodes.ERROR_TYPE, "ARG0 MUST BE NUMBER");
+              return new Null();
+            }
+          } else if (functionName.equals("substring")) {
+            if (args.length != 1 && args.length != 2) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            if (!(args[0] instanceof Number || args[0] instanceof Text || args[0] instanceof Boolean || args[0] instanceof Null || args[0] instanceof List || args[0] instanceof CreateInstance)) {
+              args[0] = (ValueBase) args[0].getData();
+            }
+            if (args.length == 2) {
+              if (!(args[1] instanceof Number || args[1] instanceof Text || args[1] instanceof Boolean || args[1] instanceof Null || args[1] instanceof List || args[1] instanceof CreateInstance)) {
+                args[1] = (ValueBase) args[1].getData();
+              }
+            }
+            if (args[0] instanceof Number) {
+              if (args.length == 2 && args[1] instanceof Number) {
+                return new Text(string.substring(((BigDecimal) args[0].getData()).intValue(), ((BigDecimal) args[1].getData()).intValue()));
+              } else if (args.length == 1) {
+                return new Text(string.substring(((BigDecimal) args[0].getData()).intValue()));
+              } else {
+                Errors.error(ErrorCodes.ERROR_TYPE, "ARG1 MUST BE NUMBER");
+                return new Null();
+              }
             } else {
               Errors.error(ErrorCodes.ERROR_TYPE, "ARG0 MUST BE NUMBER");
               return new Null();
