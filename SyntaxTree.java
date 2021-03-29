@@ -716,6 +716,20 @@ public class SyntaxTree {
               Errors.error(ErrorCodes.ERROR_TYPE, "ARG0 MUST BE NUMBER");
               return new Null();
             }
+          } else if (functionName.equals("charAtFromEnd")) {
+            if (args.length != 1) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            if (!(args[0] instanceof Number || args[0] instanceof Text || args[0] instanceof Boolean || args[0] instanceof Null || args[0] instanceof List || args[0] instanceof CreateInstance)) {
+              args[0] = (ValueBase) args[0].getData();
+            }
+            if (args[0] instanceof Number) {
+              return new Text("" + string.charAt(string.length() - 1 - ((BigDecimal) args[0].getData()).intValue()));
+            } else {
+              Errors.error(ErrorCodes.ERROR_TYPE, "ARG0 MUST BE NUMBER");
+              return new Null();
+            }
           } else if (functionName.equals("toUpper") || functionName.equals("toUpperCase")) {
             if (args.length != 0) {
               Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
@@ -827,6 +841,24 @@ public class SyntaxTree {
               return new Null();
             }
             return new Text(string.trim());
+          } else if (functionName.equals("getFirstCharacter")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Text(string.charAt(0) + "");
+          } else if (functionName.equals("getLastCharacter")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Text(string.charAt(string.length() - 1) + "");
+          } else if (functionName.equals("getRandomCharacter")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Text(string.charAt(Math.abs(new Random().nextInt()) % string.length()) + "");
           } else if (functionName.equals("trimLeft")) {
             if (args.length != 0) {
               Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
