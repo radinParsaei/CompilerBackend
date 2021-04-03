@@ -889,6 +889,24 @@ public class SyntaxTree {
                 return new Null();
               }
             }
+          } else if (functionName.equals("lastIndexOf")) {
+            if (args.length != 1 && args.length != 2) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            if (args.length == 1) {
+              return new Number(string.lastIndexOf(args[0].toString()));
+            } else {
+              if (!(args[1] instanceof Number || args[1] instanceof Text || args[1] instanceof Boolean || args[1] instanceof Null || args[1] instanceof List || args[1] instanceof CreateInstance)) {
+                args[1] = (ValueBase) args[1].getData();
+              }
+              if (args[1] instanceof Number) {
+                return new Number(string.lastIndexOf(args[0].toString(), ((BigDecimal) args[1].getData()).intValue()));
+              } else {
+                Errors.error(ErrorCodes.ERROR_TYPE, "ARG1 MUST BE NUMBER");
+                return new Null();
+              }
+            }
           }
           return new Null();
         }
