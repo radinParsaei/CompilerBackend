@@ -347,6 +347,32 @@ public class SyntaxTree {
     }
   }
 
+  public static class GetSize extends ValueBase {
+    ValueBase list;
+    public GetSize(ValueBase list) {
+      this.list = list;
+    }
+
+    @Override
+    public ValueBase getData() {
+      ValueBase list = this.list;
+      list.setConfigData(getConfigData());
+      if (!(list instanceof Number || list instanceof Text || list instanceof Boolean || list instanceof Null || list instanceof List)) {
+        list = (ValueBase)list.getData();
+      }
+      if (list instanceof List) {
+        return new Number(((ArrayList) list.getData()).size());
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "data is not List AND/OR index is not Number (Set)");
+        return new SyntaxTree.Null();
+      }
+    }
+
+    public ValueBase getList() {
+      return list;
+    }
+  }
+
   public static class Variable extends ValueBase implements java.io.Serializable {
     private String variableName;
     private boolean error = true;
@@ -585,7 +611,7 @@ public class SyntaxTree {
         for (String name : data.getFunctions().keySet()) {
           String[] splitFunctionName = functionName.split(":");
           String[] splitName = name.split(":");
-          if (name.startsWith(splitFunctionName[0]) && splitName.length > 1 && splitFunctionName.length > 1 &&
+          if (name.startsWith(splitFunctionName[0] + ":") && splitName.length > 1 && splitFunctionName.length > 1 &&
                   splitName[1].split(",").length == splitFunctionName[1].split(",").length &&
                   !name.equals(functionName)) {
             Errors.error(ErrorCodes.ERROR_FUNCTION_REDECLARATION, this.functionName);
