@@ -102,6 +102,10 @@ public class SyntaxTree {
     data.getFunctions().put(name, null);
   }
 
+  public static void deleteNativeFunction(String parent, String name, int argumentCount) {
+    data.getFunctions().remove(name + ":N#" + argumentCount + "#" + parent);
+  }
+
   public static class Number extends ValueBase {
     public Number(BigDecimal number) {
       this.setData(number);
@@ -333,7 +337,7 @@ public class SyntaxTree {
       if (list instanceof List && index instanceof Number) {
         return ((ArrayList<ValueBase>) list.getData()).get(((BigDecimal)index.getData()).intValue());
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "data is not List AND/OR index is not Number (Set)");
+        Errors.error(ErrorCodes.ERROR_TYPE, "data is not List AND/OR index is not Number (Get)");
         return new SyntaxTree.Null();
       }
     }
@@ -363,7 +367,7 @@ public class SyntaxTree {
       if (list instanceof List) {
         return new Number(((ArrayList) list.getData()).size());
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "data is not List AND/OR index is not Number (Set)");
+        Errors.error(ErrorCodes.ERROR_TYPE, "data is not List (GetSize)");
         return new SyntaxTree.Null();
       }
     }
@@ -982,7 +986,7 @@ public class SyntaxTree {
         for (ProgramBase program : programs) {
           program.eval();
         }
-        return new OpCode.PopFromVM();
+        return (ValueBase) new OpCode.PopFromVM().getData();
       }
     }
 

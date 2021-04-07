@@ -211,6 +211,8 @@ public class NameSpaces {
         } else if (value instanceof SyntaxTree.Get) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Get) value).getIndex(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Get) value).getList(), declaredVariables);
+        } else if (value instanceof SyntaxTree.GetSize) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.GetSize) value).getList(), declaredVariables);
         } else if (value instanceof SyntaxTree.Insert) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getIndex(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getList(), declaredVariables);
@@ -224,7 +226,8 @@ public class NameSpaces {
                 ((SyntaxTree.CallFunction) value).setRecursion(true);
             }
             for (ProgramBase setVariable : ((SyntaxTree.CallFunction) value).getVariableSetters()) {
-                addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) setVariable).getVariableValue(), declaredVariables);
+                if (setVariable instanceof SyntaxTree.SetVariable) addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) setVariable).getVariableValue(), declaredVariables);
+                else if (setVariable instanceof OpCode.PutToVM) addNameSpacesOnValue(nameSpace, ((OpCode.PutToVM) setVariable).getValue(), declaredVariables);
             }
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.CallFunction) value).getInstance(), declaredVariables);
         } else if (value instanceof SyntaxTree.CallFunctionFromPointer) {
