@@ -795,12 +795,18 @@ public class SyntaxTree {
               return new Null();
             }
             return new Boolean(string.startsWith(args[0].toString()));
-          }  else if (functionName.equals("length")) {
+          } else if (functionName.equals("length")) {
             if (args.length != 0) {
               Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
               return new Null();
             }
             return new Number(string.length());
+          } else if (functionName.equals("isEmpty")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Boolean(string.isEmpty());
           } else if (functionName.equals("endsWith")) {
             if (args.length != 1) {
               Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
