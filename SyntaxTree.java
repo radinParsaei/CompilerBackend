@@ -772,7 +772,7 @@ public class SyntaxTree {
               return new Null();
             }
             return new Text(string.toLowerCase());
-          } else if (functionName.equals("toTitleCase")) {
+          } else if (functionName.equals("toTitle") || functionName.equals("toTitleCase")) {
             if (args.length != 0) {
               Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
               return new Null();
