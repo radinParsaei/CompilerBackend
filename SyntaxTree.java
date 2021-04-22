@@ -877,6 +877,12 @@ public class SyntaxTree {
               return new Null();
             }
             return new Text(string.trim());
+          } else if (functionName.equals("reverse")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return (ValueBase) new Negative(instance).getData();
           } else if (functionName.equals("getFirstCharacter")) {
             if (args.length != 0) {
               Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
