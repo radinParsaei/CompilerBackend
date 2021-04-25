@@ -402,7 +402,7 @@ public class SyntaxTree {
             return -1;
           }
         });
-        return list;
+        return List.fromArrayList(arrayList);
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "data is not List (Sort)");
         return new SyntaxTree.Null();
