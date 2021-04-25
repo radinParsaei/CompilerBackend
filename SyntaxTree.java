@@ -394,14 +394,17 @@ public class SyntaxTree {
       }
       if (list instanceof List) {
         ArrayList<ValueBase> arrayList = (ArrayList<ValueBase>) ((ArrayList<ValueBase>) list.getData()).clone();
-        if (sortByNumber) arrayList.sort(Comparator.comparing(Object::toString));
-        else arrayList.sort((o1, o2) -> {
-          if (o1 instanceof Number && o2 instanceof Number) {
-            return ((BigDecimal) o1.getData()).compareTo((BigDecimal) o1.getData());
-          } else {
-            return -1;
-          }
-        });
+        if (sortByNumber) {
+          arrayList.sort((o1, o2) -> {
+            if (o1 instanceof Number && o2 instanceof Number) {
+              return ((BigDecimal) o1.getData()).compareTo((BigDecimal) o2.getData());
+            } else {
+              return -1;
+            }
+          });
+        } else {
+          arrayList.sort(Comparator.comparing(Object::toString));
+        }
         return List.fromArrayList(arrayList);
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "data is not List (Sort)");
@@ -2161,6 +2164,10 @@ public class SyntaxTree {
         return new Number(((BigDecimal)value.getData()).negate());
       } else if (value instanceof Text) {
         return new Text(new StringBuilder((String)value.getData()).reverse().toString());
+      } else if (value instanceof List) {
+        ArrayList<ValueBase> res = (ArrayList<ValueBase>) ((ArrayList<ValueBase>) value.getData()).clone();
+        Collections.reverse(res);
+        return List.fromArrayList(res);
       }
       return value;
     }
