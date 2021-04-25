@@ -393,10 +393,11 @@ public class SyntaxTree {
         list = (ValueBase)list.getData();
       }
       if (list instanceof List) {
-        if (sortByNumber) ((ArrayList) list.getData()).sort(Comparator.comparing(Object::toString));
-        else ((ArrayList) list.getData()).sort((o1, o2) -> {
+        ArrayList<ValueBase> arrayList = (ArrayList<ValueBase>) ((ArrayList<ValueBase>) list.getData()).clone();
+        if (sortByNumber) arrayList.sort(Comparator.comparing(Object::toString));
+        else arrayList.sort((o1, o2) -> {
           if (o1 instanceof Number && o2 instanceof Number) {
-            return ((BigDecimal) ((Number) o1).getData()).compareTo((BigDecimal) ((Number) o1).getData());
+            return ((BigDecimal) o1.getData()).compareTo((BigDecimal) o1.getData());
           } else {
             return -1;
           }
