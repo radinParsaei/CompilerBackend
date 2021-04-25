@@ -377,6 +377,46 @@ public class SyntaxTree {
     }
   }
 
+  public static class Sort extends ValueBase {
+    private ValueBase list;
+    private boolean sortByNumber;
+    public Sort(ValueBase list, boolean sortByNumber) {
+      this.list = list;
+      this.sortByNumber = sortByNumber;
+    }
+
+    @Override
+    public ValueBase getData() {
+      ValueBase list = this.list;
+      list.setConfigData(getConfigData());
+      if (!(list instanceof Number || list instanceof Text || list instanceof Boolean || list instanceof Null || list instanceof List)) {
+        list = (ValueBase)list.getData();
+      }
+      if (list instanceof List) {
+        if (sortByNumber) ((ArrayList) list.getData()).sort(Comparator.comparing(Object::toString));
+        else ((ArrayList) list.getData()).sort((o1, o2) -> {
+          if (o1 instanceof Number && o2 instanceof Number) {
+            return ((BigDecimal) ((Number) o1).getData()).compareTo((BigDecimal) ((Number) o1).getData());
+          } else {
+            return -1;
+          }
+        });
+        return list;
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "data is not List (Sort)");
+        return new SyntaxTree.Null();
+      }
+    }
+
+    public ValueBase getList() {
+      return list;
+    }
+
+    public boolean isSortByNumber() {
+      return sortByNumber;
+    }
+  }
+
   public static class Variable extends ValueBase implements java.io.Serializable {
     private String variableName;
     private boolean error = true;
