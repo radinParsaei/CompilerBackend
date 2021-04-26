@@ -462,9 +462,9 @@ public class SyntaxTree {
     public Object getData() {
       if (instance != null) {
         String[] splitInstance = instance.toString().split(":");
-        getConfigData().setInstanceName(splitInstance[0]);
         if (addInstanceName && !variableName.startsWith("#C"))
           variableName = "#C" + splitInstance[1] + variableName;
+        getConfigData().setInstanceName(splitInstance[0]);
       }
       if (variableName.startsWith("#C")) variableName = variableName.replace("#F", "");
       ValueBase tmp = data.getVariables().get(variableName + (useInstanceName? getConfigData().getInstanceName():""));
@@ -656,8 +656,8 @@ public class SyntaxTree {
     @Override
     void eval() {
       if (error) {
+        String[] splitFunctionName = functionName.split(":");
         for (String name : data.getFunctions().keySet()) {
-          String[] splitFunctionName = functionName.split(":");
           String[] splitName = name.split(":");
           if (name.startsWith(splitFunctionName[0] + ":") && splitName.length > 1 && splitFunctionName.length > 1 &&
                   splitName[1].split(",").length == splitFunctionName[1].split(",").length &&
@@ -2730,7 +2730,7 @@ public class SyntaxTree {
           setVariable.eval();
         }
         if (classesWithInit.contains(className)) this.callInit = new CallFunction("#C" + className + "<init>", args);
-        instance = new SyntaxTree.Text(getConfigData().getInstanceName() + ":" + className);
+        instance = new SyntaxTree.Text(instanceNameSpace + ":" + className);
         isFirst = false;
         new SetVariable("#C" + className + "%", this).fromInstance(this).setIsDeclaration(true).eval();
         if (callInit != null) callInit.fromInstance(this).getData();
