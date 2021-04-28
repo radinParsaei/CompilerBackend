@@ -61,6 +61,8 @@ public class NameSpaces {
             for (ProgramBase program2 : ((SyntaxTree.Programs)program).getPrograms()) {
                 addNameSpaces(nameSpace, program2, declaredVariables);
             }
+        } else if (program instanceof SyntaxTree.CreateLambda) {
+            addNameSpaces(nameSpace, ((SyntaxTree.CreateLambda) program).getProgram(), declaredVariables);
         } else if (program instanceof SyntaxTree.If) {
             addNameSpaces(nameSpace, ((SyntaxTree.If)program).getProgram(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.If)program).getCondition(), declaredVariables);
@@ -156,6 +158,10 @@ public class NameSpaces {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Pow) value).getV2(), declaredVariables);
         } else if (value instanceof SyntaxTree.PrintFunction) {
             addNameSpaces(nameSpace, ((SyntaxTree.PrintFunction) value).getProgram(), declaredVariables);
+        } else if (value instanceof SyntaxTree.ExitFunction) {
+            addNameSpaces(nameSpace, ((SyntaxTree.ExitFunction) value).getProgram(), declaredVariables);
+        } else if (value instanceof SyntaxTree.Lambda) {
+            addNameSpaces(nameSpace, ((SyntaxTree.Lambda) value).getCreateLambda(), declaredVariables);
         } else if (value instanceof SyntaxTree.Equals) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Equals) value).getV1(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Equals) value).getV2(), declaredVariables);

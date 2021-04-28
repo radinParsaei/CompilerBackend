@@ -2767,6 +2767,14 @@ public class SyntaxTree {
       super("l#" + i++, program, args);
     }
 
+    @Override
+    void eval() {
+      if (functions.containsKey(getFunctionName())) {
+        setFunctionName("l#" + i++);
+      }
+      super.eval();
+    }
+
     public static void setCounter(int i) {
       CreateLambda.i = i;
     }
