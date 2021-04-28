@@ -377,6 +377,43 @@ public class SyntaxTree {
     }
   }
 
+  public static class IndexOf extends ValueBase {
+    private final ValueBase list;
+    private final ValueBase value;
+    public IndexOf(ValueBase list, ValueBase data) {
+      this.list = list;
+      this.value = data;
+    }
+
+    @Override
+    public ValueBase getData() {
+      ValueBase list = this.list;
+      list.setConfigData(getConfigData());
+      if (!(list instanceof Number || list instanceof Text || list instanceof Boolean || list instanceof Null || list instanceof List)) {
+        list = (ValueBase)list.getData();
+      }
+      ValueBase data = this.value;
+      data.setConfigData(getConfigData());
+      if (!(data instanceof Number || data instanceof Text || data instanceof Boolean || data instanceof Null || data instanceof List)) {
+        data = (ValueBase)data.getData();
+      }
+      if (list instanceof List) {
+        return new Number(((ArrayList) list.getData()).indexOf(data));
+      } else {
+        Errors.error(ErrorCodes.ERROR_TYPE, "data is not List (IndexOf)");
+        return new SyntaxTree.Null();
+      }
+    }
+
+    public ValueBase getList() {
+      return list;
+    }
+
+    public ValueBase getValue() {
+      return value;
+    }
+  }
+
   public static class Sort extends ValueBase {
     private ValueBase list;
     private boolean sortByNumber;

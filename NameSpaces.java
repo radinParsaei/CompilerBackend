@@ -219,6 +219,9 @@ public class NameSpaces {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Get) value).getList(), declaredVariables);
         } else if (value instanceof SyntaxTree.GetSize) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.GetSize) value).getList(), declaredVariables);
+        } else if (value instanceof SyntaxTree.IndexOf) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.IndexOf) value).getList(), declaredVariables);
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.IndexOf) value).getValue(), declaredVariables);
         } else if (value instanceof SyntaxTree.Insert) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getIndex(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getList(), declaredVariables);
