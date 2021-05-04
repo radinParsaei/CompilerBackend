@@ -168,8 +168,8 @@ public class SyntaxTree {
   }
 
   public static class Append extends ValueBase {
-    ValueBase list;
-    ValueBase value;
+    private final ValueBase list;
+    private final ValueBase value;
     public Append(ValueBase list, ValueBase value) {
       this.list = list;
       this.value = value;
@@ -207,9 +207,9 @@ public class SyntaxTree {
   }
 
   public static class Insert extends ValueBase {
-    ValueBase list;
-    ValueBase value;
-    ValueBase index;
+    private final ValueBase list;
+    private final ValueBase value;
+    private final ValueBase index;
     public Insert(ValueBase list, ValueBase value, ValueBase index) {
       this.list = list;
       this.value = value;
@@ -265,9 +265,9 @@ public class SyntaxTree {
   }
 
   public static class Set extends ValueBase {
-    ValueBase list;
-    ValueBase value;
-    ValueBase index;
+    private final ValueBase list;
+    private final ValueBase value;
+    private final ValueBase index;
     public Set(ValueBase list, ValueBase value, ValueBase index) {
       this.list = list;
       this.value = value;
@@ -315,8 +315,8 @@ public class SyntaxTree {
   }
 
   public static class Get extends ValueBase {
-    ValueBase list;
-    ValueBase index;
+    private final ValueBase list;
+    private final ValueBase index;
     public Get(ValueBase list, ValueBase index) {
       this.list = list;
       this.index = index;
@@ -352,7 +352,7 @@ public class SyntaxTree {
   }
 
   public static class GetSize extends ValueBase {
-    ValueBase list;
+    private final ValueBase list;
     public GetSize(ValueBase list) {
       this.list = list;
     }
@@ -379,10 +379,27 @@ public class SyntaxTree {
 
   public static class IndexOf extends ValueBase {
     private final ValueBase list;
+    private ValueBase fromIndex;
     private final ValueBase value;
+    private boolean last = false;
     public IndexOf(ValueBase list, ValueBase data) {
       this.list = list;
       this.value = data;
+    }
+
+    public IndexOf(ValueBase list, ValueBase data, ValueBase fromIndex) {
+      this.list = list;
+      this.value = data;
+      this.fromIndex = fromIndex;
+    }
+
+    public boolean isLastIndexOf() {
+      return last;
+    }
+
+    public IndexOf setLastIndexOf(boolean last) {
+      this.last = last;
+      return this;
     }
 
     @Override
@@ -397,8 +414,38 @@ public class SyntaxTree {
       if (!(data instanceof Number || data instanceof Text || data instanceof Boolean || data instanceof Null || data instanceof List)) {
         data = (ValueBase)data.getData();
       }
+      ValueBase fromIndex = this.fromIndex;
+      if (fromIndex != null) {
+        fromIndex.setConfigData(getConfigData());
+      }
+      if (fromIndex != null && !(fromIndex instanceof Number || fromIndex instanceof Text || fromIndex instanceof Boolean || fromIndex instanceof Null || fromIndex instanceof List)) {
+        fromIndex = (ValueBase)fromIndex.getData();
+      }
       if (list instanceof List) {
-        return new Number(((ArrayList) list.getData()).indexOf(data));
+        if (!last) {
+          if (this.fromIndex == null) {
+            return new Number(((ArrayList) list.getData()).indexOf(data));
+          } else if (fromIndex instanceof Number) {
+            int res = ((ArrayList) list.getData()).subList(((BigDecimal) fromIndex.getData()).intValue(), ((ArrayList) list.getData()).size()).indexOf(data);
+            if (res != -1) {
+              res += ((BigDecimal) fromIndex.getData()).intValue();
+            }
+            return new Number(res);
+          } else {
+            Errors.error(ErrorCodes.ERROR_TYPE, "fromIndex is not Number (IndexOf)");
+            return new Null();
+          }
+        } else {
+          if (this.fromIndex == null) {
+            return new Number(((ArrayList) list.getData()).lastIndexOf(data));
+          } else if (fromIndex instanceof Number) {
+            int res = ((ArrayList) list.getData()).subList(0, ((BigDecimal) fromIndex.getData()).intValue() + 1).lastIndexOf(data);
+            return new Number(res);
+          } else {
+            Errors.error(ErrorCodes.ERROR_TYPE, "fromIndex is not Number (IndexOf)");
+            return new Null();
+          }
+        }
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "data is not List (IndexOf)");
         return new SyntaxTree.Null();
@@ -411,6 +458,10 @@ public class SyntaxTree {
 
     public ValueBase getValue() {
       return value;
+    }
+
+    public ValueBase getFromIndex() {
+      return fromIndex;
     }
   }
 

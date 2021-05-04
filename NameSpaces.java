@@ -222,6 +222,7 @@ public class NameSpaces {
         } else if (value instanceof SyntaxTree.IndexOf) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.IndexOf) value).getList(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.IndexOf) value).getValue(), declaredVariables);
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.IndexOf) value).getFromIndex(), declaredVariables);
         } else if (value instanceof SyntaxTree.Insert) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getIndex(), declaredVariables);
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Insert) value).getList(), declaredVariables);
