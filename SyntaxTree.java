@@ -2931,4 +2931,23 @@ public class SyntaxTree {
       return values;
     }
   }
+
+  //why this class exists? when we can do it in "frontend" (just replacing import <something> to it's code)
+//
+//because this class can be used in "more high level" code generators to know when we have import (like https://github.com/radinParsaei/Blockly-test)
+  public static class Import extends ProgramBase {
+    public interface DoImport {
+      ProgramBase doImport(String fileName);
+    }
+    private final String fileName;
+    public static DoImport doImport;
+    public Import(String fileName) {
+      this.fileName = fileName;
+    }
+
+    @Override
+    void eval() {
+      doImport.doImport(fileName).eval();
+    }
+  }
 }
