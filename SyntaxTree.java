@@ -2941,13 +2941,21 @@ public class SyntaxTree {
     }
     private final String fileName;
     public static DoImport doImport;
+    private ProgramBase program;
     public Import(String fileName) {
       this.fileName = fileName;
     }
 
     @Override
     void eval() {
-      doImport.doImport(fileName).eval();
+      getProgram().eval();
+    }
+
+    public ProgramBase getProgram() {
+      if (program == null) {
+        program = doImport.doImport(fileName);
+      }
+      return program;
     }
 
     public String getFileName() {
