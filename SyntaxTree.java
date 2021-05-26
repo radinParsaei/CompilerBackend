@@ -2949,5 +2949,9 @@ public class SyntaxTree {
     void eval() {
       doImport.doImport(fileName).eval();
     }
+
+    public String getFileName() {
+      return fileName;
+    }
   }
 }
