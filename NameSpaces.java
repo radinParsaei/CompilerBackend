@@ -27,12 +27,18 @@ public class NameSpaces {
             if (declarativeVariables) {
                 if (((SyntaxTree.SetVariable) program).getIsDeclaration()) {
                     declaredVariables.add(((SyntaxTree.SetVariable) program).getVariableName());
-                    if (nameSpace.startsWith("#C")) {
+                    if (nameSpace.startsWith("#C") && !((SyntaxTree.SetVariable) program).isStatic()) {
                         ((SyntaxTree.SetVariable) program).setUseInstanceName(!((SyntaxTree.SetVariable) program).getVariableName().startsWith("#F"));
                         SyntaxTree.getClassesParameters().get(nameSpace.substring(2)).add((SyntaxTree.SetVariable) program);
+                    } else if (nameSpace.startsWith("#C")) {
+                        SyntaxTree.staticParameters.add(nameSpace + ((SyntaxTree.SetVariable) program).getVariableName());
+                        ((SyntaxTree.SetVariable) program).setVariableName(nameSpace + sep +
+                                ((SyntaxTree.SetVariable) program).getVariableName());
+                        program.eval();
+                    } else {
+                        ((SyntaxTree.SetVariable) program).setVariableName(nameSpace + sep +
+                                ((SyntaxTree.SetVariable) program).getVariableName());
                     }
-                    ((SyntaxTree.SetVariable) program).setVariableName(nameSpace + sep +
-                            ((SyntaxTree.SetVariable) program).getVariableName());
                 } else {
                     if (declaredVariables.contains(((SyntaxTree.SetVariable) program).getVariableName())) {
                         if (nameSpace.startsWith("#C")) ((SyntaxTree.SetVariable) program).setUseInstanceName(!((SyntaxTree.SetVariable) program).getVariableName().startsWith("#F"));
@@ -98,6 +104,9 @@ public class NameSpaces {
                 ((SyntaxTree.Function) program).setFunctionName(nameSpace + ((SyntaxTree.Function) program).getFunctionName());
                 addNameSpaces(nameSpace, ((SyntaxTree.Function) program).getProgram(), declaredVariables1);
                 program.eval();
+                if (((SyntaxTree.Function) program).isStatic()) {
+                    SyntaxTree.staticFunctions.add(((SyntaxTree.Function) program).getFunctionName());
+                }
                 if (((SyntaxTree.Function) program).getFunctionName().startsWith(nameSpace + "<init>")) {
                     SyntaxTree.getClassesWithInit().add(nameSpace.replace("#C", ""));
                 }

@@ -25,6 +25,8 @@ public class SyntaxTree {
   }
 
   private static final HashMap<String, ValueBase> variables = new HashMap<>();
+  public final static ArrayList<String> staticFunctions = new ArrayList<>();
+  public final static ArrayList<String> staticParameters = new ArrayList<>();
   public static HashMap<String, ValueBase> getVariables() {
     return variables;
   }
@@ -584,6 +586,7 @@ public class SyntaxTree {
     private boolean useInstanceName = false;
     private ValueBase instance = null;
     private boolean addInstanceName = false;
+    private boolean isStatic = false;
 
     public boolean getIsDeclaration() {
       return isDeclaration;
@@ -648,6 +651,15 @@ public class SyntaxTree {
       if (!isDeclaration && data.getVariables().get(variableName + (useInstanceName? data.getInstanceName():"")) == null) {
         Errors.error(ErrorCodes.ERROR_VARIABLE_NOT_DECLARED, variableName);
       }
+    }
+
+    public boolean isStatic() {
+      return isStatic;
+    }
+
+    public SetVariable setStatic(boolean aStatic) {
+      isStatic = aStatic;
+      return this;
     }
 
     @Override
@@ -716,6 +728,7 @@ public class SyntaxTree {
     private final ProgramBase program;
     private final String[] args;
     private boolean error = true;
+    private boolean isStatic = false;
     public Function(String functionName, ProgramBase program, boolean error, String... args) {
       this.args = args;
       this.error = error;
@@ -783,6 +796,15 @@ public class SyntaxTree {
 
     public String[] getArgs() {
       return args;
+    }
+
+    public Function setStatic(boolean aStatic) {
+      isStatic = aStatic;
+      return this;
+    }
+
+    public boolean isStatic() {
+      return isStatic;
     }
   }
 
@@ -2960,6 +2982,43 @@ public class SyntaxTree {
 
     public String getFileName() {
       return fileName;
+    }
+  }
+
+  public static class AwaitedProgram extends ProgramBase {
+    public interface FetchProgram {
+      ProgramBase fetch();
+    }
+
+    private final FetchProgram fetchProgram;
+    public AwaitedProgram(FetchProgram fetchProgram) {
+      this.fetchProgram = fetchProgram;
+    }
+
+    @Override
+    void eval() {
+      super.eval();
+      fetchProgram.fetch().eval();
+    }
+  }
+
+  public static class AwaitedValue extends ValueBase {
+    public interface FetchValue {
+      ValueBase fetch();
+    }
+
+    private final FetchValue fetchValue;
+    public AwaitedValue(FetchValue fetchProgram) {
+      this.fetchValue = fetchProgram;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase value = fetchValue.fetch();
+      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null || value instanceof List)) {
+        value = (ValueBase)value.getData();
+      }
+      return value;
     }
   }
 }
