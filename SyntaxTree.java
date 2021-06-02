@@ -56,7 +56,7 @@ public class SyntaxTree {
         touchFunctionsFromClass(program1, className);
       }
     } else if (program instanceof Function) {
-      functions.put("#C" + className + ((Function) program).getFunctionName(), null);
+      functions.put("#C" + className + "#" + ((Function) program).getFunctionName(), null);
     }
   }
 
@@ -553,7 +553,7 @@ public class SyntaxTree {
       if (instance != null) {
         String[] splitInstance = instance.toString().split(":");
         if (addInstanceName && !variableName.startsWith("#C"))
-          variableName = "#C" + splitInstance[1] + variableName;
+          variableName = "#C" + splitInstance[1] + "#" + variableName;
         getConfigData().setInstanceName(splitInstance[0]);
       }
       if (variableName.startsWith("#C")) variableName = variableName.replace("#F", "");
@@ -668,7 +668,7 @@ public class SyntaxTree {
         String[] splitInstance = instance.toString().split(":");
         getData().setInstanceName(splitInstance[0]);
         if (addInstanceName && !variableName.startsWith("#C"))
-          variableName = "#C" + splitInstance[1] + variableName;
+          variableName = "#C" + splitInstance[1] + "#" + variableName;
       }
       if (variableName.startsWith("#C")) variableName = variableName.replace("#F", "");
       if (checkDeclarationInRuntime) checkDeclaration();
@@ -1109,7 +1109,7 @@ public class SyntaxTree {
         String[] splitInstance = instance.toString().split(":");
         getConfigData().setInstanceName(splitInstance[0]);
         if (addInstanceName) {
-          functionName = "#C" + splitInstance[1] + functionName;
+          functionName = "#C" + splitInstance[1] + "#" + functionName;
         }
       }
       findFunction();
@@ -1210,7 +1210,7 @@ public class SyntaxTree {
 
   public static ValueBase getTextFromInstance(ValueBase instance) {
     String className = ((CreateInstance) instance).getClassName();
-    if (functions.containsKey("#C" + className + "toString:"))
+    if (functions.containsKey("#C" + className + "#toString:"))
       instance = new SyntaxTree.CallFunction("toString").fromInstance(instance).setAddInstanceName(true).getData();
     if (instance instanceof CreateInstance && !((CreateInstance) instance).getClassName().equals(className)) instance = getTextFromInstance(instance);
     return new Text(instance.toString());
@@ -1239,7 +1239,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean hasAdd = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Add:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#Add:,((?!,).)+")) {
             hasAdd = true;
             break;
           }
@@ -1251,7 +1251,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean hasSub = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Add:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#Add:,((?!,).)+")) {
             hasSub = true;
             break;
           }
@@ -1300,7 +1300,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean hasSub = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Subtract:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#Subtract:,((?!,).)+")) {
             hasSub = true;
             break;
           }
@@ -1312,7 +1312,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean hasSub = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Subtract:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#Subtract:,((?!,).)+")) {
             hasSub = true;
             break;
           }
@@ -1361,7 +1361,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean hasMul = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Multiply:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#Multiply:,((?!,).)+")) {
             hasMul = true;
             break;
           }
@@ -1373,7 +1373,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean hasMul = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Multiply:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#Multiply:,((?!,).)+")) {
             hasMul = true;
             break;
           }
@@ -1435,7 +1435,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean hasDiv = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Divide:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#Divide:,((?!,).)+")) {
             hasDiv = true;
             break;
           }
@@ -1447,7 +1447,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean hasDiv = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Divide:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#Divide:,((?!,).)+")) {
             hasDiv = true;
             break;
           }
@@ -1497,7 +1497,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean hasMod = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Modulo:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#Modulo:,((?!,).)+")) {
             hasMod = true;
             break;
           }
@@ -1509,7 +1509,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean hasMod = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Modulo:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#Modulo:,((?!,).)+")) {
             hasMod = true;
             break;
           }
@@ -1559,7 +1559,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Power:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#Power:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1571,7 +1571,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Power:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#Power:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1621,7 +1621,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "LooksEqual:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#LooksEqual:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1633,7 +1633,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "LooksEqual:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#LooksEqual:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1701,7 +1701,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "Equals:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#Equals:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1713,7 +1713,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "Equals:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#Equals:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1759,7 +1759,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "GreaterThan:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#GreaterThan:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1771,7 +1771,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "GreaterThan:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "z3GreaterThan:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1821,7 +1821,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "GreaterThanOrEqual:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#GreaterThanOrEqual:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1833,7 +1833,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "GreaterThanOrEqual:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#GreaterThanOrEqual:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1884,7 +1884,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "LesserThan:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#LesserThan:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1896,7 +1896,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "LesserThan:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#LesserThan:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1946,7 +1946,7 @@ public class SyntaxTree {
       if (v1 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "LesserThanOrEqual:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v1).getClassName() + "#LesserThanOrEqual:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -1958,7 +1958,7 @@ public class SyntaxTree {
       if (v2 instanceof CreateInstance) {
         boolean overloaded = false;
         for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
-          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "LesserThanOrEqual:,((?!,).)+")) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) v2).getClassName() + "#LesserThanOrEqual:,((?!,).)+")) {
             overloaded = true;
             break;
           }
@@ -2407,7 +2407,7 @@ public class SyntaxTree {
           itemToPrint = (ValueBase) itemToPrint.getData();
         }
         if (itemToPrint instanceof CreateInstance) {
-          if (functions.containsKey("#C" + ((CreateInstance) itemToPrint).getClassName() + "toString:"))
+          if (functions.containsKey("#C" + ((CreateInstance) itemToPrint).getClassName() + "#toString:"))
             itemToPrint = new SyntaxTree.CallFunction("toString").fromInstance(itemToPrint).setAddInstanceName(true);
         }
         if (separator2 instanceof Variable) {
@@ -2417,7 +2417,7 @@ public class SyntaxTree {
           separator2 = (ValueBase) separator2.getData();
         }
         if (separator2 instanceof CreateInstance) {
-          if (functions.containsKey("#C" + ((CreateInstance) separator2).getClassName() + "toString:"))
+          if (functions.containsKey("#C" + ((CreateInstance) separator2).getClassName() + "#toString:"))
             separator2 = new SyntaxTree.CallFunction("toString").fromInstance(separator2).setAddInstanceName(true);
         }
         if (Targets.systemPrint) {
@@ -2797,7 +2797,7 @@ public class SyntaxTree {
       classesParameters.put(className, variables);
       Programs programs1 = new Programs(programs);
       touchFunctionsFromClass(programs1, className);
-      this.programs = NameSpaces.addNameSpaces("#C" + className, programs1, new ArrayList<String>(Collections.singleton("%")));
+      this.programs = NameSpaces.addNameSpaces("#C" + className + "#", programs1, new ArrayList<String>(Collections.singleton("%")));
     }
 
     public ProgramBase getPrograms() {
@@ -2839,10 +2839,10 @@ public class SyntaxTree {
         for (SetVariable setVariable : parameters) {
           setVariable.eval();
         }
-        if (classesWithInit.contains(className)) this.callInit = new CallFunction("#C" + className + "<init>", args);
+        if (classesWithInit.contains(className)) this.callInit = new CallFunction("#C" + className + "#<init>", args);
         instance = new SyntaxTree.Text(instanceNameSpace + ":" + className);
         isFirst = false;
-        new SetVariable("#C" + className + "%", this).fromInstance(this).setIsDeclaration(true).eval();
+        new SetVariable("#C" + className + "#%", this).fromInstance(this).setIsDeclaration(true).eval();
         if (callInit != null) callInit.fromInstance(this).getData();
       }
       return instance;
@@ -3019,6 +3019,10 @@ public class SyntaxTree {
         value = (ValueBase)value.getData();
       }
       return value;
+    }
+
+    public ValueBase fetchValue() {
+      return fetchValue.fetch();
     }
   }
 }
