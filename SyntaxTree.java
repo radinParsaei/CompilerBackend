@@ -3035,10 +3035,10 @@ public class SyntaxTree {
 
     @Override
     void eval() {
+      super.eval();
       if (functions.containsKey(getFunctionName())) {
         setFunctionName("l#" + i++);
       }
-      super.eval();
     }
 
     public static void setCounter(int i) {
@@ -3054,8 +3054,9 @@ public class SyntaxTree {
 
     @Override
     public Object getData() {
+      Text tmp = new Text(createLambda.getFunctionName());
       createLambda.eval();
-      return new Text(createLambda.getFunctionName());
+      return tmp;
     }
 
     public CreateLambda getCreateLambda() {

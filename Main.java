@@ -37,8 +37,8 @@ public class Main {
             )),
             new SyntaxTree.Print(new SyntaxTree.Variable("a")),
             new SyntaxTree.SetVariable("test", new SyntaxTree.CreateInstance("Test")),
-            new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("#CTestprintMsg").fromInstance(new SyntaxTree.Variable("test"))),
-            new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("#CTestsetMsg", new SyntaxTree.Text("Data From Class")).fromInstance(new SyntaxTree.Variable("test"))),
+            new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("#CTest#printMsg").fromInstance(new SyntaxTree.Variable("test"))),
+            new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("#CTest#setMsg", new SyntaxTree.Text("Data From Class")).fromInstance(new SyntaxTree.Variable("test"))),
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg").fromInstance(new SyntaxTree.Variable("test")).setAddInstanceName(true)),
             new OpCode.PutToVM(new SyntaxTree.Variable("a")),
             new OpCode(SyntaxTree.objectToValue(VM.PRINT)),
@@ -66,16 +66,16 @@ public class Main {
 //    new SyntaxTree.SetVariable("variable", new SyntaxTree.CreateInstance("Test")).eval();
 //    System.out.println(new SyntaxTree.Variable("variable").getData().getClass().getName());
 //    System.out.println(new SyntaxTree.CallFunction("createInstance").setAddInstanceName(true).fromInstance(new SyntaxTree.Variable("variable")).getData().getClass().getName());
-    try {
-      FileWriter writer = new FileWriter("a");
-      VMTools vmTools = new VMTools();
-      writer.write(vmTools.syntaxTreeToVMByteCode(program));
-      writer.close();
-    } catch (IOException e) {
-      System.out.println("ERROR");
-      e.printStackTrace();
-    }
-    System.out.println("\n");
+//    try {
+//      FileWriter writer = new FileWriter("a");
+//      VMTools vmTools = new VMTools();
+//      writer.write(vmTools.syntaxTreeToVMByteCode(program));
+//      writer.close();
+//    } catch (IOException e) {
+//      System.out.println("ERROR");
+//      e.printStackTrace();
+//    }
+//    System.out.println("\n");
     String xml = new XMLGenerator().syntaxTreeToXML(new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Number(10))));
     System.out.println(xml);
     System.out.println("\n");
