@@ -18,7 +18,7 @@ public class XMLToSyntaxTree {
 
     public ProgramBase xmlToProgram(String xml) throws Exception {
         Node node = loadXMLFromString(xml).getFirstChild();
-        if (!node.getNodeName().equals("program")) return new SyntaxTree.Programs();
+        if (!node.getNodeName().equals("program") && !node.getNodeName().equals("pr")) return new SyntaxTree.Programs();
         node = node.getFirstChild();
         return xmlToProgram(node);
     }
@@ -26,17 +26,21 @@ public class XMLToSyntaxTree {
     public ProgramBase xmlToProgram(Node node) {
         ArrayList<ProgramBase> programs = new ArrayList<>();
         while (node != null) {
-            if (node.getNodeName().equals("print")) {
+            if (node.getNodeName().equals("print") || node.getNodeName().equals("p")) {
                 ValueBase separator = null;
                 ArrayList<ValueBase> values = new ArrayList<>();
-                Node node1 = node.getChildNodes().item(1);
-                if (node1.getNodeName().equals("separator")) {
-                    separator = getValueFromNode(node1.getChildNodes().item(1));
-                }
-                node1 = node1.getNextSibling();
+                Node node1;
+                if (node.getNodeName().equals("p")) node1 = node.getChildNodes().item(0);
+                else node1 = node.getChildNodes().item(1);
                 while (node1 != null) {
+                    if (node1.getNodeName().equals("separator"))
+                        separator = getValueFromNode(node1.getChildNodes().item(1));
                     if (node1.getNodeName().equals("data"))
                         values.add(getValueFromNode(node1.getChildNodes().item(1)));
+                    if (node1.getNodeName().equals("s"))
+                        separator = getValueFromNode(node1.getChildNodes().item(0));
+                    if (node1.getNodeName().equals("d"))
+                        values.add(getValueFromNode(node1.getChildNodes().item(0)));
                     node1 = node1.getNextSibling();
                 }
                 ValueBase[] valuesArray = new ValueBase[values.size()];
@@ -44,10 +48,10 @@ public class XMLToSyntaxTree {
                     valuesArray[i] = values.get(i);
                 }
                 programs.add(new SyntaxTree.Print(valuesArray).setSeparator(separator));
-            } else if (node.getNodeName().equals("executeValue")) {
+            } else if (node.getNodeName().equals("executeValue") || node.getNodeName().equals("ev")) {
                 ValueBase value = null;
                 Node node1 = node.getChildNodes().item(1);
-                if (node1.getNodeName().equals("value")) {
+                if (node1.getNodeName().equals("value") || node1.getNodeName().equals("v")) {
                     value = getValueFromNode(node1.getChildNodes().item(1));
                 }
                 programs.add(new SyntaxTree.ExecuteValue(value));
@@ -64,10 +68,13 @@ public class XMLToSyntaxTree {
     private ValueBase getValueFromNode(Node node) {
         switch (node.getNodeName()) {
             case "number":
+            case "n":
                 return new SyntaxTree.Number(new BigDecimal(node.getTextContent()));
             case "text":
+            case "t":
                 return new SyntaxTree.Text(node.getAttributes().getNamedItem("data").getNodeValue());
             case "printFunction":
+            case "pf":
                 return new SyntaxTree.PrintFunction((SyntaxTree.Print) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);
         }
         return new SyntaxTree.Null();

@@ -79,8 +79,12 @@ public class Main {
     String xml = new XMLGenerator().syntaxTreeToXML(new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Number(10))));
     System.out.println(xml);
     System.out.println("\n");
+    String xmlCompressed = new XMLGenerator(true).syntaxTreeToXML(new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Number(10))));
+    System.out.println(xmlCompressed);
+    System.out.println("\n");
     try {
       new XMLToSyntaxTree().xmlToProgram(xml).eval();
+      new XMLToSyntaxTree().xmlToProgram(xmlCompressed).eval();
     } catch (Exception e) {
       e.printStackTrace();
     }
