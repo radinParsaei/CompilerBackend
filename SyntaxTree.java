@@ -2479,9 +2479,22 @@ public class SyntaxTree {
     public Object getData() {
       ValueBase value = this.value;
       value.setConfigData(data);
-      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null || value instanceof List)) {
+      if (!(value instanceof Number || value instanceof Text || value instanceof Boolean || value instanceof Null || value instanceof List || value instanceof CreateInstance)) {
         value = (ValueBase)value.getData();
       }
+      if (value instanceof CreateInstance) {
+        boolean overloaded = false;
+        for (Map.Entry<String, ProgramBase> entry : functions.entrySet()) {
+          if (entry.getKey().matches("#C" + ((CreateInstance) value).getClassName() + "#Not:")) {
+            overloaded = true;
+            break;
+          }
+        }
+        if (overloaded) {
+          return new SyntaxTree.CallFunction("Not").fromInstance(value).setAddInstanceName(true).getData();
+        }
+      }
+      if (value instanceof CreateInstance) value = getTextFromInstance(value);
       if (value instanceof Number) {
         return new Boolean((((BigDecimal) value.getData()).compareTo(BigDecimal.ZERO) == 0));
       } else if (value instanceof Boolean) {
