@@ -70,6 +70,9 @@ public class XMLToSyntaxTree {
             case "number":
             case "n":
                 return new SyntaxTree.Number(new BigDecimal(node.getTextContent()));
+            case "bool":
+            case "b":
+                return new SyntaxTree.Boolean(node.getTextContent().toLowerCase().equals("true"));
             case "text":
             case "t":
                 return new SyntaxTree.Text(node.getAttributes().getNamedItem("data").getNodeValue());

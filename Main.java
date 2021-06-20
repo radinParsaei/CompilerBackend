@@ -76,10 +76,11 @@ public class Main {
 //      e.printStackTrace();
 //    }
 //    System.out.println("\n");
-    String xml = new XMLGenerator().syntaxTreeToXML(new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Number(10))));
+    ProgramBase program_ = new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Boolean(true)));
+    String xml = new XMLGenerator().syntaxTreeToXML(program_);
     System.out.println(xml);
     System.out.println("\n");
-    String xmlCompressed = new XMLGenerator(true).syntaxTreeToXML(new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Number(10))));
+    String xmlCompressed = new XMLGenerator(true).syntaxTreeToXML(program_);
     System.out.println(xmlCompressed);
     System.out.println("\n");
     try {
