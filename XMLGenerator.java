@@ -58,6 +58,8 @@ public class XMLGenerator {
             return getTabs(1) + "<text data=\"".replace("text", compressed? "t":"text") + value.getData() + "\"/>";
         } else if (value instanceof SyntaxTree.Boolean) {
             return getTabs(1) + (compressed? "<b>":"<bool>") + value.getData() + (compressed? "</b>":"</bool>");
+        } else if (value instanceof SyntaxTree.Null) {
+            return getTabs(1) + (compressed? "<nl/>":"<null/>");
         } else if (value instanceof SyntaxTree.PrintFunction) {
             String string = getTabs(1) + (compressed? "<pf>":"<printFunction>");
             tabCount++;
