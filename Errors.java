@@ -40,9 +40,12 @@ public class Errors {
         System.err.println("use of undeclared variable " + args[0]);
         break;
       case ErrorCodes.ERROR_TYPE:
-        System.out.print("Type Error");
-        if (args.length != 0) System.out.println(":\t" + args[0]);
-        else System.out.println();
+        System.err.print("Type Error");
+        if (args.length != 0) System.err.println(":\t" + args[0]);
+        else System.err.println();
+        break;
+      case ErrorCodes.ERROR_CLASS_REDECLARATION:
+        System.err.println("Class " + args[0] + " already exists");
         break;
     }
     if (!Targets.isWeb) System.exit(1);

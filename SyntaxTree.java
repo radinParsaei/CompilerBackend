@@ -2999,6 +2999,9 @@ public class SyntaxTree {
     private final Programs programs;
     private final String className;
     public CreateClass(String className, ProgramBase... programs) {
+      if (classesParameters.get(className) != null) {
+        Errors.error(ErrorCodes.ERROR_CLASS_REDECLARATION, className);
+      }
       this.className = className;
       ArrayList<SetVariable> variables = new ArrayList<>();
       variables.add(new SetVariable("%", new Null()).setIsDeclaration(true));
