@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class XMLGenerator {
     private boolean isFirst = true;
     private int tabCount = 1;
@@ -60,6 +62,12 @@ public class XMLGenerator {
             return getTabs(1) + (compressed? "<b>":"<bool>") + value.getData() + (compressed? "</b>":"</bool>");
         } else if (value instanceof SyntaxTree.Null) {
             return getTabs(1) + (compressed? "<nl/>":"<null/>");
+        } else if (value instanceof SyntaxTree.List) {
+            StringBuilder stringBuilder = new StringBuilder(getTabs(1) + (compressed? "<l>":"<list>"));
+            for (ValueBase valueBase : (ArrayList<ValueBase>) value.getData()) {
+                stringBuilder.append(compressed? "<d>":"<data>").append(getValueAsXMLString(valueBase)).append(compressed? "</d>":"</data>");
+            }
+            return stringBuilder + (compressed? "</l>":"</list>");
         } else if (value instanceof SyntaxTree.PrintFunction) {
             String string = getTabs(1) + (compressed? "<pf>":"<printFunction>");
             tabCount++;

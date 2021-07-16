@@ -76,6 +76,23 @@ public class XMLToSyntaxTree {
             case "null":
             case "nl":
                 return new SyntaxTree.Null();
+            case "list":
+            case "l": {
+                ArrayList<ValueBase> res = new ArrayList<>();
+                Node node1 = node.getFirstChild();
+                while (node1 != null) {
+                    if (node1.getNodeName().equals("data"))
+                        res.add(getValueFromNode(node1.getChildNodes().item(1)));
+                    if (node1.getNodeName().equals("d"))
+                        res.add(getValueFromNode(node1.getChildNodes().item(0)));
+                    node1 = node1.getNextSibling();
+                }
+                ValueBase[] valuesArray = new ValueBase[res.size()];
+                for (int i = 0; i < res.size(); i++) {
+                    valuesArray[i] = res.get(i);
+                }
+                return new SyntaxTree.List(valuesArray);
+            }
             case "text":
             case "t":
                 return new SyntaxTree.Text(node.getAttributes().getNamedItem("data").getNodeValue());
