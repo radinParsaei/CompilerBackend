@@ -48,6 +48,13 @@ public class XMLToSyntaxTree {
                     valuesArray[i] = values.get(i);
                 }
                 programs.add(new SyntaxTree.Print(valuesArray).setSeparator(separator));
+            } else if (node.getNodeName().equals("exit") || node.getNodeName().equals("e")) {
+                ValueBase separator = null;
+                ArrayList<ValueBase> values = new ArrayList<>();
+                Node node1;
+                if (node.getNodeName().equals("p")) node1 = node.getChildNodes().item(0);
+                else node1 = node.getChildNodes().item(1);
+                programs.add(new SyntaxTree.Exit(getValueFromNode(node1)));
             } else if (node.getNodeName().equals("executeValue") || node.getNodeName().equals("ev")) {
                 ValueBase value = null;
                 Node node1 = node.getChildNodes().item(1);
@@ -99,6 +106,9 @@ public class XMLToSyntaxTree {
             case "printFunction":
             case "pf":
                 return new SyntaxTree.PrintFunction((SyntaxTree.Print) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);
+            case "exitFunction":
+            case "ef":
+                return new SyntaxTree.ExitFunction((SyntaxTree.Exit) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);
         }
         return new SyntaxTree.Null();
     }

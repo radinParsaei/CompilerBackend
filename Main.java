@@ -76,7 +76,7 @@ public class Main {
 //      e.printStackTrace();
 //    }
 //    System.out.println("\n");
-    ProgramBase program_ = new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Null(), new SyntaxTree.List(new SyntaxTree.Number(10), new SyntaxTree.Text("Hello"))));
+    ProgramBase program_ = new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Number(10)), new SyntaxTree.Print(new SyntaxTree.Null(), new SyntaxTree.List(new SyntaxTree.Number(10), new SyntaxTree.Text("Hello"))));//, new SyntaxTree.Exit(new SyntaxTree.Number(10)));
     String xml = new XMLGenerator().syntaxTreeToXML(program_);
     System.out.println(xml);
     System.out.println("\n");

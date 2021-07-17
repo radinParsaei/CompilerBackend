@@ -38,6 +38,10 @@ public class XMLGenerator {
                 stringBuilder.append(getTabs(0)).append(compressed? "<d>":"<data>").append(getValueAsXMLString(value)).append(getTabs(-1)).append(compressed? "</d>":"</data>");
             }
             stringBuilder.append(getTabs(-1)).append(compressed? "</p>":"</print>");
+        } else if (program instanceof SyntaxTree.Exit) {
+            stringBuilder.append(getTabs(0)).append(compressed? "<e>":"<exit>")
+                    .append(getValueAsXMLString(((SyntaxTree.Exit) program).getStatus()));
+            stringBuilder.append(getTabs(-1)).append(compressed? "</e>":"</exit>");
         } else if (program instanceof SyntaxTree.Programs) {
             for (ProgramBase program1 : ((SyntaxTree.Programs) program).getPrograms()) {
                 stringBuilder.append(syntaxTreeToXML(program1));
@@ -72,6 +76,11 @@ public class XMLGenerator {
             String string = getTabs(1) + (compressed? "<pf>":"<printFunction>");
             tabCount++;
             string += syntaxTreeToXML(((SyntaxTree.PrintFunction) value).getProgram()) + getTabs(-1) + (compressed? "</pf>":"</printFunction>");
+            return string;
+        } else if (value instanceof SyntaxTree.ExitFunction) {
+            String string = getTabs(1) + (compressed? "<ef>":"<exitFunction>");
+            tabCount++;
+            string += syntaxTreeToXML(((SyntaxTree.ExitFunction) value).getProgram()) + getTabs(-1) + (compressed? "</ef>":"</exitFunction>");
             return string;
         }
         tabCount--;
