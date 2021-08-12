@@ -578,6 +578,34 @@ public class SyntaxTree {
     }
   }
 
+  public static class Increase extends ValueBase implements java.io.Serializable {
+    private final Variable variable;
+    public Increase(Variable variable) {
+      this.variable = variable;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase tmp = (ValueBase) variable.getData();
+      new SetVariable(variable.getVariableName(), new Add(tmp, new Number(1))).eval();
+      return tmp;
+    }
+  }
+
+  public static class Decrease extends ValueBase implements java.io.Serializable {
+    private final Variable variable;
+    public Decrease(Variable variable) {
+      this.variable = variable;
+    }
+
+    @Override
+    public Object getData() {
+      ValueBase tmp = (ValueBase) variable.getData();
+      new SetVariable(variable.getVariableName(), new Sub(tmp, new Number(1))).eval();
+      return tmp;
+    }
+  }
+
   public static class SetVariable extends ProgramBase implements java.io.Serializable {
     private String variableName;
     private final ValueBase value;
