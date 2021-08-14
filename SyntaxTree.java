@@ -580,29 +580,33 @@ public class SyntaxTree {
 
   public static class Increase extends ValueBase implements java.io.Serializable {
     private final Variable variable;
-    public Increase(Variable variable) {
+    private final boolean isPostfix;
+    public Increase(Variable variable, boolean isPostfix) {
       this.variable = variable;
+      this.isPostfix = isPostfix;
     }
 
     @Override
     public Object getData() {
       ValueBase tmp = (ValueBase) variable.getData();
       new SetVariable(variable.getVariableName(), new Add(tmp, new Number(1))).eval();
-      return tmp;
+      return isPostfix? tmp:variable.getData();
     }
   }
 
   public static class Decrease extends ValueBase implements java.io.Serializable {
     private final Variable variable;
-    public Decrease(Variable variable) {
+    private final boolean isPostfix;
+    public Decrease(Variable variable, boolean isPostfix) {
       this.variable = variable;
+      this.isPostfix = isPostfix;
     }
 
     @Override
     public Object getData() {
       ValueBase tmp = (ValueBase) variable.getData();
       new SetVariable(variable.getVariableName(), new Sub(tmp, new Number(1))).eval();
-      return tmp;
+      return isPostfix? tmp:variable.getData();
     }
   }
 
