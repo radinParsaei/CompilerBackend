@@ -49,7 +49,7 @@ public class XMLGenerator {
         } else if (program instanceof SyntaxTree.ExecuteValue) {
             stringBuilder.append(getTabs(0)).append(compressed? "<ev>":"<executeValue>").append(getTabs(1)).append(compressed? "<v>":"<value>")
                     .append(getValueAsXMLString(((SyntaxTree.ExecuteValue) program).getValue()))
-                    .append(getTabs(-1)).append(compressed? "<v>":"</value>").append(getTabs(-1)).append(compressed? "</ev>":"</executeValue>");
+                    .append(getTabs(-1)).append(compressed? "</v>":"</value>").append(getTabs(-1)).append(compressed? "</ev>":"</executeValue>");
         }
         if (isFirst1) {
             stringBuilder.append(getTabs(-1)).append(compressed? "</pr>":"</program>");
@@ -72,6 +72,8 @@ public class XMLGenerator {
                 stringBuilder.append(compressed? "<d>":"<data>").append(getValueAsXMLString(valueBase)).append(compressed? "</d>":"</data>");
             }
             return stringBuilder + (compressed? "</l>":"</list>");
+        } else if (value instanceof SyntaxTree.Add) {
+            return getTabs(1) + (compressed? "<a><d1>":"<add><data1>") + getValueAsXMLString(((SyntaxTree.Add) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Add) value).getV2()) + (compressed? "</d2></a>":"></data2></add>");
         } else if (value instanceof SyntaxTree.PrintFunction) {
             String string = getTabs(1) + (compressed? "<pf>":"<printFunction>");
             tabCount++;
