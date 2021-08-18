@@ -57,9 +57,9 @@ public class XMLToSyntaxTree {
                 programs.add(new SyntaxTree.Exit(getValueFromNode(node1)));
             } else if (node.getNodeName().equals("executeValue") || node.getNodeName().equals("ev")) {
                 ValueBase value = null;
-                Node node1 = node.getChildNodes().item(1);
+                Node node1 = node.getNodeName().equals("ev")? node.getChildNodes().item(0):node.getChildNodes().item(1);
                 if (node1.getNodeName().equals("value") || node1.getNodeName().equals("v")) {
-                    value = getValueFromNode(node1.getChildNodes().item(1));
+                    value = node1.getNodeName().equals("v")? getValueFromNode(node1.getChildNodes().item(0)):getValueFromNode(node1.getChildNodes().item(1));
                 }
                 programs.add(new SyntaxTree.ExecuteValue(value));
             }
@@ -110,6 +110,10 @@ public class XMLToSyntaxTree {
                 return new SyntaxTree.Add(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
             case "a":
                 return new SyntaxTree.Add(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "sub":
+                return new SyntaxTree.Sub(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+            case "s":
+                return new SyntaxTree.Sub(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "exitFunction":
             case "ef":
                 return new SyntaxTree.ExitFunction((SyntaxTree.Exit) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);

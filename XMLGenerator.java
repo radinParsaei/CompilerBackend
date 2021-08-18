@@ -74,6 +74,8 @@ public class XMLGenerator {
             return stringBuilder + (compressed? "</l>":"</list>");
         } else if (value instanceof SyntaxTree.Add) {
             return getTabs(1) + (compressed? "<a><d1>":"<add><data1>") + getValueAsXMLString(((SyntaxTree.Add) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Add) value).getV2()) + (compressed? "</d2></a>":"></data2></add>");
+        } else if (value instanceof SyntaxTree.Sub) {
+            return getTabs(1) + (compressed? "<s><d1>":"<sub><data1>") + getValueAsXMLString(((SyntaxTree.Sub) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Sub) value).getV2()) + (compressed? "</d2></s>":"></data2></sub>");
         } else if (value instanceof SyntaxTree.PrintFunction) {
             String string = getTabs(1) + (compressed? "<pf>":"<printFunction>");
             tabCount++;
