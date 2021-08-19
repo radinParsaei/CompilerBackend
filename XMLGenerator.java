@@ -76,6 +76,12 @@ public class XMLGenerator {
             return getTabs(1) + (compressed? "<a><d1>":"<add><data1>") + getValueAsXMLString(((SyntaxTree.Add) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Add) value).getV2()) + (compressed? "</d2></a>":"></data2></add>");
         } else if (value instanceof SyntaxTree.Sub) {
             return getTabs(1) + (compressed? "<s><d1>":"<sub><data1>") + getValueAsXMLString(((SyntaxTree.Sub) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Sub) value).getV2()) + (compressed? "</d2></s>":"></data2></sub>");
+        } else if (value instanceof SyntaxTree.Mul) {
+            return getTabs(1) + (compressed? "<m><d1>":"<mul><data1>") + getValueAsXMLString(((SyntaxTree.Mul) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Mul) value).getV2()) + (compressed? "</d2></m>":"></data2></mul>");
+        } else if (value instanceof SyntaxTree.Div) {
+            return getTabs(1) + (compressed? "<d><d1>":"<div><data1>") + getValueAsXMLString(((SyntaxTree.Div) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Div) value).getV2()) + (compressed? "</d2></d>":"></data2></div>");
+        } else if (value instanceof SyntaxTree.Pow) {
+            return getTabs(1) + (compressed? "<p1><d1>":"<pow><data1>") + getValueAsXMLString(((SyntaxTree.Pow) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Pow) value).getV2()) + (compressed? "</d2></p1>":"></data2></pow>");
         } else if (value instanceof SyntaxTree.PrintFunction) {
             String string = getTabs(1) + (compressed? "<pf>":"<printFunction>");
             tabCount++;
