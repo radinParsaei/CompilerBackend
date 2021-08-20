@@ -126,6 +126,26 @@ public class XMLToSyntaxTree {
                 return new SyntaxTree.Pow(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
             case "p1":
                 return new SyntaxTree.Pow(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "equals":
+                return new SyntaxTree.Equals(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+            case "eq":
+                return new SyntaxTree.Equals(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "greater-than":
+                return new SyntaxTree.GreaterThan(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+            case "gt":
+                return new SyntaxTree.GreaterThan(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "lesser-than":
+                return new SyntaxTree.LesserThan(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+            case "lt":
+                return new SyntaxTree.LesserThan(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "lesser-than-or-equal":
+                return new SyntaxTree.LesserThanOrEqual(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+            case "le":
+                return new SyntaxTree.LesserThanOrEqual(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "greater-than-or-equal":
+                return new SyntaxTree.GreaterThanOrEqual(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+            case "ge":
+                return new SyntaxTree.GreaterThanOrEqual(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "exitFunction":
             case "ef":
                 return new SyntaxTree.ExitFunction((SyntaxTree.Exit) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);

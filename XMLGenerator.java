@@ -82,6 +82,16 @@ public class XMLGenerator {
             return getTabs(1) + (compressed? "<d><d1>":"<div><data1>") + getValueAsXMLString(((SyntaxTree.Div) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Div) value).getV2()) + (compressed? "</d2></d>":"></data2></div>");
         } else if (value instanceof SyntaxTree.Pow) {
             return getTabs(1) + (compressed? "<p1><d1>":"<pow><data1>") + getValueAsXMLString(((SyntaxTree.Pow) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Pow) value).getV2()) + (compressed? "</d2></p1>":"></data2></pow>");
+        } else if (value instanceof SyntaxTree.Equals) {
+            return getTabs(1) + (compressed? "<eq><d1>":"<equals><data1>") + getValueAsXMLString(((SyntaxTree.Equals) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.Equals) value).getV2()) + (compressed? "</d2></eq>":"></data2></equals>");
+        } else if (value instanceof SyntaxTree.GreaterThan) {
+            return getTabs(1) + (compressed? "<gt><d1>":"<greater-than><data1>") + getValueAsXMLString(((SyntaxTree.GreaterThan) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.GreaterThan) value).getV2()) + (compressed? "</d2></gt>":"></data2></greater-than>");
+        } else if (value instanceof SyntaxTree.LesserThan) {
+            return getTabs(1) + (compressed? "<lt><d1>":"<lesser-than><data1>") + getValueAsXMLString(((SyntaxTree.LesserThan) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.LesserThan) value).getV2()) + (compressed? "</d2></lt>":"></data2></lesser-than>");
+        } else if (value instanceof SyntaxTree.GreaterThanOrEqual) {
+            return getTabs(1) + (compressed? "<ge><d1>":"<greater-than-or-equal><data1>") + getValueAsXMLString(((SyntaxTree.GreaterThanOrEqual) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.GreaterThanOrEqual) value).getV2()) + (compressed? "</d2></ge>":"></data2></greater-than-or-equal>");
+        } else if (value instanceof SyntaxTree.LesserThanOrEqual) {
+            return getTabs(1) + (compressed? "<le><d1>":"<lesser-than-or-equal><data1>") + getValueAsXMLString(((SyntaxTree.LesserThanOrEqual) value).getV1()) + (compressed? "</d1><d2>":"</data1><data2>") + getValueAsXMLString(((SyntaxTree.LesserThanOrEqual) value).getV2()) + (compressed? "</d2></le>":"></data2></lesser-than-or-equal>");
         } else if (value instanceof SyntaxTree.PrintFunction) {
             String string = getTabs(1) + (compressed? "<pf>":"<printFunction>");
             tabCount++;
