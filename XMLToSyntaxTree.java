@@ -107,45 +107,69 @@ public class XMLToSyntaxTree {
             case "pf":
                 return new SyntaxTree.PrintFunction((SyntaxTree.Print) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);
             case "add":
-                return new SyntaxTree.Add(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+                return new SyntaxTree.Add(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "a":
                 return new SyntaxTree.Add(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "sub":
-                return new SyntaxTree.Sub(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+                return new SyntaxTree.Sub(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "s":
                 return new SyntaxTree.Sub(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "mul":
-                return new SyntaxTree.Mul(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+                return new SyntaxTree.Mul(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "m":
                 return new SyntaxTree.Mul(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "div":
-                return new SyntaxTree.Div(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+                return new SyntaxTree.Div(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "d":
                 return new SyntaxTree.Div(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "mod":
+                return new SyntaxTree.Mod(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+            case "m1":
+                return new SyntaxTree.Mod(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "pow":
-                return new SyntaxTree.Pow(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+                return new SyntaxTree.Pow(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "p1":
                 return new SyntaxTree.Pow(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "equals":
-                return new SyntaxTree.Equals(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+                return new SyntaxTree.Equals(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "eq":
                 return new SyntaxTree.Equals(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "strict-equals":
+                return new SyntaxTree.StrictEquals(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
+            case "seq":
+                return new SyntaxTree.StrictEquals(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "greater-than":
-                return new SyntaxTree.GreaterThan(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+                return new SyntaxTree.GreaterThan(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "gt":
                 return new SyntaxTree.GreaterThan(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "lesser-than":
-                return new SyntaxTree.LesserThan(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+                return new SyntaxTree.LesserThan(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "lt":
                 return new SyntaxTree.LesserThan(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "lesser-than-or-equal":
-                return new SyntaxTree.LesserThanOrEqual(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+                return new SyntaxTree.LesserThanOrEqual(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "le":
                 return new SyntaxTree.LesserThanOrEqual(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "greater-than-or-equal":
-                return new SyntaxTree.GreaterThanOrEqual(getValueFromNode(node.getFirstChild().getLastChild()), getValueFromNode(node.getLastChild().getChildNodes().item(1)));
+                return new SyntaxTree.GreaterThanOrEqual(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "ge":
                 return new SyntaxTree.GreaterThanOrEqual(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "and":
+                return new SyntaxTree.And(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
+            case "a1":
+                return new SyntaxTree.And(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "or":
+                return new SyntaxTree.Or(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
+            case "o":
+                return new SyntaxTree.Or(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "bitwise-and":
+                return new SyntaxTree.BitwiseAnd(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
+            case "ba":
+                return new SyntaxTree.BitwiseAnd(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "bitwise-or":
+                return new SyntaxTree.BitwiseOr(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
+            case "bo":
+                return new SyntaxTree.BitwiseOr(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
             case "exitFunction":
             case "ef":
                 return new SyntaxTree.ExitFunction((SyntaxTree.Exit) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);
