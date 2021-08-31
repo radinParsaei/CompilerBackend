@@ -2569,11 +2569,11 @@ public class SyntaxTree {
       }
       if (value instanceof CreateInstance) value = getTextFromInstance(value);
       if (value instanceof Number) {
-        return ~((BigDecimal)value.getData()).intValue();
+        return new Number(~((BigDecimal)value.getData()).intValue());
       } else if (value instanceof Boolean) {
-        return ((boolean)value.getData()? new BigDecimal(-2) : new BigDecimal(-1));
+        return new Number((boolean)value.getData()? new BigDecimal(-2) : new BigDecimal(-1));
       } else if (value instanceof Null) {
-        return -1;
+        return new Number(-1);
       } else {
         Errors.error(ErrorCodes.ERROR_TYPE, "STR in ~");
         return new Null();

@@ -170,6 +170,10 @@ public class XMLToSyntaxTree {
                 return new SyntaxTree.BitwiseOr(getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1)), getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)));
             case "bo":
                 return new SyntaxTree.BitwiseOr(getValueFromNode(node.getFirstChild().getFirstChild()), getValueFromNode(node.getLastChild().getFirstChild()));
+            case "bitwise-not":
+                return new SyntaxTree.BitwiseNot(getValueFromNode(node.getChildNodes().item(1)));
+            case "bn":
+                return new SyntaxTree.BitwiseNot(getValueFromNode(node.getFirstChild()));
             case "exitFunction":
             case "ef":
                 return new SyntaxTree.ExitFunction((SyntaxTree.Exit) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);

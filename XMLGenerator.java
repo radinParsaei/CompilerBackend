@@ -68,10 +68,11 @@ public class XMLGenerator {
             return getTabs(1) + (compressed? "<nl/>":"<null/>");
         } else if (value instanceof SyntaxTree.List) {
             StringBuilder stringBuilder = new StringBuilder(getTabs(1) + (compressed? "<l>":"<list>"));
+            tabCount++;
             for (ValueBase valueBase : (ArrayList<ValueBase>) value.getData()) {
-                stringBuilder.append(compressed? "<d>":"<data>").append(getValueAsXMLString(valueBase)).append(compressed? "</d>":"</data>");
+                stringBuilder.append(compressed? "<d>":getTabs(0) + "<data>").append(getValueAsXMLString(valueBase)).append(compressed? "</d>":getTabs(-1) + "</data>");
             }
-            return stringBuilder + (compressed? "</l>":"</list>");
+            return stringBuilder + (compressed? "</l>":getTabs(-1) + "</list>");
         } else if (value instanceof SyntaxTree.Add) {
             return getTabs(1) + (compressed? "<a><d1>":"<add>" + getTabs(1) + "<data1>") + getValueAsXMLString(((SyntaxTree.Add) value).getV1()) + (compressed? "</d1><d2>":getTabs(-1) + "</data1>" + getTabs(0) + "<data2>") + getValueAsXMLString(((SyntaxTree.Add) value).getV2()) + (compressed? "</d2></a>":getTabs(-1) + "</data2>" + getTabs(-1) +  "</add>");
         } else if (value instanceof SyntaxTree.Sub) {
@@ -104,6 +105,10 @@ public class XMLGenerator {
             return getTabs(1) + (compressed? "<ba><d1>":"<bitwise-and>" + getTabs(1) + "<data1>") + getValueAsXMLString(((SyntaxTree.BitwiseAnd) value).getV1()) + (compressed? "</d1><d2>":getTabs(-1) + "</data1>" + getTabs(0) + "<data2>") + getValueAsXMLString(((SyntaxTree.BitwiseAnd) value).getV2()) + (compressed? "</d2></ba>":getTabs(-1) + "</data2>" + getTabs(-1) + "</bitwise-and>");
         } else if (value instanceof SyntaxTree.BitwiseOr) {
             return getTabs(1) + (compressed? "<bo><d1>":"<bitwise-or>" + getTabs(1) + "<data1>") + getValueAsXMLString(((SyntaxTree.BitwiseOr) value).getV1()) + (compressed? "</d1><d2>":getTabs(-1) + "</data1>" + getTabs(0) + "<data2>") + getValueAsXMLString(((SyntaxTree.BitwiseOr) value).getV2()) + (compressed? "</d2></bo>":getTabs(-1) + "</data2>" + getTabs(-1) + "</bitwise-or>");
+        } else if (value instanceof SyntaxTree.BitwiseNot) {
+            return getTabs(1) + (compressed? "<bn>":"<bitwise-not>") + getValueAsXMLString(((SyntaxTree.BitwiseNot) value).getValue()) + (compressed? "</bn>":getTabs(-1) + "</bitwise-not>");
+        } else if (value instanceof SyntaxTree.Not) {
+            return getTabs(1) + (compressed? "<n1>":"<not>") + getValueAsXMLString(((SyntaxTree.Not) value).getValue()) + (compressed? "</n1>":getTabs(-1) + "</not>");
         } else if (value instanceof SyntaxTree.PrintFunction) {
             String string = getTabs(1) + (compressed? "<pf>":"<printFunction>");
             tabCount++;
