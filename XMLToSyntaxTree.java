@@ -49,12 +49,21 @@ public class XMLToSyntaxTree {
                 }
                 programs.add(new SyntaxTree.Print(valuesArray).setSeparator(separator));
             } else if (node.getNodeName().equals("exit") || node.getNodeName().equals("e")) {
-                ValueBase separator = null;
-                ArrayList<ValueBase> values = new ArrayList<>();
                 Node node1;
                 if (node.getNodeName().equals("p")) node1 = node.getChildNodes().item(0);
                 else node1 = node.getChildNodes().item(1);
                 programs.add(new SyntaxTree.Exit(getValueFromNode(node1)));
+            } else if (node.getNodeName().equals("if") || node.getNodeName().equals("i")) {
+                ValueBase condition;
+                ProgramBase program;
+                if (node.getNodeName().equals("if")) {
+                    condition = getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1));
+                    program = xmlToProgram(node.getChildNodes().item(3).getChildNodes().item(1));
+                } else {
+                    condition = getValueFromNode(node.getFirstChild().getFirstChild());
+                    program = xmlToProgram(node.getLastChild().getFirstChild());
+                }
+                programs.add(new SyntaxTree.If(condition, program));
             } else if (node.getNodeName().equals("executeValue") || node.getNodeName().equals("ev")) {
                 ValueBase value = null;
                 Node node1 = node.getNodeName().equals("ev")? node.getChildNodes().item(0):node.getChildNodes().item(1);

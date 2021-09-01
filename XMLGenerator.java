@@ -38,6 +38,12 @@ public class XMLGenerator {
                 stringBuilder.append(getTabs(0)).append(compressed? "<d>":"<data>").append(getValueAsXMLString(value)).append(getTabs(-1)).append(compressed? "</d>":"</data>");
             }
             stringBuilder.append(getTabs(-1)).append(compressed? "</p>":"</print>");
+        } else if (program instanceof SyntaxTree.If) {
+            stringBuilder.append(getTabs(0)).append(compressed? "<i>":"<if>").append(getTabs(1)).append(compressed? "<c>":"<condition>")
+                    .append(getValueAsXMLString(((SyntaxTree.If) program).getCondition())).append(getTabs(-1)).append(compressed? "</c>":"</condition>")
+                    .append(getTabs(0)).append(compressed? "<p>":"<program>");
+            stringBuilder.append(syntaxTreeToXML(((SyntaxTree.If) program).getProgram())).append(getTabs(-1)).append(compressed? "</p>":"</program>")
+                    .append(getTabs(-1)).append(compressed? "</i>":"</if>");
         } else if (program instanceof SyntaxTree.Exit) {
             stringBuilder.append(getTabs(0)).append(compressed? "<e>":"<exit>")
                     .append(getValueAsXMLString(((SyntaxTree.Exit) program).getStatus()));
