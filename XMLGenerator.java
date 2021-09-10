@@ -42,8 +42,14 @@ public class XMLGenerator {
             stringBuilder.append(getTabs(0)).append(compressed? "<i>":"<if>").append(getTabs(1)).append(compressed? "<c>":"<condition>")
                     .append(getValueAsXMLString(((SyntaxTree.If) program).getCondition())).append(getTabs(-1)).append(compressed? "</c>":"</condition>")
                     .append(getTabs(0)).append(compressed? "<p>":"<program>");
-            stringBuilder.append(syntaxTreeToXML(((SyntaxTree.If) program).getProgram())).append(getTabs(-1)).append(compressed? "</p>":"</program>")
-                    .append(getTabs(-1)).append(compressed? "</i>":"</if>");
+            tabCount++;
+            stringBuilder.append(syntaxTreeToXML(((SyntaxTree.If) program).getProgram())).append(getTabs(-1)).append(compressed? "</p>":"</program>");
+            if (((SyntaxTree.If) program).getElseProgram() != null) {
+                stringBuilder.append(getTabs(0)).append(compressed? "<e>":"<else>");
+                tabCount++;
+                stringBuilder.append(syntaxTreeToXML(((SyntaxTree.If) program).getElseProgram())).append(getTabs(-1)).append(compressed? "</e>":"</else>");
+            }
+            stringBuilder.append(getTabs(-1)).append(compressed? "</i>":"</if>");
         } else if (program instanceof SyntaxTree.Exit) {
             stringBuilder.append(getTabs(0)).append(compressed? "<e>":"<exit>")
                     .append(getValueAsXMLString(((SyntaxTree.Exit) program).getStatus()));
