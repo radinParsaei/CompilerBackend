@@ -66,7 +66,9 @@ public class XMLToSyntaxTree {
                 } else {
                     condition = getValueFromNode(node.getFirstChild().getFirstChild());
                     program = xmlToProgram(node.getChildNodes().item(1).getFirstChild());
-                    elseProgram = xmlToProgram(node.getChildNodes().item(2).getFirstChild());
+                    try {
+                        elseProgram = xmlToProgram(node.getChildNodes().item(2).getFirstChild());
+                    } catch (Exception ignore) {}
                 }
                 SyntaxTree.If _if = new SyntaxTree.If(condition, program);
                 if (elseProgram != null) _if.addElse(elseProgram);
@@ -190,6 +192,10 @@ public class XMLToSyntaxTree {
                 return new SyntaxTree.BitwiseNot(getValueFromNode(node.getChildNodes().item(1)));
             case "bn":
                 return new SyntaxTree.BitwiseNot(getValueFromNode(node.getFirstChild()));
+            case "not":
+                return new SyntaxTree.Not(getValueFromNode(node.getChildNodes().item(1)));
+            case "n1":
+                return new SyntaxTree.Not(getValueFromNode(node.getFirstChild()));
             case "exitFunction":
             case "ef":
                 return new SyntaxTree.ExitFunction((SyntaxTree.Exit) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);
