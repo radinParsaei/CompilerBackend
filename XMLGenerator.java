@@ -50,6 +50,16 @@ public class XMLGenerator {
                 stringBuilder.append(syntaxTreeToXML(((SyntaxTree.If) program).getElseProgram())).append(getTabs(-1)).append(compressed? "</e>":"</else>");
             }
             stringBuilder.append(getTabs(-1)).append(compressed? "</i>":"</if>");
+        } else if (program instanceof SyntaxTree.While) {
+            stringBuilder.append(getTabs(0)).append(compressed? "<w>":"<while>").append(getTabs(1)).append(compressed? "<c>":"<condition>")
+                    .append(getValueAsXMLString(((SyntaxTree.While) program).getCondition())).append(getTabs(-1)).append(compressed? "</c>":"</condition>")
+                    .append(getTabs(0)).append(compressed? "<p>":"<program>");
+            tabCount++;
+            stringBuilder.append(syntaxTreeToXML(((SyntaxTree.While) program).getProgram())).append(getTabs(-1)).append(compressed? "</p>":"</program>");
+            stringBuilder.append(getTabs(-1)).append(compressed? "</w>":"</while>");
+        } else if (program instanceof SyntaxTree.Break
+        ) {
+            stringBuilder.append(compressed? "<br/>":"<break/>");
         } else if (program instanceof SyntaxTree.Exit) {
             stringBuilder.append(getTabs(0)).append(compressed? "<e>":"<exit>")
                     .append(getValueAsXMLString(((SyntaxTree.Exit) program).getStatus()));

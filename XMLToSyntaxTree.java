@@ -73,6 +73,19 @@ public class XMLToSyntaxTree {
                 SyntaxTree.If _if = new SyntaxTree.If(condition, program);
                 if (elseProgram != null) _if.addElse(elseProgram);
                 programs.add(_if);
+            } else if (node.getNodeName().equals("while") || node.getNodeName().equals("w")) {
+                ValueBase condition;
+                ProgramBase program;
+                if (node.getNodeName().equals("while")) {
+                    condition = getValueFromNode(node.getChildNodes().item(1).getChildNodes().item(1));
+                    program = xmlToProgram(node.getChildNodes().item(3).getChildNodes().item(1));
+                } else {
+                    condition = getValueFromNode(node.getFirstChild().getFirstChild());
+                    program = xmlToProgram(node.getChildNodes().item(1).getFirstChild());
+                }
+                programs.add(new SyntaxTree.While(condition, program));
+            } else if (node.getNodeName().equals("break") || node.getNodeName().equals("br")) {
+                programs.add(new SyntaxTree.Break());
             } else if (node.getNodeName().equals("executeValue") || node.getNodeName().equals("ev")) {
                 ValueBase value = null;
                 Node node1 = node.getNodeName().equals("ev")? node.getChildNodes().item(0):node.getChildNodes().item(1);
