@@ -589,7 +589,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase tmp = (ValueBase) variable.getData();
-      new SetVariable(variable.getVariableName(), new Add(tmp, new Number(1))).eval();
+      SetVariable setVariable = new SetVariable(variable.getVariableName(), new Add(tmp, new Number(1)));
+      if (variable.instance != null) setVariable.fromInstance(variable.instance);
+      if (variable.addInstanceName) setVariable.setAddInstanceName(true);
+      setVariable.eval();
       return isPostfix? tmp:variable.getData();
     }
   }
@@ -605,7 +608,10 @@ public class SyntaxTree {
     @Override
     public Object getData() {
       ValueBase tmp = (ValueBase) variable.getData();
-      new SetVariable(variable.getVariableName(), new Sub(tmp, new Number(1))).eval();
+      SetVariable setVariable = new SetVariable(variable.getVariableName(), new Sub(tmp, new Number(1)));
+      if (variable.instance != null) setVariable.fromInstance(variable.instance);
+      if (variable.addInstanceName) setVariable.setAddInstanceName(true);
+      setVariable.eval();
       return isPostfix? tmp:variable.getData();
     }
   }
@@ -2755,9 +2761,17 @@ public class SyntaxTree {
 
   public static class For extends ProgramBase implements java.io.Serializable {
     private final Programs code;
+    private final ProgramBase program;
+    private final ValueBase condition;
+    private final ProgramBase init;
+    private final ProgramBase step;
 
     public For(ValueBase condition, ProgramBase step, ProgramBase init, ProgramBase program) {
       NameSpaces.addCodeBeforeContinue(step);
+      this.program = program;
+      this.condition = condition;
+      this.init = init;
+      this.step = init;
       this.code = NameSpaces.addNameSpaces(nextNameSpace(), new Programs(init, new While(condition, new Programs(program, step))), null);
       NameSpaces.addCodeBeforeContinue(null);
     }
@@ -2769,6 +2783,22 @@ public class SyntaxTree {
 
     public Programs getCode() {
       return code;
+    }
+
+    public ProgramBase getProgram() {
+      return program;
+    }
+
+    public ValueBase getCondition() {
+      return condition;
+    }
+
+    public ProgramBase getInit() {
+      return init;
+    }
+
+    public ProgramBase getStep() {
+      return step;
     }
   }
 

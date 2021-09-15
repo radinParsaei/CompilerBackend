@@ -58,7 +58,10 @@ public class Main {
             new SyntaxTree.SetVariable("l", new SyntaxTree.List(new SyntaxTree.Number(20), new SyntaxTree.Number(10))),
             new SyntaxTree.Print(new SyntaxTree.Insert(new SyntaxTree.Variable("l"), new SyntaxTree.Null(), new SyntaxTree.Number(1))),
             new SyntaxTree.Print(new SyntaxTree.Set(new SyntaxTree.Variable("l"), new SyntaxTree.Boolean(true), new SyntaxTree.Number(1))),
-            new SyntaxTree.Print(new SyntaxTree.Get(new SyntaxTree.Variable("l"), new SyntaxTree.Number(1)))
+            new SyntaxTree.Print(new SyntaxTree.Get(new SyntaxTree.Variable("l"), new SyntaxTree.Number(1))),
+            new SyntaxTree.Print(new SyntaxTree.Text("\n")),
+            new SyntaxTree.SetVariable("msg", new SyntaxTree.Number(0)).fromInstance(new SyntaxTree.Variable("instance")).setAddInstanceName(true),
+            new SyntaxTree.Print(new SyntaxTree.Increase(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("instance")).setAddInstanceName(true), false))
             );
 //    program.eval();
     serializer.serialize("file.ser", program);
@@ -78,6 +81,7 @@ public class Main {
 //    System.out.println("\n");
 //    ProgramBase program_ = new SyntaxTree.Programs(new SyntaxTree.If(new SyntaxTree.Boolean(false), new SyntaxTree.Print(new SyntaxTree.Sub(new SyntaxTree.Add(new SyntaxTree.Number(10), new SyntaxTree.Number(20)), new SyntaxTree.Number(5)), new SyntaxTree.Equals(new SyntaxTree.Pow(new SyntaxTree.Number(2), new SyntaxTree.Number(2)), new SyntaxTree.Mul(new SyntaxTree.Number(2), new SyntaxTree.Number(2))))).addElse(new SyntaxTree.Print(new SyntaxTree.Text("HAHA"))), new SyntaxTree.ExecuteValue(new SyntaxTree.PrintFunction(new SyntaxTree.Print(new SyntaxTree.Null(), new SyntaxTree.List(new SyntaxTree.Number(10), new SyntaxTree.Text("Hello"))))), new SyntaxTree.Print(new SyntaxTree.Text("Hello")));
     ProgramBase program_ = new SyntaxTree.Programs(new SyntaxTree.While(new SyntaxTree.Boolean(true), new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Text("Hello")), new SyntaxTree.Break())));
+    System.out.println();
     String xml = new XMLGenerator().syntaxTreeToXML(program_);
     System.out.println(xml);
     System.out.println("\n");
