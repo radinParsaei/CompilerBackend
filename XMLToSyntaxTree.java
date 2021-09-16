@@ -86,6 +86,11 @@ public class XMLToSyntaxTree {
                 programs.add(new SyntaxTree.While(condition, program));
             } else if (node.getNodeName().equals("break") || node.getNodeName().equals("br")) {
                 programs.add(new SyntaxTree.Break());
+            } else if (node.getNodeName().equals("set-variable") || node.getNodeName().equals("set")) {
+                programs.add(new SyntaxTree.SetVariable(node.getAttributes().getNamedItem(node.getNodeName().equals("set")? "n":"name")
+                        .getNodeValue(), getValueFromNode(node.getNodeName().equals("set")? node.getFirstChild().getFirstChild():node.getChildNodes().item(1).getChildNodes().item(1))));
+            } else if (node.getNodeName().equals("continue") || node.getNodeName().equals("con")) {
+                programs.add(new SyntaxTree.Continue());
             } else if (node.getNodeName().equals("executeValue") || node.getNodeName().equals("ev")) {
                 ValueBase value = null;
                 Node node1 = node.getNodeName().equals("ev")? node.getChildNodes().item(0):node.getChildNodes().item(1);
@@ -212,6 +217,9 @@ public class XMLToSyntaxTree {
             case "exitFunction":
             case "ef":
                 return new SyntaxTree.ExitFunction((SyntaxTree.Exit) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);
+            case "variable":
+            case "v":
+                return new SyntaxTree.Variable(node.getTextContent());
         }
         return new SyntaxTree.Null();
     }

@@ -80,7 +80,7 @@ public class Main {
 //    }
 //    System.out.println("\n");
 //    ProgramBase program_ = new SyntaxTree.Programs(new SyntaxTree.If(new SyntaxTree.Boolean(false), new SyntaxTree.Print(new SyntaxTree.Sub(new SyntaxTree.Add(new SyntaxTree.Number(10), new SyntaxTree.Number(20)), new SyntaxTree.Number(5)), new SyntaxTree.Equals(new SyntaxTree.Pow(new SyntaxTree.Number(2), new SyntaxTree.Number(2)), new SyntaxTree.Mul(new SyntaxTree.Number(2), new SyntaxTree.Number(2))))).addElse(new SyntaxTree.Print(new SyntaxTree.Text("HAHA"))), new SyntaxTree.ExecuteValue(new SyntaxTree.PrintFunction(new SyntaxTree.Print(new SyntaxTree.Null(), new SyntaxTree.List(new SyntaxTree.Number(10), new SyntaxTree.Text("Hello"))))), new SyntaxTree.Print(new SyntaxTree.Text("Hello")));
-    ProgramBase program_ = new SyntaxTree.Programs(new SyntaxTree.While(new SyntaxTree.Boolean(true), new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Text("Hello")), new SyntaxTree.Break())));
+    ProgramBase program_ = new SyntaxTree.Programs(new SyntaxTree.SetVariable("msg", new SyntaxTree.Text("Hello")), new SyntaxTree.While(new SyntaxTree.Boolean(true), new SyntaxTree.Programs(new SyntaxTree.Print(new SyntaxTree.Variable("msg")), new SyntaxTree.Break())));
     System.out.println();
     String xml = new XMLGenerator().syntaxTreeToXML(program_);
     System.out.println(xml);

@@ -57,9 +57,17 @@ public class XMLGenerator {
             tabCount++;
             stringBuilder.append(syntaxTreeToXML(((SyntaxTree.While) program).getProgram())).append(getTabs(-1)).append(compressed? "</p>":"</program>");
             stringBuilder.append(getTabs(-1)).append(compressed? "</w>":"</while>");
-        } else if (program instanceof SyntaxTree.Break
-        ) {
-            stringBuilder.append(compressed? "<br/>":"<break/>");
+        } else if (program instanceof SyntaxTree.Break) {
+            stringBuilder.append(getTabs(0)).append(compressed? "<br/>":"<break/>");
+        } else if (program instanceof SyntaxTree.Continue) {
+            stringBuilder.append(getTabs(0)).append(compressed? "<con/>":"<continue/>");
+        } else if (program instanceof SyntaxTree.SetVariable) {
+            stringBuilder.append(getTabs(0)).append(compressed? "<set n=\"":"<set-variable name=\"")
+                    .append(((SyntaxTree.SetVariable) program).getVariableName()).append("\">")
+                    .append(getTabs(1)).append(compressed? "<v>":"<value>")
+                    .append(getValueAsXMLString(((SyntaxTree.SetVariable) program).getVariableValue()))
+                    .append(getTabs(-1)).append(compressed? "</v>":"</value>")
+                    .append(getTabs(-1)).append(compressed? "</set>":"</set-variable>");
         } else if (program instanceof SyntaxTree.Exit) {
             stringBuilder.append(getTabs(0)).append(compressed? "<e>":"<exit>")
                     .append(getValueAsXMLString(((SyntaxTree.Exit) program).getStatus()));
@@ -82,6 +90,8 @@ public class XMLGenerator {
     private String getValueAsXMLString(ValueBase value) {
         if (value instanceof SyntaxTree.Number) {
             return getTabs(1) + (compressed? "<n>":"<number>") + value.getData() + (compressed? "</n>":"</number>");
+        } else if (value instanceof SyntaxTree.Variable) {
+            return getTabs(1) + (compressed? "<v>":"<variable>") + ((SyntaxTree.Variable) value).getVariableName() + (compressed? "</v>":"</variable>");
         } else if (value instanceof SyntaxTree.Text) {
             return getTabs(1) + "<text data=\"".replace("text", compressed? "t":"text") + value.getData() + "\"/>";
         } else if (value instanceof SyntaxTree.Boolean) {
