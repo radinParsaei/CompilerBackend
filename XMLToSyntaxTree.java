@@ -91,6 +91,21 @@ public class XMLToSyntaxTree {
                         .getNodeValue(), getValueFromNode(node.getNodeName().equals("set")? node.getFirstChild().getFirstChild():node.getChildNodes().item(1).getChildNodes().item(1))));
             } else if (node.getNodeName().equals("continue") || node.getNodeName().equals("con")) {
                 programs.add(new SyntaxTree.Continue());
+            } else if (node.getNodeName().equals("for") || node.getNodeName().equals("f")) {
+                ValueBase condition;
+                ProgramBase step, init, program;
+                if (node.getNodeName().equals("for")) {
+                    init = xmlToProgram(node.getChildNodes().item(1).getChildNodes().item(1));
+                    step = xmlToProgram(node.getChildNodes().item(3).getChildNodes().item(1));
+                    program = xmlToProgram(node.getChildNodes().item(5).getChildNodes().item(1));
+                    condition = getValueFromNode(node.getChildNodes().item(7).getChildNodes().item(1));
+                } else {
+                    init = xmlToProgram(node.getFirstChild().getFirstChild());
+                    step = xmlToProgram(node.getChildNodes().item(1).getFirstChild());
+                    program = xmlToProgram(node.getChildNodes().item(2).getFirstChild());
+                    condition = getValueFromNode(node.getChildNodes().item(3).getFirstChild());
+                }
+                programs.add(new SyntaxTree.For(condition, step, init, program));
             } else if (node.getNodeName().equals("executeValue") || node.getNodeName().equals("ev")) {
                 ValueBase value = null;
                 Node node1 = node.getNodeName().equals("ev")? node.getChildNodes().item(0):node.getChildNodes().item(1);
@@ -220,6 +235,14 @@ public class XMLToSyntaxTree {
             case "variable":
             case "v":
                 return new SyntaxTree.Variable(node.getTextContent());
+            case "increase":
+                return new SyntaxTree.Increase((SyntaxTree.Variable) getValueFromNode(node.getChildNodes().item(1)), node.getAttributes().getNamedItem("is-postfix").getNodeValue().equals("true"));
+            case "in":
+                return new SyntaxTree.Increase((SyntaxTree.Variable) getValueFromNode(node.getFirstChild()), node.getAttributes().getNamedItem("p").getNodeValue().equals("true"));
+            case "decrease":
+                return new SyntaxTree.Decrease((SyntaxTree.Variable) getValueFromNode(node.getChildNodes().item(1)), node.getAttributes().getNamedItem("is-postfix").getNodeValue().equals("true"));
+            case "de":
+                return new SyntaxTree.Decrease((SyntaxTree.Variable) getValueFromNode(node.getFirstChild()), node.getAttributes().getNamedItem("p").getNodeValue().equals("true"));
         }
         return new SyntaxTree.Null();
     }

@@ -581,6 +581,15 @@ public class SyntaxTree {
   public static class Increase extends ValueBase implements java.io.Serializable {
     private final Variable variable;
     private final boolean isPostfix;
+
+    public Variable getVariable() {
+      return variable;
+    }
+
+    public boolean isPostfix() {
+      return isPostfix;
+    }
+
     public Increase(Variable variable, boolean isPostfix) {
       this.variable = variable;
       this.isPostfix = isPostfix;
@@ -600,6 +609,15 @@ public class SyntaxTree {
   public static class Decrease extends ValueBase implements java.io.Serializable {
     private final Variable variable;
     private final boolean isPostfix;
+
+    public Variable getVariable() {
+      return variable;
+    }
+
+    public boolean isPostfix() {
+      return isPostfix;
+    }
+
     public Decrease(Variable variable, boolean isPostfix) {
       this.variable = variable;
       this.isPostfix = isPostfix;
@@ -2771,7 +2789,7 @@ public class SyntaxTree {
       this.program = program;
       this.condition = condition;
       this.init = init;
-      this.step = init;
+      this.step = step;
       this.code = NameSpaces.addNameSpaces(nextNameSpace(), new Programs(init, new While(condition, new Programs(program, step))), null);
       NameSpaces.addCodeBeforeContinue(null);
     }
