@@ -86,6 +86,8 @@ public class XMLToSyntaxTree {
                 programs.add(new SyntaxTree.While(condition, program));
             } else if (node.getNodeName().equals("break") || node.getNodeName().equals("br")) {
                 programs.add(new SyntaxTree.Break());
+            } else if (node.getNodeName().equals("function") || node.getNodeName().equals("fun")) {
+                programs.add(new SyntaxTree.Function(node.getAttributes().getNamedItem(node.getNodeName().equals("fun")? "n":"name").getNodeValue(), xmlToProgram(node.getFirstChild()), node.getAttributes().getNamedItem(node.getNodeName().equals("fun")? "a":"args").getNodeValue().split(",")));
             } else if (node.getNodeName().equals("set-variable") || node.getNodeName().equals("set")) {
                 programs.add(new SyntaxTree.SetVariable(node.getAttributes().getNamedItem(node.getNodeName().equals("set")? "n":"name")
                         .getNodeValue(), getValueFromNode(node.getNodeName().equals("set")? node.getFirstChild().getFirstChild():node.getChildNodes().item(1).getChildNodes().item(1))));
@@ -243,6 +245,24 @@ public class XMLToSyntaxTree {
                 return new SyntaxTree.Decrease((SyntaxTree.Variable) getValueFromNode(node.getChildNodes().item(1)), node.getAttributes().getNamedItem("is-postfix").getNodeValue().equals("true"));
             case "de":
                 return new SyntaxTree.Decrease((SyntaxTree.Variable) getValueFromNode(node.getFirstChild()), node.getAttributes().getNamedItem("p").getNodeValue().equals("true"));
+            case "call-function": {
+                ArrayList<ValueBase> values = new ArrayList<>();
+                for (int i = 1; i < node.getChildNodes().getLength(); i += 2) {
+                    values.add(getValueFromNode(node.getChildNodes().item(i).getChildNodes().item(1)));
+                }
+                ValueBase[] valuesArray = new ValueBase[values.size()];
+                valuesArray = values.toArray(valuesArray);
+                return new SyntaxTree.CallFunction(node.getAttributes().getNamedItem("name").getNodeValue(), valuesArray);
+            }
+            case "c": {
+                ArrayList<ValueBase> values = new ArrayList<>();
+                for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                    values.add(getValueFromNode(node.getChildNodes().item(i).getFirstChild()));
+                }
+                ValueBase[] valuesArray = new ValueBase[values.size()];
+                valuesArray = values.toArray(valuesArray);
+                return new SyntaxTree.CallFunction(node.getAttributes().getNamedItem("n").getNodeValue(), valuesArray);
+            }
         }
         return new SyntaxTree.Null();
     }

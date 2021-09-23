@@ -61,6 +61,21 @@ public class XMLGenerator {
             stringBuilder.append(getTabs(0)).append(compressed? "<br/>":"<break/>");
         } else if (program instanceof SyntaxTree.Continue) {
             stringBuilder.append(getTabs(0)).append(compressed? "<con/>":"<continue/>");
+        } else if (program instanceof SyntaxTree.Function) {
+            stringBuilder.append(getTabs(0)).append(compressed? "<fun n=\"":"<function name=\"")
+                    .append(((SyntaxTree.Function) program).getFunctionName().split(":")[0]).append(compressed? "\" a=\"":"\" args=\"");
+            if (((SyntaxTree.Function) program).getArgs().length > 0) {
+                for (String i : ((SyntaxTree.Function) program).getArgs()) {
+                    stringBuilder.append(i).append(",");
+                }
+                stringBuilder.setCharAt(stringBuilder.length() - 1, '"');
+            } else {
+                stringBuilder.append('"');
+            }
+            stringBuilder.append(">");
+            tabCount++;
+            stringBuilder.append(syntaxTreeToXML(((SyntaxTree.Function) program).getProgram()))
+                    .append(getTabs(-1)).append(compressed? "</fun>":"</function>");
         } else if (program instanceof SyntaxTree.For) {
             stringBuilder.append(getTabs(0)).append(compressed? "<f>":"<for>").append(getTabs(1))
                     .append(compressed? "<i>":"<init>");
@@ -160,6 +175,20 @@ public class XMLGenerator {
             return getTabs(1) + (compressed? "<bn>":"<bitwise-not>") + getValueAsXMLString(((SyntaxTree.BitwiseNot) value).getValue()) + (compressed? "</bn>":getTabs(-1) + "</bitwise-not>");
         } else if (value instanceof SyntaxTree.Not) {
             return getTabs(1) + (compressed? "<n1>":"<not>") + getValueAsXMLString(((SyntaxTree.Not) value).getValue()) + (compressed? "</n1>":getTabs(-1) + "</not>");
+        } else if (value instanceof SyntaxTree.CallFunction) {
+            StringBuilder builder = new StringBuilder();
+            int c = -1;
+            tabCount++;
+            for (ValueBase i : ((SyntaxTree.CallFunction) value).getArgs()) {
+                builder.append(getTabs(1)).append("<arg").append(++c).append(">").append(getValueAsXMLString(i)).append(getTabs(-1)).append("</arg").append(c).append(">");
+                tabCount--;
+            }
+            tabCount--;
+            if (((SyntaxTree.CallFunction) value).getArgs().length > 0) {
+                builder.append(getTabs(1));
+                tabCount--;
+            }
+            return getTabs(1) + (compressed? "<c n=\"":"<call-function name=\"") + ((SyntaxTree.CallFunction) value).getFunctionName() + "\">" + builder + (compressed? "</c>":"</call-function>");
         } else if (value instanceof SyntaxTree.PrintFunction) {
             String string = getTabs(1) + (compressed? "<pf>":"<printFunction>");
             tabCount++;
