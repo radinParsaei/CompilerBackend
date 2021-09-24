@@ -61,6 +61,14 @@ public class XMLGenerator {
             stringBuilder.append(getTabs(0)).append(compressed? "<br/>":"<break/>");
         } else if (program instanceof SyntaxTree.Continue) {
             stringBuilder.append(getTabs(0)).append(compressed? "<con/>":"<continue/>");
+        } else if (program instanceof SyntaxTree.Repeat) {
+            stringBuilder.append(getTabs(0)).append(compressed? "<r>":"<repeat>").append(getTabs(1))
+                    .append(compressed? "<p>":"<program>");
+            tabCount++;
+            stringBuilder.append(syntaxTreeToXML(((SyntaxTree.Repeat) program).getProgram()))
+                    .append(getTabs(-1)).append(compressed? "</p>":"</program>").append(getTabs(0)).append(compressed? "<c>":"<count>")
+                    .append(getValueAsXMLString(((SyntaxTree.Repeat) program).getCount())).append(getTabs(-1))
+                    .append(compressed? "</c>":"</count>").append(getTabs(-1)).append(compressed? "</r>":"</repeat>");
         } else if (program instanceof SyntaxTree.Function) {
             stringBuilder.append(getTabs(0)).append(compressed? "<fun n=\"":"<function name=\"")
                     .append(((SyntaxTree.Function) program).getFunctionName().split(":")[0]).append(compressed? "\" a=\"":"\" args=\"");

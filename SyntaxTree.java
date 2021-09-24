@@ -2968,7 +2968,7 @@ public class SyntaxTree {
           }
         }
       } else {
-        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in If");
+        Errors.error(ErrorCodes.ERROR_TYPE, "STR | BOOL | NULL in Repeat");
       }
     }
   }

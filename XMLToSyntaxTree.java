@@ -93,6 +93,10 @@ public class XMLToSyntaxTree {
                         .getNodeValue(), getValueFromNode(node.getNodeName().equals("set")? node.getFirstChild().getFirstChild():node.getChildNodes().item(1).getChildNodes().item(1))));
             } else if (node.getNodeName().equals("continue") || node.getNodeName().equals("con")) {
                 programs.add(new SyntaxTree.Continue());
+            } else if (node.getNodeName().equals("repeat")) {
+                programs.add(new SyntaxTree.Repeat(getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)), xmlToProgram(node.getChildNodes().item(1).getChildNodes().item(1))));
+            } else if (node.getNodeName().equals("r")) {
+                programs.add(new SyntaxTree.Repeat(getValueFromNode(node.getChildNodes().item(1).getFirstChild()), xmlToProgram(node.getFirstChild().getFirstChild())));
             } else if (node.getNodeName().equals("for") || node.getNodeName().equals("f")) {
                 ValueBase condition;
                 ProgramBase step, init, program;
