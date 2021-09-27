@@ -258,6 +258,10 @@ public class NameSpaces {
             for (ValueBase value1 : ((SyntaxTree.CallFunctionFromPointer) value).getValues()) {
                 addNameSpacesOnValue(nameSpace, value1, declaredVariables);
             }
+        } else if (value instanceof SyntaxTree.Increase) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Increase) value).getVariable(), declaredVariables);
+        } else if (value instanceof SyntaxTree.Decrease) {
+            addNameSpacesOnValue(nameSpace, ((SyntaxTree.Decrease) value).getVariable(), declaredVariables);
         }
     }
 
