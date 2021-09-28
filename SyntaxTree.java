@@ -1164,7 +1164,7 @@ public class SyntaxTree {
         }
         String[] splitInstance = instance.toString().split(":");
         getConfigData().setInstanceName(splitInstance[0]);
-        if (addInstanceName) {
+        if (addInstanceName && !functionName.contains("#C")) {
           functionName = "#C" + splitInstance[1] + "#" + functionName;
         }
       }
