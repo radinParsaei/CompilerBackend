@@ -581,6 +581,11 @@ public class SyntaxTree {
   public static class Increase extends ValueBase implements java.io.Serializable {
     private final Variable variable;
     private final boolean isPostfix;
+    private final SetVariable setVariable;
+
+    public SetVariable getVariableSetter() {
+      return setVariable;
+    }
 
     public Variable getVariable() {
       return variable;
@@ -593,14 +598,13 @@ public class SyntaxTree {
     public Increase(Variable variable, boolean isPostfix) {
       this.variable = variable;
       this.isPostfix = isPostfix;
+      setVariable = new SetVariable(variable.getVariableName(), new Null());
     }
 
     @Override
     public Object getData() {
       ValueBase tmp = (ValueBase) variable.getData();
-      SetVariable setVariable = new SetVariable(variable.getVariableName(), new Add(tmp, new Number(1)));
-      if (variable.instance != null) setVariable.fromInstance(variable.instance);
-      if (variable.addInstanceName) setVariable.setAddInstanceName(true);
+      setVariable.value = new Add(tmp, new Number(1));
       setVariable.eval();
       return isPostfix? tmp:variable.getData();
     }
@@ -609,6 +613,11 @@ public class SyntaxTree {
   public static class Decrease extends ValueBase implements java.io.Serializable {
     private final Variable variable;
     private final boolean isPostfix;
+    private final SetVariable setVariable;
+
+    public SetVariable getVariableSetter() {
+      return setVariable;
+    }
 
     public Variable getVariable() {
       return variable;
@@ -621,14 +630,13 @@ public class SyntaxTree {
     public Decrease(Variable variable, boolean isPostfix) {
       this.variable = variable;
       this.isPostfix = isPostfix;
+      setVariable = new SetVariable(variable.getVariableName(), new Null());
     }
 
     @Override
     public Object getData() {
       ValueBase tmp = (ValueBase) variable.getData();
-      SetVariable setVariable = new SetVariable(variable.getVariableName(), new Sub(tmp, new Number(1)));
-      if (variable.instance != null) setVariable.fromInstance(variable.instance);
-      if (variable.addInstanceName) setVariable.setAddInstanceName(true);
+      setVariable.value = new Sub(tmp, new Number(1));
       setVariable.eval();
       return isPostfix? tmp:variable.getData();
     }
@@ -636,7 +644,7 @@ public class SyntaxTree {
 
   public static class SetVariable extends ProgramBase implements java.io.Serializable {
     private String variableName;
-    private final ValueBase value;
+    private ValueBase value;
     private boolean isDeclaration = false;
     private boolean checkDeclarationInRuntime = false;
     private boolean useInstanceName = false;
