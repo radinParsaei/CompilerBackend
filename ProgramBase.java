@@ -1,4 +1,4 @@
-public class ProgramBase implements java.io.Serializable {
+public class ProgramBase implements java.io.Serializable, Cloneable {
   protected Data data;
 
   public Data getData() {
@@ -15,5 +15,9 @@ public class ProgramBase implements java.io.Serializable {
 
   void eval() {
     //run tasks
+  }
+
+  protected Object clone() throws CloneNotSupportedException {
+    return super.clone();
   }
 }

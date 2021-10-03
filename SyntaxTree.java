@@ -1,5 +1,5 @@
-import java.util.*;
 import java.math.BigDecimal;
+import java.util.*;
 
 public class SyntaxTree {
   public static ValueBase objectToValue(Object object) {
@@ -25,6 +25,7 @@ public class SyntaxTree {
   }
 
   private static final HashMap<String, ValueBase> variables = new HashMap<>();
+  private final static HashMap<String, ProgramBase> classesRawProgram = new HashMap<>();
   public final static ArrayList<String> staticFunctions = new ArrayList<>();
   public final static ArrayList<String> staticParameters = new ArrayList<>();
   public static HashMap<String, ValueBase> getVariables() {
@@ -3083,14 +3084,50 @@ public class SyntaxTree {
     }
   }
 
+  public static ProgramBase[] cloneProgram(ProgramBase... programs) {
+    ProgramBase[] copiedProgram = new ProgramBase[programs.length];
+    for (int i = 0; i < programs.length; i++) {
+      try {
+        copiedProgram[i] = (ProgramBase) programs[i].clone();
+      } catch (CloneNotSupportedException e) {
+        e.printStackTrace();
+      }
+    }
+    return copiedProgram;
+  }
+
+  public static ProgramBase[] deepCopyProgram(ProgramBase... programs) {
+    return (ProgramBase[]) PipedDeepCopy.copy(programs);
+  }
+
   public static class CreateClass extends ProgramBase implements java.io.Serializable {
     private final Programs programs;
     private final String className;
+    public CreateClass(String className, ArrayList<String> parents, ProgramBase... programs) {
+      if (classesParameters.get(className) != null) {
+        Errors.error(ErrorCodes.ERROR_CLASS_REDECLARATION, className);
+      }
+      this.className = className;
+      Programs rawProgram = new Programs(deepCopyProgram(programs));
+      Programs programs1 = new Programs(programs);
+      for (String i : parents) {
+        rawProgram = new Programs(new Programs(classesRawProgram.get(i)), rawProgram);
+        programs1 = new Programs(new Programs(deepCopyProgram(classesRawProgram.get(i))), programs1);
+      }
+      classesRawProgram.put(className, rawProgram);
+      ArrayList<SetVariable> variables = new ArrayList<>();
+      variables.add(new SetVariable("%", new Null()).setIsDeclaration(true));
+      classesParameters.put(className, variables);
+      touchFunctionsFromClass(programs1, className);
+      this.programs = NameSpaces.addNameSpaces("#C" + className + "#", programs1, new ArrayList<String>(Collections.singleton("%")));
+    }
+
     public CreateClass(String className, ProgramBase... programs) {
       if (classesParameters.get(className) != null) {
         Errors.error(ErrorCodes.ERROR_CLASS_REDECLARATION, className);
       }
       this.className = className;
+      classesRawProgram.put(className, new Programs(deepCopyProgram(programs)));
       ArrayList<SetVariable> variables = new ArrayList<>();
       variables.add(new SetVariable("%", new Null()).setIsDeclaration(true));
       classesParameters.put(className, variables);
