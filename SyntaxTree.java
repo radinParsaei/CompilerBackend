@@ -25,7 +25,6 @@ public class SyntaxTree {
   }
 
   private static final HashMap<String, ValueBase> variables = new HashMap<>();
-  private final static HashMap<String, ProgramBase> classesRawProgram = new HashMap<>();
   public final static ArrayList<String> staticFunctions = new ArrayList<>();
   public final static ArrayList<String> staticParameters = new ArrayList<>();
   public static HashMap<String, ValueBase> getVariables() {
@@ -41,6 +40,12 @@ public class SyntaxTree {
   }
   private static final ArrayList<String> classesWithInit = new ArrayList<>();
   private static final ArrayList<String> touchedVariables = new ArrayList<>();
+  private static final HashMap<String, ArrayList<String>> classesParents = new HashMap<>();
+
+  public static HashMap<String, ArrayList<String>> getClassesParents() {
+    return classesParents;
+  }
+
   private static int id = 0;
 
   public static int getId() {
@@ -3084,22 +3089,6 @@ public class SyntaxTree {
     }
   }
 
-  public static ProgramBase[] cloneProgram(ProgramBase... programs) {
-    ProgramBase[] copiedProgram = new ProgramBase[programs.length];
-    for (int i = 0; i < programs.length; i++) {
-      try {
-        copiedProgram[i] = (ProgramBase) programs[i].clone();
-      } catch (CloneNotSupportedException e) {
-        e.printStackTrace();
-      }
-    }
-    return copiedProgram;
-  }
-
-  public static ProgramBase[] deepCopyProgram(ProgramBase... programs) {
-    return (ProgramBase[]) PipedDeepCopy.copy(programs);
-  }
-
   public static class CreateClass extends ProgramBase implements java.io.Serializable {
     private final Programs programs;
     private final String className;
@@ -3108,16 +3097,14 @@ public class SyntaxTree {
         Errors.error(ErrorCodes.ERROR_CLASS_REDECLARATION, className);
       }
       this.className = className;
-      Programs rawProgram = new Programs(deepCopyProgram(programs));
       Programs programs1 = new Programs(programs);
       for (String i : parents) {
-        rawProgram = new Programs(new Programs(classesRawProgram.get(i)), rawProgram);
-        programs1 = new Programs(new Programs(deepCopyProgram(classesRawProgram.get(i))), programs1);
+        programs1 = new Programs(new SetVariable("#P" + i, new Null()).setIsDeclaration(true), programs1);
       }
-      classesRawProgram.put(className, rawProgram);
       ArrayList<SetVariable> variables = new ArrayList<>();
       variables.add(new SetVariable("%", new Null()).setIsDeclaration(true));
       classesParameters.put(className, variables);
+      classesParents.put(className, parents);
       touchFunctionsFromClass(programs1, className);
       this.programs = NameSpaces.addNameSpaces("#C" + className + "#", programs1, new ArrayList<String>(Collections.singleton("%")));
     }
@@ -3127,7 +3114,6 @@ public class SyntaxTree {
         Errors.error(ErrorCodes.ERROR_CLASS_REDECLARATION, className);
       }
       this.className = className;
-      classesRawProgram.put(className, new Programs(deepCopyProgram(programs)));
       ArrayList<SetVariable> variables = new ArrayList<>();
       variables.add(new SetVariable("%", new Null()).setIsDeclaration(true));
       classesParameters.put(className, variables);
@@ -3142,6 +3128,34 @@ public class SyntaxTree {
 
     public String getClassName() {
       return className;
+    }
+  }
+
+  public static class InitParentClass extends ProgramBase implements java.io.Serializable {
+    private final String className;
+    private final CreateInstance instance;
+    private final SetVariable setter;
+    public InitParentClass(String className, CreateInstance instance) {
+      this.className = className;
+      this.instance = instance;
+      this.setter = new SetVariable("#P" + className, instance);
+    }
+
+    public String getClassName() {
+      return className;
+    }
+
+    public CreateInstance getInstance() {
+      return instance;
+    }
+
+    public SetVariable getSetter() {
+      return setter;
+    }
+
+    @Override
+    void eval() {
+      setter.eval();
     }
   }
 
@@ -3364,6 +3378,22 @@ public class SyntaxTree {
 
     public ValueBase fetchValue() {
       return fetchValue.fetch();
+    }
+  }
+
+  public static class Parent extends ValueBase {
+    private final Variable variable;
+    public Parent(String className) {
+      variable = new Variable("#P" + className);
+    }
+
+    public Variable getVariable() {
+      return variable;
+    }
+
+    @Override
+    public Object getData() {
+      return variable.getData();
     }
   }
 }

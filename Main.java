@@ -64,7 +64,7 @@ public class Main {
             new SyntaxTree.Print(new SyntaxTree.Text("\n")),
             new SyntaxTree.SetVariable("msg", new SyntaxTree.Number(0)).fromInstance(new SyntaxTree.Variable("instance")).setAddInstanceName(true),
             new SyntaxTree.Print(new SyntaxTree.Increase(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("instance")).setAddInstanceName(true), false)),
-            new SyntaxTree.CreateClass("ClassTest", new ArrayList<>(Collections.singleton("Test")), new SyntaxTree.Function("printMsg1", new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg")))),
+            new SyntaxTree.CreateClass("ClassTest", new ArrayList<>(Collections.singleton("Test")), new SyntaxTree.Programs(new SyntaxTree.Function("printMsg", new SyntaxTree.Print(new SyntaxTree.Text("Overloaded!"))), new SyntaxTree.Function("printMsg1", new SyntaxTree.Programs(new SyntaxTree.InitParentClass("Test", new SyntaxTree.CreateInstance("Test")), new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg")), new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg").fromInstance(new SyntaxTree.Parent("Test")).setAddInstanceName(true)))))),
             new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg1").fromInstance(new SyntaxTree.CreateInstance("ClassTest")).setAddInstanceName(true))
             );
 //    program.eval();
