@@ -657,6 +657,7 @@ public class SyntaxTree {
     private ValueBase instance = null;
     private boolean addInstanceName = false;
     private boolean isStatic = false;
+    private boolean sameNameExists = false;
 
     public boolean getIsDeclaration() {
       return isDeclaration;
@@ -685,6 +686,7 @@ public class SyntaxTree {
       return this;
     }
     public SetVariable(String variableName, ValueBase value, boolean isDeclaration) {
+      sameNameExists = getVariables().containsKey(variableName);
       this.variableName = variableName;
       this.value = value;
       this.isDeclaration = isDeclaration;
@@ -694,6 +696,7 @@ public class SyntaxTree {
     }
 
     public SetVariable(String variableName, ValueBase value, boolean isDeclaration, boolean checkDeclarationInRuntime) {
+      sameNameExists = getVariables().containsKey(variableName);
       this.variableName = variableName;
       this.value = value;
       this.isDeclaration = isDeclaration;
@@ -706,6 +709,7 @@ public class SyntaxTree {
     }
 
     public SetVariable(String variableName, ValueBase value) {
+      sameNameExists = getVariables().containsKey(variableName);
       this.variableName = variableName;
       this.value = value;
       if (!data.getVariables().containsKey(variableName)) data.getVariables().put(variableName, null);
@@ -757,7 +761,7 @@ public class SyntaxTree {
     }
 
     public SetVariable setVariableName(String variableName) {
-      data.getVariables().remove(this.variableName);
+      if (!sameNameExists) data.getVariables().remove(this.variableName);
       this.variableName = variableName;
       data.getVariables().put(variableName, null);
       return this;
@@ -2635,6 +2639,7 @@ public class SyntaxTree {
     @Override
     void eval() {
       int id = getId();
+      String instanceName = getData().getInstanceName();
       for (ProgramBase program : programs) {
         if (data.isContinued()) {
           break;
@@ -2645,7 +2650,7 @@ public class SyntaxTree {
           break;
         }
         if (id != getId()) break;
-        program.getData().setInstanceName(getData().getInstanceName());
+        program.getData().setInstanceName(instanceName);
         program.eval();
         if (data.isBroken()) break;
         if (data.getReturnedData() != null) break;

@@ -23,6 +23,45 @@ public class NameSpaces {
         if (isFirst) {
             globals = new ArrayList<>();
         }
+        if (program instanceof SyntaxTree.SetVariable && nameSpace.startsWith("#C") && ((SyntaxTree.SetVariable) program).getInstance() == null) {
+            boolean hasVariableInClass = false;
+            boolean publicVariableExists = false;
+            boolean hasVariableInParentClass = false;
+            String parent = null;
+            if (!(((SyntaxTree.SetVariable) program).getInstance() instanceof SyntaxTree.Variable &&
+                    ((SyntaxTree.Variable) ((SyntaxTree.SetVariable) program).getInstance()).getVariableName().equals("%"))) {
+                for (String i : SyntaxTree.getVariables().keySet()) {
+                    if (i.equals(nameSpace + ((SyntaxTree.SetVariable) program).getVariableName())) {
+                        hasVariableInClass = true;
+                    }
+                    if (i.equals(((SyntaxTree.SetVariable) program).getVariableName())) {
+                        publicVariableExists = true;
+                    }
+                    if (SyntaxTree.getClassesParents().containsKey(nameSpace.replace("#C", "").replace("#", ""))) {
+                        for (String j : SyntaxTree.getClassesParents().get(nameSpace.replace("#C", "").replace("#", ""))) {
+                            if (i.equals("#C" + j + "#" + ((SyntaxTree.SetVariable) program).getVariableName())) {
+                                hasVariableInParentClass = true;
+                                parent = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+                hasVariableInClass &= !publicVariableExists;
+                hasVariableInParentClass &= !publicVariableExists;
+                hasVariableInParentClass &= !hasVariableInClass;
+                if (hasVariableInParentClass) {
+                    ((SyntaxTree.SetVariable) program).fromInstance(new SyntaxTree.Parent(parent)).setAddInstanceName(true);
+                    addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) program).getInstance(), declaredVariables);
+                }
+                if (publicVariableExists && !((SyntaxTree.SetVariable) program).getVariableName().contains("%")
+                        && !((SyntaxTree.SetVariable) program).getVariableName().contains("#") && !((SyntaxTree.SetVariable) program).getIsDeclaration()) {
+                    addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) program).getInstance(), declaredVariables);
+                    addNameSpacesOnValue(nameSpace, ((SyntaxTree.SetVariable) program).getVariableValue(), declaredVariables);
+                    return new SyntaxTree.Programs(program);
+                }
+            }
+        }
         if (program instanceof SyntaxTree.SetVariable) {
             if (declarativeVariables) {
                 if (((SyntaxTree.SetVariable) program).getIsDeclaration()) {
@@ -159,35 +198,39 @@ public class NameSpaces {
             }
         }
         if (value instanceof SyntaxTree.Variable && nameSpace.startsWith("#C") && ((SyntaxTree.Variable) value).getInstance() == null) {
-            boolean hasFunctionInClass = false;
-            boolean publicFunctionExists = false;
-            boolean hasFunctionInParentClass = false;
+            boolean hasVariableInClass = false;
+            boolean publicVariableExists = false;
+            boolean hasVariableInParentClass = false;
             String parent = null;
             if (!(((SyntaxTree.Variable) value).getInstance() instanceof SyntaxTree.Variable &&
                     ((SyntaxTree.Variable) ((SyntaxTree.Variable) value).getInstance()).getVariableName().equals("%"))) {
                 for (String i : SyntaxTree.getVariables().keySet()) {
                     if (i.equals(nameSpace + ((SyntaxTree.Variable) value).getVariableName())) {
-                        hasFunctionInClass = true;
+                        hasVariableInClass = true;
                     }
-                    if (i.equals(((SyntaxTree.Variable) value).getVariableName() + ":")) {
-                        publicFunctionExists = true;
+                    if (i.equals(((SyntaxTree.Variable) value).getVariableName())) {
+                        publicVariableExists = true;
                     }
                     if (SyntaxTree.getClassesParents().containsKey(nameSpace.replace("#C", "").replace("#", ""))) {
                         for (String j : SyntaxTree.getClassesParents().get(nameSpace.replace("#C", "").replace("#", ""))) {
                             if (i.equals("#C" + j + "#" + ((SyntaxTree.Variable) value).getVariableName())) {
-                                hasFunctionInParentClass = true;
+                                hasVariableInParentClass = true;
                                 parent = j;
                                 break;
                             }
                         }
                     }
                 }
-                hasFunctionInClass &= !publicFunctionExists;
-                hasFunctionInParentClass &= !publicFunctionExists;
-                hasFunctionInParentClass &= !hasFunctionInClass;
-                if (hasFunctionInParentClass) {
+                hasVariableInClass &= !publicVariableExists;
+                hasVariableInParentClass &= !publicVariableExists;
+                hasVariableInParentClass &= !hasVariableInClass;
+                if (hasVariableInParentClass) {
                     ((SyntaxTree.Variable) value).fromInstance(new SyntaxTree.Parent(parent)).setAddInstanceName(true);
                     addNameSpacesOnValue(nameSpace, ((SyntaxTree.Variable) value).getInstance(), declaredVariables);
+                }
+                if (publicVariableExists && !((SyntaxTree.Variable) value).getVariableName().equals("%")) {
+                    addNameSpacesOnValue(nameSpace, ((SyntaxTree.Variable) value).getInstance(), declaredVariables);
+                    return;
                 }
             }
         }
