@@ -153,6 +153,17 @@ public class SyntaxTree {
     }
 
     @Override
+    public Object getData() {
+      ArrayList<ValueBase> list = (ArrayList<ValueBase>) super.getData();
+      for (int i = 0; i < list.size(); i++) {
+        if (!(list.get(i) instanceof Number || list.get(i) instanceof Text || list.get(i) instanceof Boolean || list.get(i) instanceof Null || list.get(i) instanceof List)) {
+          list.set(i, (ValueBase) list.get(i).getData());
+        }
+      }
+      return super.getData();
+    }
+
+    @Override
     public String toString() {
       StringBuilder stringBuilder = new StringBuilder("[");
       boolean isFirst = true;
