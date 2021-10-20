@@ -810,7 +810,7 @@ public class SyntaxTree {
 
   public static class Function extends ProgramBase implements java.io.Serializable {
     private String functionName;
-    private final ProgramBase program;
+    private ProgramBase program;
     private final String[] args;
     private boolean error = true;
     private boolean isStatic = false;
@@ -836,7 +836,9 @@ public class SyntaxTree {
       this.functionName = finalFunctionName.toString();
       if (data.getFunctions().containsKey(this.functionName)) touchedVariables.add(this.functionName);
       else data.getFunctions().put(this.functionName, null);
-      this.program = NameSpaces.addNameSpaces("#F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
+      this.program = program;
+      program = NameSpaces.addNameSpaces("#F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
+
     }
 
     @Override

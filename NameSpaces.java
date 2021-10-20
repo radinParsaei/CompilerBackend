@@ -83,7 +83,7 @@ public class NameSpaces {
                 } else {
                     if (declaredVariables.contains(((SyntaxTree.SetVariable) program).getVariableName())) {
                         if (nameSpace.startsWith("#C")) ((SyntaxTree.SetVariable) program).setUseInstanceName(!((SyntaxTree.SetVariable) program).getVariableName().startsWith("#F"));
-                        ((SyntaxTree.SetVariable) program).setVariableName(nameSpace + sep + ((SyntaxTree.SetVariable) program).getVariableName());
+                        if (!(nameSpace.startsWith("#F") && ((SyntaxTree.SetVariable) program).getInstance() != null)) ((SyntaxTree.SetVariable) program).setVariableName(nameSpace + sep + ((SyntaxTree.SetVariable) program).getVariableName());
                     }
                 }
             } else {
@@ -228,9 +228,17 @@ public class NameSpaces {
                     ((SyntaxTree.Variable) value).fromInstance(new SyntaxTree.Parent(parent)).setAddInstanceName(true);
                     addNameSpacesOnValue(nameSpace, ((SyntaxTree.Variable) value).getInstance(), declaredVariables);
                 }
-                if (publicVariableExists && !((SyntaxTree.Variable) value).getVariableName().equals("%")) {
+                if (publicVariableExists && !((SyntaxTree.Variable) value).getVariableName().equals("%") && !((SyntaxTree.Variable) value).getVariableName().contains("#F")) {
                     addNameSpacesOnValue(nameSpace, ((SyntaxTree.Variable) value).getInstance(), declaredVariables);
                     return;
+                }
+                if (((SyntaxTree.Variable) value).getVariableName().contains("#F") && nameSpace.startsWith("#C")) {
+                    if (declaredVariables.contains(((SyntaxTree.Variable) value).getVariableName())) {
+                        SyntaxTree.getVariables().remove(((SyntaxTree.Variable) value).getVariableName());
+                        if (nameSpace.startsWith("#C")) ((SyntaxTree.Variable) value).setUseInstanceName(!((SyntaxTree.Variable) value).getVariableName().startsWith("#F"));
+                        if (!(((SyntaxTree.Variable) value).getInstance() instanceof SyntaxTree.Parent)) ((SyntaxTree.Variable) value).setVariableName((nameSpace + sep + ((SyntaxTree.Variable) value).getVariableName()).replace("##F", "#"));
+                    }
+                    addNameSpacesOnValue(nameSpace, ((SyntaxTree.Variable) value).getInstance(), declaredVariables);
                 }
             }
         }
@@ -238,6 +246,9 @@ public class NameSpaces {
             return;
         }
         if (value instanceof SyntaxTree.Variable) {
+//            if (nameSpace.startsWith("#C") && declaredVariables.()) {
+//                System.out.println(((SyntaxTree.Variable) value).getVariableName());
+//            }
             if (declaredVariables.contains(((SyntaxTree.Variable) value).getVariableName())) {
                 if (nameSpace.startsWith("#C")) ((SyntaxTree.Variable) value).setUseInstanceName(!((SyntaxTree.Variable) value).getVariableName().startsWith("#F"));
                 if (!(((SyntaxTree.Variable) value).getInstance() instanceof SyntaxTree.Parent)) ((SyntaxTree.Variable) value).setVariableName(nameSpace + sep + ((SyntaxTree.Variable) value).getVariableName());
