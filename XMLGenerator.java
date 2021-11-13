@@ -71,7 +71,7 @@ public class XMLGenerator {
                     .append(compressed? "</c>":"</count>").append(getTabs(-1)).append(compressed? "</r>":"</repeat>");
         } else if (program instanceof SyntaxTree.Function) {
             stringBuilder.append(getTabs(0)).append(compressed? "<fun n=\"":"<function name=\"")
-                    .append(((SyntaxTree.Function) program).getFunctionName().split(":")[0]).append(compressed? "\" a=\"":"\" args=\"");
+                    .append(((SyntaxTree.Function) program).getFunctionName().split(":")[0].split("#")[((SyntaxTree.Function) program).getFunctionName().split("#").length - 1].replace("<", "#")).append(compressed? "\" a=\"":"\" args=\"");
             if (((SyntaxTree.Function) program).getArgs().length > 0) {
                 for (String i : ((SyntaxTree.Function) program).getArgs()) {
                     stringBuilder.append(i).append(",");
@@ -106,6 +106,12 @@ public class XMLGenerator {
                     .append(getValueAsXMLString(((SyntaxTree.SetVariable) program).getVariableValue()))
                     .append(getTabs(-1)).append(compressed? "</v>":"</value>")
                     .append(getTabs(-1)).append(compressed? "</set>":"</set-variable>");
+        } else if (program instanceof SyntaxTree.CreateClass) {
+            stringBuilder.append(getTabs(0)).append(compressed? "<cl n=\"":"<class name=\"")
+                    .append(((SyntaxTree.CreateClass) program).getClassName()).append("\">");
+            tabCount++;
+            stringBuilder.append(syntaxTreeToXML(((SyntaxTree.CreateClass) program).getPrograms()));
+            stringBuilder.append(getTabs(-1)).append(compressed? "</cl>":"</class>");
         } else if (program instanceof SyntaxTree.Exit) {
             stringBuilder.append(getTabs(0)).append(compressed? "<e>":"<exit>")
                     .append(getValueAsXMLString(((SyntaxTree.Exit) program).getStatus()));
@@ -207,6 +213,20 @@ public class XMLGenerator {
             tabCount++;
             string += syntaxTreeToXML(((SyntaxTree.ExitFunction) value).getProgram()) + getTabs(-1) + (compressed? "</ef>":"</exitFunction>");
             return string;
+        } else if (value instanceof SyntaxTree.CreateInstance) {
+            StringBuilder builder = new StringBuilder();
+            int c = -1;
+            tabCount++;
+            for (ValueBase i : ((SyntaxTree.CreateInstance) value).getArgs()) {
+                builder.append(getTabs(1)).append("<arg").append(++c).append(">").append(getValueAsXMLString(i)).append(getTabs(-1)).append("</arg").append(c).append(">");
+                tabCount--;
+            }
+            tabCount--;
+            if (((SyntaxTree.CreateInstance) value).getArgs().length > 0) {
+                builder.append(getTabs(1));
+                tabCount--;
+            }
+            return getTabs(1) + (compressed? "<ci n=\"":"<createInstance name=\"") + ((SyntaxTree.CreateInstance) value).getClassName() + "\">" + builder + (compressed? "</ci>":"</createInstance>");
         }
         tabCount--;
         return "";

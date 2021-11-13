@@ -87,7 +87,7 @@ public class XMLToSyntaxTree {
             } else if (node.getNodeName().equals("break") || node.getNodeName().equals("br")) {
                 programs.add(new SyntaxTree.Break());
             } else if (node.getNodeName().equals("function") || node.getNodeName().equals("fun")) {
-                programs.add(new SyntaxTree.Function(node.getAttributes().getNamedItem(node.getNodeName().equals("fun")? "n":"name").getNodeValue(), xmlToProgram(node.getFirstChild()), node.getAttributes().getNamedItem(node.getNodeName().equals("fun")? "a":"args").getNodeValue().split(",")));
+                programs.add(new SyntaxTree.Function(node.getAttributes().getNamedItem(node.getNodeName().equals("fun")? "n":"name").getNodeValue().replace("#", "<"), xmlToProgram(node.getFirstChild()), node.getAttributes().getNamedItem(node.getNodeName().equals("fun")? "a":"args").getNodeValue().split(",")));
             } else if (node.getNodeName().equals("set-variable") || node.getNodeName().equals("set")) {
                 programs.add(new SyntaxTree.SetVariable(node.getAttributes().getNamedItem(node.getNodeName().equals("set")? "n":"name")
                         .getNodeValue(), getValueFromNode(node.getNodeName().equals("set")? node.getFirstChild().getFirstChild():node.getChildNodes().item(1).getChildNodes().item(1))));
@@ -97,6 +97,10 @@ public class XMLToSyntaxTree {
                 programs.add(new SyntaxTree.Repeat(getValueFromNode(node.getChildNodes().item(3).getChildNodes().item(1)), xmlToProgram(node.getChildNodes().item(1).getChildNodes().item(1))));
             } else if (node.getNodeName().equals("r")) {
                 programs.add(new SyntaxTree.Repeat(getValueFromNode(node.getChildNodes().item(1).getFirstChild()), xmlToProgram(node.getFirstChild().getFirstChild())));
+            } else if (node.getNodeName().equals("class")) {
+                programs.add(new SyntaxTree.CreateClass(node.getAttributes().getNamedItem("name").getFirstChild().getNodeValue(), xmlToProgram(node.getChildNodes().item(1))));
+            } else if (node.getNodeName().equals("cl")) {
+                programs.add(new SyntaxTree.CreateClass(node.getAttributes().getNamedItem("n").getFirstChild().getNodeValue(), xmlToProgram(node.getFirstChild())));
             } else if (node.getNodeName().equals("for") || node.getNodeName().equals("f")) {
                 ValueBase condition;
                 ProgramBase step, init, program;
@@ -249,6 +253,10 @@ public class XMLToSyntaxTree {
                 return new SyntaxTree.Decrease((SyntaxTree.Variable) getValueFromNode(node.getChildNodes().item(1)), node.getAttributes().getNamedItem("is-postfix").getNodeValue().equals("true"));
             case "de":
                 return new SyntaxTree.Decrease((SyntaxTree.Variable) getValueFromNode(node.getFirstChild()), node.getAttributes().getNamedItem("p").getNodeValue().equals("true"));
+            case "ci":
+                return new SyntaxTree.CreateInstance(node.getAttributes().getNamedItem("n").getNodeValue());
+            case "createInstance":
+                return new SyntaxTree.CreateInstance(node.getAttributes().getNamedItem("name").getNodeValue());
             case "call-function": {
                 ArrayList<ValueBase> values = new ArrayList<>();
                 for (int i = 1; i < node.getChildNodes().getLength(); i += 2) {
