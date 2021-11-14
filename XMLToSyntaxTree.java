@@ -7,6 +7,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class XMLToSyntaxTree {
     private Document loadXMLFromString(String xml) throws Exception {
@@ -89,8 +90,18 @@ public class XMLToSyntaxTree {
             } else if (node.getNodeName().equals("function") || node.getNodeName().equals("fun")) {
                 programs.add(new SyntaxTree.Function(node.getAttributes().getNamedItem(node.getNodeName().equals("fun")? "n":"name").getNodeValue().replace("#", "<"), xmlToProgram(node.getFirstChild()), node.getAttributes().getNamedItem(node.getNodeName().equals("fun")? "a":"args").getNodeValue().split(",")));
             } else if (node.getNodeName().equals("set-variable") || node.getNodeName().equals("set")) {
+                ValueBase instance = null;
+                try {
+                    if (node.getLastChild().getPreviousSibling().getNodeName().equals("instance") || node.getLastChild().getNodeName().equals("instance")) {
+                        if (node.getNodeName().equals("set-variable"))
+                            instance = getValueFromNode(node.getLastChild().getPreviousSibling().getChildNodes().item(1));
+                        else
+                            instance = getValueFromNode(node.getLastChild().getFirstChild());
+                    }
+                } catch (Exception ignored) {}
                 programs.add(new SyntaxTree.SetVariable(node.getAttributes().getNamedItem(node.getNodeName().equals("set")? "n":"name")
-                        .getNodeValue(), getValueFromNode(node.getNodeName().equals("set")? node.getFirstChild().getFirstChild():node.getChildNodes().item(1).getChildNodes().item(1))));
+                        .getNodeValue(), getValueFromNode(node.getNodeName().equals("set")? node.getFirstChild().getFirstChild():node.getChildNodes().item(1).getChildNodes().item(1))).fromInstance(instance).setAddInstanceName(node.getAttributes().getNamedItem(node.getNodeName().equals("set")? "ain":"addInstanceName").getNodeValue().equals("true"))
+                        .setIsDeclaration(node.getAttributes().getNamedItem(node.getNodeName().equals("set")? "d":"declaration").getNodeValue().equals("true")));
             } else if (node.getNodeName().equals("continue") || node.getNodeName().equals("con")) {
                 programs.add(new SyntaxTree.Continue());
             } else if (node.getNodeName().equals("repeat")) {
@@ -242,9 +253,26 @@ public class XMLToSyntaxTree {
             case "exitFunction":
             case "ef":
                 return new SyntaxTree.ExitFunction((SyntaxTree.Exit) ((SyntaxTree.Programs) xmlToProgram(node.getFirstChild())).getPrograms()[0]);
-            case "variable":
-            case "v":
-                return new SyntaxTree.Variable(node.getTextContent());
+            case "variable": {
+                ValueBase instance = null;
+                try {
+                    if (node.getLastChild().getPreviousSibling().getNodeName().equals("instance")) {
+                        instance = getValueFromNode(node.getLastChild().getPreviousSibling().getChildNodes().item(1));
+                    }
+                } catch (Exception ignored) {
+                }
+                return new SyntaxTree.Variable(node.getAttributes().getNamedItem("name").getNodeValue()).fromInstance(instance).setAddInstanceName(node.getAttributes().getNamedItem("addInstanceName").getNodeValue().equals("true"));
+            }
+            case "v": {
+                ValueBase instance = null;
+                try {
+                    if (node.getLastChild().getNodeName().equals("instance")) {
+                        instance = getValueFromNode(node.getLastChild().getFirstChild());
+                    }
+                } catch (Exception ignored) {
+                }
+                return new SyntaxTree.Variable(node.getAttributes().getNamedItem("n").getNodeValue()).fromInstance(instance).setAddInstanceName(node.getAttributes().getNamedItem("ain").getNodeValue().equals("true"));
+            }
             case "increase":
                 return new SyntaxTree.Increase((SyntaxTree.Variable) getValueFromNode(node.getChildNodes().item(1)), node.getAttributes().getNamedItem("is-postfix").getNodeValue().equals("true"));
             case "in":
@@ -253,27 +281,55 @@ public class XMLToSyntaxTree {
                 return new SyntaxTree.Decrease((SyntaxTree.Variable) getValueFromNode(node.getChildNodes().item(1)), node.getAttributes().getNamedItem("is-postfix").getNodeValue().equals("true"));
             case "de":
                 return new SyntaxTree.Decrease((SyntaxTree.Variable) getValueFromNode(node.getFirstChild()), node.getAttributes().getNamedItem("p").getNodeValue().equals("true"));
-            case "ci":
-                return new SyntaxTree.CreateInstance(node.getAttributes().getNamedItem("n").getNodeValue());
-            case "createInstance":
-                return new SyntaxTree.CreateInstance(node.getAttributes().getNamedItem("name").getNodeValue());
-            case "call-function": {
-                ArrayList<ValueBase> values = new ArrayList<>();
-                for (int i = 1; i < node.getChildNodes().getLength(); i += 2) {
-                    values.add(getValueFromNode(node.getChildNodes().item(i).getChildNodes().item(1)));
-                }
-                ValueBase[] valuesArray = new ValueBase[values.size()];
-                valuesArray = values.toArray(valuesArray);
-                return new SyntaxTree.CallFunction(node.getAttributes().getNamedItem("name").getNodeValue(), valuesArray);
-            }
-            case "c": {
+            case "ci": {
                 ArrayList<ValueBase> values = new ArrayList<>();
                 for (int i = 0; i < node.getChildNodes().getLength(); i++) {
                     values.add(getValueFromNode(node.getChildNodes().item(i).getFirstChild()));
                 }
                 ValueBase[] valuesArray = new ValueBase[values.size()];
                 valuesArray = values.toArray(valuesArray);
-                return new SyntaxTree.CallFunction(node.getAttributes().getNamedItem("n").getNodeValue(), valuesArray);
+                return new SyntaxTree.CreateInstance(node.getAttributes().getNamedItem("n").getNodeValue(), valuesArray);
+            }
+            case "createInstance": {
+                ArrayList<ValueBase> values = new ArrayList<>();
+                for (int i = 1; i < node.getChildNodes().getLength(); i += 2) {
+                    values.add(getValueFromNode(node.getChildNodes().item(i).getChildNodes().item(1)));
+                }
+                ValueBase[] valuesArray = new ValueBase[values.size()];
+                valuesArray = values.toArray(valuesArray);
+                return new SyntaxTree.CreateInstance(node.getAttributes().getNamedItem("name").getNodeValue(), valuesArray);
+            }
+            case "call-function": {
+                ArrayList<ValueBase> values = new ArrayList<>();
+                for (int i = 1; i < node.getChildNodes().getLength(); i += 2) {
+                    if (node.getChildNodes().item(i).getNodeName().startsWith("arg"))
+                        values.add(getValueFromNode(node.getChildNodes().item(i).getChildNodes().item(1)));
+                }
+                ValueBase[] valuesArray = new ValueBase[values.size()];
+                valuesArray = values.toArray(valuesArray);
+                ValueBase instance = null;
+                try {
+                    if (node.getLastChild().getPreviousSibling().getNodeName().equals("instance")) {
+                        instance = getValueFromNode(node.getLastChild().getPreviousSibling().getChildNodes().item(1));
+                    }
+                } catch (Exception ignored) {}
+                return new SyntaxTree.CallFunction(node.getAttributes().getNamedItem("name").getNodeValue(), valuesArray).setAddInstanceName(node.getAttributes().getNamedItem("addInstanceName").getNodeValue().equals("true")).fromInstance(instance);
+            }
+            case "c": {
+                ArrayList<ValueBase> values = new ArrayList<>();
+                for (int i = 0; i < node.getChildNodes().getLength(); i++) {
+                    if (node.getChildNodes().item(i).getNodeName().startsWith("arg"))
+                        values.add(getValueFromNode(node.getChildNodes().item(i).getFirstChild()));
+                }
+                ValueBase instance = null;
+                try {
+                    if (node.getLastChild().getNodeName().equals("instance")) {
+                        instance = getValueFromNode(node.getLastChild().getFirstChild());
+                    }
+                } catch (Exception ignored) {}
+                ValueBase[] valuesArray = new ValueBase[values.size()];
+                valuesArray = values.toArray(valuesArray);
+                return new SyntaxTree.CallFunction(node.getAttributes().getNamedItem("n").getNodeValue(), valuesArray).setAddInstanceName(node.getAttributes().getNamedItem("ain").getNodeValue().equals("true")).fromInstance(instance);
             }
         }
         return new SyntaxTree.Null();

@@ -556,7 +556,7 @@ public class SyntaxTree {
     }
 
     public Variable fromInstance(ValueBase value) {
-      useInstanceName = true;
+      if (value != null) useInstanceName = true;
       instance = value;
       return this;
     }
@@ -799,7 +799,7 @@ public class SyntaxTree {
 
     public SetVariable fromInstance(ValueBase instance) {
       this.instance = instance;
-      useInstanceName = true;
+      if (instance != null) useInstanceName = true;
       return this;
     }
 

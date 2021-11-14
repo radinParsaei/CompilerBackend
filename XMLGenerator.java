@@ -101,10 +101,11 @@ public class XMLGenerator {
             stringBuilder.append(getTabs(-1)).append(compressed? "</f>":"</for>");
         } else if (program instanceof SyntaxTree.SetVariable) {
             stringBuilder.append(getTabs(0)).append(compressed? "<set n=\"":"<set-variable name=\"")
-                    .append(((SyntaxTree.SetVariable) program).getVariableName()).append("\">")
+                    .append(((SyntaxTree.SetVariable) program).getVariableName().split("#")[((SyntaxTree.SetVariable) program).getVariableName().split("#").length - 1]).append("\" ")
+                    .append(compressed? "ain=\"":"addInstanceName=\"").append(((SyntaxTree.SetVariable) program).isAddInstanceName()).append("\" ").append(compressed? "d=\"":"declaration=\"").append(((SyntaxTree.SetVariable) program).getIsDeclaration()).append("\">")
                     .append(getTabs(1)).append(compressed? "<v>":"<value>")
                     .append(getValueAsXMLString(((SyntaxTree.SetVariable) program).getVariableValue()))
-                    .append(getTabs(-1)).append(compressed? "</v>":"</value>")
+                    .append(getTabs(-1)).append(compressed? "</v>":"</value>").append(((SyntaxTree.SetVariable) program).getInstance() != null? getTabs(0) + "<instance>" + getValueAsXMLString(((SyntaxTree.SetVariable) program).getInstance()) + getTabs(-1) + "</instance>":"")
                     .append(getTabs(-1)).append(compressed? "</set>":"</set-variable>");
         } else if (program instanceof SyntaxTree.CreateClass) {
             stringBuilder.append(getTabs(0)).append(compressed? "<cl n=\"":"<class name=\"")
@@ -135,7 +136,7 @@ public class XMLGenerator {
         if (value instanceof SyntaxTree.Number) {
             return getTabs(1) + (compressed? "<n>":"<number>") + value.getData() + (compressed? "</n>":"</number>");
         } else if (value instanceof SyntaxTree.Variable) {
-            return getTabs(1) + (compressed? "<v>":"<variable>") + ((SyntaxTree.Variable) value).getVariableName() + (compressed? "</v>":"</variable>");
+            return getTabs(1) + (compressed? "<v n=\"":"<variable name=\"") + ((SyntaxTree.Variable) value).getVariableName().split("#")[((SyntaxTree.Variable) value).getVariableName().split("#").length - 1] + "\" " + (compressed? "ain=\"":"addInstanceName=\"") + ((SyntaxTree.Variable) value).isAddInstanceName() + "\">" + (((SyntaxTree.Variable) value).getInstance() != null? getTabs(1) + "<instance>" + getValueAsXMLString(((SyntaxTree.Variable) value).getInstance()) + getTabs(-1) + "</instance>" + getTabs(-1):"") + (compressed? "</v>":"</variable>");
         } else if (value instanceof SyntaxTree.Increase) {
             return getTabs(1) + (compressed? "<in p=\"":"<increase is-postfix=\"") + ((SyntaxTree.Increase) value).isPostfix() + "\">" + getValueAsXMLString(((SyntaxTree.Increase) value).getVariable()) + getTabs(-1) + (compressed? "</in>":"</increase>");
         } else if (value instanceof SyntaxTree.Decrease) {
@@ -202,7 +203,7 @@ public class XMLGenerator {
                 builder.append(getTabs(1));
                 tabCount--;
             }
-            return getTabs(1) + (compressed? "<c n=\"":"<call-function name=\"") + ((SyntaxTree.CallFunction) value).getFunctionName() + "\">" + builder + (compressed? "</c>":"</call-function>");
+            return getTabs(1) + (compressed? "<c n=\"":"<call-function name=\"") + ((SyntaxTree.CallFunction) value).getFunctionName() + "\" " + (compressed? "ain=\"":"addInstanceName=\"") + ((SyntaxTree.CallFunction) value).isAddInstanceName() + "\">" + builder + (((SyntaxTree.CallFunction) value).getInstance() != null? getTabs(1) + "<instance>" + getValueAsXMLString(((SyntaxTree.CallFunction) value).getInstance()) + getTabs(-1) + "</instance>" + getTabs(-1):"") + (compressed? "</c>":"</call-function>");
         } else if (value instanceof SyntaxTree.PrintFunction) {
             String string = getTabs(1) + (compressed? "<pf>":"<printFunction>");
             tabCount++;
