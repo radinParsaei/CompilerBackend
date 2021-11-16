@@ -9,6 +9,11 @@ public class Analyzer {
     public static final int LIST = 0b00010000;
     public static final int INSTANCE = 0b00100000;
     public static final int UNKNOWN = 0b11111111;
+
+    public static void setFunction(String functionName, ArrayList<ValueBase> returnedValues) {
+        functions.put(functionName, returnedValues);
+    }
+
     private static class Type {
         int type = 0;
         final ArrayList<String> instances = new ArrayList<>();
@@ -24,6 +29,15 @@ public class Analyzer {
 
     static void clear() {
         variables.clear();
+        functions.clear();
+    }
+
+    static boolean functionExists(String functionName) {
+        return functions.containsKey(functionName);
+    }
+
+    static boolean variableExists(String variableName) {
+        return variables.containsKey(variableName);
     }
 
     static void initTypeFromValue(Type type, ValueBase value) {
@@ -96,11 +110,16 @@ public class Analyzer {
                 type.addType(NUMBER);
             }
             type.addType(UNKNOWN);
+        } else if (value instanceof SyntaxTree.CallFunction) {
+            for (ValueBase value1 : functions.get(((SyntaxTree.CallFunction) value).getFunctionName())) {
+                initTypeFromValue(type, value1);
+            }
         } else {
             type.addType(UNKNOWN);
         }
     }
     private static final HashMap<String, Type> variables = new HashMap<>();
+    private static final HashMap<String, ArrayList<ValueBase>> functions = new HashMap<>();
 
     static void setVariable(String variableName, ValueBase value) {
         Type type;

@@ -125,6 +125,9 @@ public class Main {
 //            new SyntaxTree.SetVariable("status", new SyntaxTree.Number(10)),
 //            new SyntaxTree.Exit(new SyntaxTree.Variable("status"))
     );
+    Targets.useAnalyzer = true;
+    new SyntaxTree.Function("test", new SyntaxTree.Programs(new SyntaxTree.If(new SyntaxTree.Boolean(true), new SyntaxTree.Return(new SyntaxTree.Text("Hello"))), new SyntaxTree.Return(new SyntaxTree.Number(10))));
+    System.out.println(Analyzer.matches(new SyntaxTree.CallFunction("test"), Analyzer.NUMBER));
     try {
       JVMTool jvmTool = new JVMTool();
       byte[] out = jvmTool.syntaxTreeToJVMClass(program2, "Test");
