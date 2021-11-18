@@ -10,8 +10,8 @@ public class Analyzer {
     public static final int INSTANCE = 0b00100000;
     public static final int UNKNOWN = 0b11111111;
 
-    public static void setFunction(String functionName, ArrayList<ValueBase> returnedValues) {
-        functions.put(functionName, returnedValues);
+    public static void setFunction(String functionName, int argCount, ArrayList<ValueBase> returnedValues) {
+        functions.put(functionName + ":" + argCount, returnedValues);
     }
 
     private static class Type {
@@ -111,7 +111,7 @@ public class Analyzer {
             }
             type.addType(UNKNOWN);
         } else if (value instanceof SyntaxTree.CallFunction) {
-            for (ValueBase value1 : functions.get(((SyntaxTree.CallFunction) value).getFunctionName())) {
+            for (ValueBase value1 : functions.get(((SyntaxTree.CallFunction) value).getFunctionName() + ":" + ((SyntaxTree.CallFunction) value).getArgs().length)) {
                 initTypeFromValue(type, value1);
             }
         } else {

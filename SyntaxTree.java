@@ -848,8 +848,7 @@ public class SyntaxTree {
       if (data.getFunctions().containsKey(this.functionName)) touchedVariables.add(this.functionName);
       else data.getFunctions().put(this.functionName, null);
       this.program = NameSpaces.addNameSpaces("#F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
-      if (Targets.useAnalyzer) System.out.println(getReturnedValues(this.program));
-      if (Targets.useAnalyzer) Analyzer.setFunction(functionName, getReturnedValues(this.program));
+      if (Targets.useAnalyzer) Analyzer.setFunction(functionName, args.length, getReturnedValues(this.program));
     }
 
     public Function(String functionName, ProgramBase program, String... args) {
@@ -863,7 +862,7 @@ public class SyntaxTree {
       else data.getFunctions().put(this.functionName, null);
       this.program = program;
       program = NameSpaces.addNameSpaces("#F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
-      if (Targets.useAnalyzer) Analyzer.setFunction(functionName, getReturnedValues(this.program));
+      if (Targets.useAnalyzer) Analyzer.setFunction(functionName, args.length, getReturnedValues(this.program));
     }
 
     @Override
