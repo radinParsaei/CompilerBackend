@@ -3,7 +3,6 @@ public class Targets {
     public static final boolean customWhile = false;
     public static final boolean isWeb = false;
     public static final boolean isInThread = false;
-    public static boolean useAnalyzer = false;
 
     public interface CustomWhileInterface {
         boolean run();

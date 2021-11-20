@@ -703,7 +703,6 @@ public class SyntaxTree {
       this.isDeclaration = isDeclaration;
       checkDeclaration();
       if (!data.getVariables().containsKey(variableName)) data.getVariables().put(variableName, null);
-      if (Targets.useAnalyzer) Analyzer.setVariable(variableName, value);
     }
 
     public SetVariable(String variableName, ValueBase value, boolean isDeclaration, boolean checkDeclarationInRuntime) {
@@ -716,7 +715,6 @@ public class SyntaxTree {
         checkDeclaration();
       }
       if (!data.getVariables().containsKey(variableName)) data.getVariables().put(variableName, null);
-      if (Targets.useAnalyzer) Analyzer.setVariable(variableName, value);
     }
 
     public SetVariable(String variableName, ValueBase value) {
@@ -724,7 +722,6 @@ public class SyntaxTree {
       this.variableName = variableName;
       this.value = value;
       if (!data.getVariables().containsKey(variableName)) data.getVariables().put(variableName, null);
-      if (Targets.useAnalyzer) Analyzer.setVariable(variableName, value);
     }
 
     public void checkDeclaration() {
@@ -808,29 +805,6 @@ public class SyntaxTree {
     }
   }
 
-  // check if a program instance contains return
-  static ArrayList<ValueBase> getReturnedValues(ProgramBase program) {
-    ArrayList<ValueBase> returnedValues = new ArrayList<>();
-    if (program instanceof SyntaxTree.Programs) {
-      for (ProgramBase program1 : ((SyntaxTree.Programs) program).getPrograms()) {
-        returnedValues.addAll(getReturnedValues(program1));
-        if (!returnedValues.isEmpty() && !(program1 instanceof If)) return returnedValues;
-      }
-    } else if (program instanceof If) {
-      returnedValues = getReturnedValues(((If) program).getProgram());
-      returnedValues.addAll(getReturnedValues(((If) program).getElseProgram()));
-      return returnedValues;
-    } else if (program instanceof While) {
-      return getReturnedValues(((While) program).getProgram());
-    } else if (program instanceof For) {
-      return getReturnedValues(((For) program).getProgram());
-    } else if (program instanceof Return) {
-      returnedValues.add(((Return) program).getValue());
-      return returnedValues;
-    }
-    return returnedValues;
-  }
-
   public static class Function extends ProgramBase implements java.io.Serializable {
     private String functionName;
     private ProgramBase program;
@@ -848,7 +822,6 @@ public class SyntaxTree {
       if (data.getFunctions().containsKey(this.functionName)) touchedVariables.add(this.functionName);
       else data.getFunctions().put(this.functionName, null);
       this.program = NameSpaces.addNameSpaces("#F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
-      if (Targets.useAnalyzer) Analyzer.setFunction(functionName, args.length, getReturnedValues(this.program));
     }
 
     public Function(String functionName, ProgramBase program, String... args) {
@@ -862,7 +835,6 @@ public class SyntaxTree {
       else data.getFunctions().put(this.functionName, null);
       this.program = program;
       program = NameSpaces.addNameSpaces("#F" + this.functionName, program, new ArrayList<>(Arrays.asList(args)));
-      if (Targets.useAnalyzer) Analyzer.setFunction(functionName, args.length, getReturnedValues(this.program));
     }
 
     @Override

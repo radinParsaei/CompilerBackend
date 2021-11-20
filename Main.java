@@ -116,9 +116,35 @@ public class Main {
       e.printStackTrace();
     }
     System.out.println();
-    Targets.useAnalyzer = true;
-    new SyntaxTree.Function("test", new SyntaxTree.Programs(new SyntaxTree.If(new SyntaxTree.Boolean(true), new SyntaxTree.Return(new SyntaxTree.Text("Hello"))), new SyntaxTree.Return(new SyntaxTree.Number(10))));
-    System.out.println(Analyzer.matches(new SyntaxTree.CallFunction("test"), Analyzer.NUMBER));
+    // test analyzer
+    SyntaxTree.Variable getVariableFromIf = new SyntaxTree.Variable("a");
+    // initiate it with:
+    // var a = 10
+    // if true {
+    //   var a = new Test()
+    //   print(a)
+    // }
+    // func test(a) {
+    //   if true {
+    //     return "Hello"
+    //   }
+    //   return 10
+    // }
+    // func test() {
+    //   if true {
+    //     return "Hello"
+    //   }
+    //   return 10
+    // }
+    // if true return "Hello" return 10 - This means both return statements can occur (we know it will always run the return statement in the if, but this analyzer cannot understand it for now)
+    Analyzer analyzer = new Analyzer(new SyntaxTree.Programs(new SyntaxTree.SetVariable("a", new SyntaxTree.Number(10)).setIsDeclaration(true), new SyntaxTree.If(new SyntaxTree.Boolean(true), new SyntaxTree.Programs(new SyntaxTree.SetVariable("a", new SyntaxTree.CreateInstance("Test")).setIsDeclaration(true), new SyntaxTree.Print(getVariableFromIf))), new SyntaxTree.Programs(new SyntaxTree.Function("test", new SyntaxTree.Programs(new SyntaxTree.If(new SyntaxTree.Boolean(true), new SyntaxTree.Return(new SyntaxTree.Text("Hello"))), new SyntaxTree.Return(new SyntaxTree.Number(10))), "a"), new SyntaxTree.Function("test", new SyntaxTree.Programs(new SyntaxTree.If(new SyntaxTree.Boolean(true), new SyntaxTree.Return(new SyntaxTree.Text("Hello"))), new SyntaxTree.Return(new SyntaxTree.Number(10)))))));
+    System.out.println(analyzer.matches(new SyntaxTree.CallFunction("test"), Analyzer.NUMBER));
+    System.out.println(analyzer.functionExists("test", 0));
+    System.out.println(analyzer.possibleFunctionArgs("test"));
+    System.out.println(analyzer.matches(new SyntaxTree.Variable("a"), Analyzer.NUMBER));
+    System.out.println(analyzer.variableExists("a"));
+    System.out.println(analyzer.matches(getVariableFromIf, Analyzer.NUMBER));
+    System.out.println(analyzer.getPossibleInstanceNames(getVariableFromIf));
     System.out.println("\n\n-----JVMTool Test-----\n\n");
     ProgramBase program2 = new SyntaxTree.Programs(
             new SyntaxTree.Print(new SyntaxTree.Boolean(true), new SyntaxTree.Number(10), new SyntaxTree.Null(), new SyntaxTree.Text("Hello\n")),
