@@ -138,6 +138,14 @@ public class NameSpaces {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Print)program).getSeparator(), declaredVariables);
         } else if (program instanceof SyntaxTree.InitParentClass) {
             addNameSpaces(nameSpace, ((SyntaxTree.InitParentClass)program).getSetter(), declaredVariables);
+        } else if (program instanceof CustomProgram) {
+            for (Object i : ((CustomProgram) program).addNamespaceOn()) {
+                if (i instanceof ProgramBase) {
+                    addNameSpaces(nameSpace, (ProgramBase) i, declaredVariables);
+                } else if (i instanceof ValueBase) {
+                    addNameSpacesOnValue(nameSpace, (ValueBase) i, declaredVariables);
+                }
+            }
         } else if (program instanceof SyntaxTree.Function) {
             if (nameSpace.startsWith("#C")) {
                 ArrayList<String> declaredVariables1 = (ArrayList<String>) declaredVariables.clone();
@@ -371,6 +379,14 @@ public class NameSpaces {
             addNameSpaces(nameSpace, ((SyntaxTree.Decrease) value).getVariableSetter(), declaredVariables);
         } else if (value instanceof SyntaxTree.Parent) {
             addNameSpacesOnValue(nameSpace, ((SyntaxTree.Parent) value).getVariable(), declaredVariables);
+        } else if (value instanceof CustomValue) {
+            for (Object i : ((CustomValue) value).addNamespaceOn()) {
+                if (i instanceof ProgramBase) {
+                    addNameSpaces(nameSpace, (ProgramBase) i, declaredVariables);
+                } else if (i instanceof ValueBase) {
+                    addNameSpacesOnValue(nameSpace, (ValueBase) i, declaredVariables);
+                }
+            }
         }
     }
 
