@@ -692,6 +692,10 @@ public class SyntaxTree {
       return checkDeclarationInRuntime;
     }
 
+    public void setVariableValue(ValueBase value) {
+      this.value = value;
+    }
+
     public SetVariable setCheckDeclarationInRuntime(boolean checkDeclarationInRuntime) {
       this.checkDeclarationInRuntime = checkDeclarationInRuntime;
       return this;
@@ -906,12 +910,14 @@ public class SyntaxTree {
 
     void findFunction() {
       if (functionName.contains(":")) return;
+      boolean aFunctionWithThisNameExists = false;
       programs = new ProgramBase[args.length];
       ArrayList<String> params = new ArrayList<>();
       for (Map.Entry<String, ProgramBase> entry : data.getFunctions().entrySet()) {
         if (entry.getKey().split(":")[0].equals(functionName)) {
           String previousFunctionName = functionName;
           this.functionName = entry.getKey();
+          aFunctionWithThisNameExists = true;
           if (this.functionName.split(":").length > 1) {
             if (this.functionName.split(":")[1].startsWith("N#")) {
               if (!("" + args.length).equals(this.functionName.split(":")[1].substring(2).split("#")[0])) {
@@ -941,10 +947,10 @@ public class SyntaxTree {
           }
         }
       }
-      if (!nativeFunction && params.size() != args.length) {
+      if (!nativeFunction && aFunctionWithThisNameExists && (params.size() != args.length || !functionName.contains(":"))) {
         Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
       }
-      if (!nativeFunction) {
+      if (!nativeFunction && aFunctionWithThisNameExists) {
         int i = 0;
         boolean hasF = true;
         for (ValueBase value : args) {
@@ -1205,16 +1211,16 @@ public class SyntaxTree {
               tmp.put(entry.getKey(), entry.getValue());
           }
         }
-        if (programs != null) {
-          for (ProgramBase program : programs) {
-            program.getData().setInstanceName(getConfigData().getInstanceName());
-            program.eval();
-          }
-        }
         ProgramBase program = data.getFunctions().get(functionName);
         if (program == null) {
           Errors.error(ErrorCodes.ERROR_FUNCTION_DOES_NOT_EXISTS, functionName);
           return new Null();
+        }
+        if (programs != null) {
+          for (ProgramBase program1 : programs) {
+            program1.getData().setInstanceName(getConfigData().getInstanceName());
+            program1.eval();
+          }
         }
         program.setData(getConfigData());
         program.eval();
