@@ -968,6 +968,7 @@ public class SyntaxTree {
           instance = (ValueBase) instance.getData();
         }
         if (instance instanceof Text) {
+          // The function is being called on a string literal (e.g. "Hello".replace("H", "h"))
           String string = (String) instance.getData();
           if (functionName.equals("replace")) {
             if (args.length != 2) {
@@ -1192,6 +1193,12 @@ public class SyntaxTree {
                 return new Null();
               }
             }
+          } else if (functionName.equals("toNumber")) {
+            if (args.length != 0) {
+              Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
+              return new Null();
+            }
+            return new Number(new BigDecimal(string));
           }
           return new Null();
         }
