@@ -19,6 +19,9 @@ public class NameSpaces {
         } else {
             sep = ":";
         }
+        if (declaredVariables.size() > 0 && declaredVariables.get(declaredVariables.size() - 1).equals("%args")) {
+            declaredVariables.set(declaredVariables.size() - 1, "args");
+        }
         boolean isFirst = !declarativeVariables && globals == null;
         if (isFirst) {
             globals = new ArrayList<>();

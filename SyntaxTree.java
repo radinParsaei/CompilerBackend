@@ -911,6 +911,7 @@ public class SyntaxTree {
     void findFunction() {
       if (functionName.contains(":")) return;
       boolean aFunctionWithThisNameExists = false;
+      boolean isVarArg = false;
       programs = new ProgramBase[args.length];
       ArrayList<String> params = new ArrayList<>();
       for (Map.Entry<String, ProgramBase> entry : data.getFunctions().entrySet()) {
@@ -941,19 +942,29 @@ public class SyntaxTree {
               }
             }
           }
-          if (!nativeFunction && (params.size() != args.length)) {
+          if (!nativeFunction && params.size() >= 1 && params.get(params.size() - 1).equals("%args")) {
+            if (params.size() - 1 <= args.length) {
+              int len = params.size();
+              if (len == 0) len = 1;
+              programs = new ProgramBase[len];
+              isVarArg = true;
+              ArrayList<ValueBase> args1 = new ArrayList<>(Arrays.asList(args).subList(params.size() - 1, args.length));
+              programs[params.size() - 1] = new SyntaxTree.SetVariable((!this.functionName.startsWith("#C") ? "#F" : "") + this.functionName + ":args", List.fromArrayList(args1));
+            }
+          } else if (!isVarArg && !nativeFunction && (params.size() != args.length)) {
             this.functionName = previousFunctionName;
             params.clear();
           }
         }
       }
-      if (!nativeFunction && aFunctionWithThisNameExists && (params.size() != args.length || !functionName.contains(":"))) {
+      if (!isVarArg && !nativeFunction && aFunctionWithThisNameExists && (params.size() != args.length || !functionName.contains(":"))) {
         Errors.error(ErrorCodes.ERROR_ARGS_NOT_MATCH, functionName);
       }
       if (!nativeFunction && aFunctionWithThisNameExists) {
         int i = 0;
         boolean hasF = true;
         for (ValueBase value : args) {
+          if (params.get(i).equals("%args")) break;
           if (this.functionName.startsWith("#C")) hasF = false;
           programs[i] = new SyntaxTree.SetVariable((hasF ? "#F" : "") + this.functionName + ":" + params.get(i++), value);
         }

@@ -65,8 +65,10 @@ public class Main {
             new SyntaxTree.SetVariable("msg", new SyntaxTree.Number(0)).fromInstance(new SyntaxTree.Variable("instance")).setAddInstanceName(true),
             new SyntaxTree.Print(new SyntaxTree.Increase(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Variable("instance")).setAddInstanceName(true), false)),
             new SyntaxTree.CreateClass("ClassTest", new ArrayList<>(Collections.singleton("Test")), new SyntaxTree.Programs(new SyntaxTree.Function("printMsg", new SyntaxTree.Print(new SyntaxTree.Text("Overloaded!"))), new SyntaxTree.SetVariable("msg", new SyntaxTree.Text("Changed!!")).setIsDeclaration(true), new SyntaxTree.Function("printMsg1", new SyntaxTree.Programs(new SyntaxTree.InitParentClass("Test", new SyntaxTree.CreateInstance("Test")), new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg")), new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg").fromInstance(new SyntaxTree.Parent("Test")).setAddInstanceName(true)), new SyntaxTree.Print(new SyntaxTree.Variable("msg")), new SyntaxTree.Print(new SyntaxTree.Variable("msg").fromInstance(new SyntaxTree.Parent("Test")).setAddInstanceName(true)))))),
-            new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg1").fromInstance(new SyntaxTree.CreateInstance("ClassTest")).setAddInstanceName(true))
-            );
+            new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("printMsg1").fromInstance(new SyntaxTree.CreateInstance("ClassTest")).setAddInstanceName(true)),
+            new SyntaxTree.Function("vararg", new SyntaxTree.Print(new SyntaxTree.Variable("args")), "%args"),
+            new SyntaxTree.ExecuteValue(new SyntaxTree.CallFunction("vararg", new SyntaxTree.Number(10)))
+    );
 //    program.eval();
     serializer.serialize("file.ser", program);
     serializer.deserialize("file.ser").eval();
